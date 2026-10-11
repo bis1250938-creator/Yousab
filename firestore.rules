@@ -1,0 +1,48 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isOwner() {
+      return request.auth != null
+        && request.auth.token.owner == true
+        && request.auth.token.firebase.sign_in_provider == 'google.com'
+        && request.auth.token.email_verified == true;
+    }
+
+    function validBookingRequest() {
+      let data = request.resource.data;
+      return data.keys().hasAll([
+          'name', 'contact', 'services', 'hours', 'date', 'time',
+          'project', 'total', 'status', 'createdAt'
+        ])
+        && data.keys().hasOnly([
+          'name', 'contact', 'services', 'hours', 'date', 'time',
+          'project', 'total', 'status', 'createdAt'
+        ])
+        && data.name is string && data.name.size() > 0 && data.name.size() <= 100
+        && data.contact is string && data.contact.size() > 0 && data.contact.size() <= 160
+        && data.services is list && data.services.size() > 0 && data.services.size() <= 4
+        && data.services.hasOnly(['recording', 'mixing', 'mastering', 'editing'])
+        && data.hours is int && data.hours >= 0 && data.hours <= 6
+        && data.date is string && data.date.size() == 10
+        && data.time in ['Flexible', 'Morning', 'Afternoon', 'Evening']
+        && data.project is string && data.project.size() <= 500
+        && data.total is int && data.total > 0 && data.total <= 100000
+        && data.status == 'new'
+        && data.createdAt == request.time;
+    }
+
+    match /bookingRequests/{requestId} {
+      allow create: if validBookingRequest();
+      allow get, list: if isOwner();
+      allow update: if isOwner()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+        && request.resource.data.status in ['new', 'contacted', 'confirmed', 'completed', 'cancelled'];
+      allow delete: if isOwner();
+    }
+
+    match /projects/{projectId} {
+      allow get, list: if isOwner() || resource.data.published == true;
+      allow create, update, delete: if isOwner();
+    }
+  }
+}

@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1117">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Your account — YJ Studios</title>
+  <link rel="icon" href="./icons/yj-icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{color-scheme:dark;--bg:#0b1117;--panel:#121b23;--line:#263842;--text:#eef5f7;--muted:#9aabb2;--cyan:#72e1ef;--green:#8ee2bb;--sans:'DM Sans',sans-serif;--display:'Manrope',sans-serif}
+    *{box-sizing:border-box}body{min-height:100vh;margin:0;background:radial-gradient(ellipse at 50% 8%,#17404a55,transparent 45%),var(--bg);color:var(--text);font:14px var(--sans);-webkit-font-smoothing:antialiased}a{color:inherit;text-decoration:none}button{font:inherit;cursor:pointer}.wrap{width:min(1000px,100% - 40px);margin:auto;padding:28px 0 56px}.top{display:flex;justify-content:space-between;align-items:center;gap:14px;padding-bottom:20px;border-bottom:1px solid var(--line)}.brand{display:flex;align-items:center;gap:10px}.brand img{width:40px;height:40px;border:1px solid #56d1df;border-radius:50%;object-fit:cover}.brand strong{display:block;font:800 11px var(--display);letter-spacing:.15em}.brand small{display:block;margin-top:4px;color:var(--muted);font-size:8px;letter-spacing:.13em;text-transform:uppercase}.signout,.button{min-height:40px;padding:0 13px;border:1px solid #42616b;background:transparent;color:var(--text);font-size:11px}.signout:hover,.button:hover{border-color:var(--cyan);color:var(--cyan)}main{padding-top:clamp(42px,8vw,84px)}.eyebrow{color:var(--cyan);font-size:9px;letter-spacing:.2em;text-transform:uppercase}h1{margin:11px 0 8px;font:600 clamp(30px,6vw,48px)/1.1 var(--display);letter-spacing:-.06em}.lead{max-width:620px;margin:0;color:var(--muted);font-size:13px;line-height:1.8}.grid{display:grid;grid-template-columns:1.2fr .8fr;gap:15px;margin-top:30px}.panel{padding:22px;border:1px solid var(--line);background:linear-gradient(145deg,#15212a,#10171d)}.panel h2{margin:0 0 11px;font:600 16px var(--display)}.panel p{margin:0;color:var(--muted);font-size:11px;line-height:1.8}.identity{display:flex;align-items:center;gap:13px;margin-top:22px;padding-top:18px;border-top:1px solid var(--line)}.avatar{width:48px;height:48px;display:grid;place-items:center;overflow:hidden;border-radius:50%;background:#17343b;color:var(--cyan);font-weight:700}.avatar img{width:100%;height:100%;object-fit:cover}.identity strong{display:block;font-size:12px}.identity small{display:block;margin-top:4px;color:var(--muted);font-size:10px}.verified{display:inline-flex;align-items:center;gap:6px;margin-top:9px;color:var(--green);font-size:9px}.verified i{width:6px;height:6px;border-radius:50%;background:var(--green)}.button{display:inline-flex;align-items:center;justify-content:center;margin-top:17px;background:#12262b}.status{min-height:22px;margin-top:20px;color:var(--muted);font-size:10px;line-height:1.6}.skeleton{max-width:460px;padding:30px;border:1px solid var(--line);color:var(--muted);font-size:12px}.footer{margin-top:55px;color:#809199;font-size:9px}.footer a{color:var(--cyan)}button:focus-visible,a:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}@media(max-width:700px){.wrap{width:calc(100% - 28px);padding-top:16px}.grid{grid-template-columns:1fr}.top{align-items:flex-start}.panel{padding:18px}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="top"><a class="brand" href="./index.html"><img src="./yj-studios-logo.jpg" alt=""><span><strong>YJ STUDIOS</strong><small>Sound engineering & recording</small></span></a><button class="signout" id="sign-out" type="button" hidden>Sign out</button></header>
+    <main>
+      <section id="loading" class="skeleton" role="status" aria-live="polite">Checking your secure account session…</section>
+      <section id="account-content" hidden aria-labelledby="account-title">
+        <div class="eyebrow">Your account</div>
+        <h1 id="account-title">Welcome back<span id="name-ending"></span>.</h1>
+        <p class="lead">Your YJ Studios account is ready. Your verified Google identity is available when you contact the studio; session requests are sent through the public booking form.</p>
+        <div class="grid">
+          <article class="panel">
+            <h2>Account details</h2>
+            <p>This account uses Google sign-in. Your session is securely remembered in this browser and can be restored after a refresh.</p>
+            <div class="identity"><span class="avatar" id="avatar">Y</span><span><strong id="display-name">YJ Studios member</strong><small id="email-address"></small><span class="verified"><i></i> Google account verified</span></span></div>
+          </article>
+          <article class="panel">
+            <h2>Book studio time</h2>
+            <p>Explore the studio’s audio and video work, review the rates, and send a session request. The Owner will confirm availability with you.</p>
+            <a class="button" href="./index.html#book">View services & request a session ↗</a>
+          </article>
+        </div>
+        <p class="status" id="session-status" role="status" aria-live="polite">Signed in securely.</p>
+        <div class="footer">Owner tools are restricted to the trusted studio role. <a href="./index.html">Return to YJ Studios</a></div>
+      </section>
+    </main>
+  </div>
+  <script type="module">
+    window.addEventListener('pageshow', (event) => { if (event.persisted) location.reload(); });
+    window.addEventListener('pagehide', () => { document.getElementById('account-content').hidden = true; });
+    const loading = document.getElementById('loading');
+    const content = document.getElementById('account-content');
+    const signOutButton = document.getElementById('sign-out');
+    const status = document.getElementById('session-status');
+    let authApi, flow, auth;
+    let routedUid = '';
+    try {
+      [authApi, flow, { auth }] = await Promise.all([
+        import('https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js'),
+        import('./auth-flow.mjs'),
+        import('./firebase-client.js')
+      ]);
+      await authApi.setPersistence(auth, authApi.indexedDBLocalPersistence);
+      authApi.onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+          location.replace('./auth.html?mode=signin');
+          return;
+        }
+        if (routedUid === user.uid) return;
+        routedUid = user.uid;
+        try {
+          const tokenResult = await authApi.getIdTokenResult(user, true);
+          const destination = flow.getAuthenticatedDestination(user, tokenResult);
+          if (destination === 'dashboard.html') {
+            location.replace('./dashboard.html');
+            return;
+          }
+          document.getElementById('display-name').textContent = user.displayName || 'YJ Studios member';
+          document.getElementById('email-address').textContent = user.email || '';
+          document.getElementById('name-ending').textContent = user.displayName ? `, ${user.displayName.split(/\s+/)[0]}` : '';
+          const avatar = document.getElementById('avatar');
+          avatar.textContent = (user.displayName || user.email || 'Y').trim().charAt(0).toUpperCase();
+          if (user.photoURL) {
+            try {
+              const imageUrl = new URL(user.photoURL);
+              if (imageUrl.protocol === 'https:' && (imageUrl.hostname === 'googleusercontent.com' || imageUrl.hostname.endsWith('.googleusercontent.com'))) {
+                const image = document.createElement('img');
+                image.alt = '';
+                image.addEventListener('load', () => avatar.replaceChildren(image), { once: true });
+                image.src = imageUrl.href;
+              }
+            } catch {}
+          }
+          loading.hidden = true;
+          content.hidden = false;
+          signOutButton.hidden = false;
+        } catch (error) {
+          routedUid = '';
+          await authApi.signOut(auth).catch(() => {});
+          loading.textContent = `Your session could not be verified. ${flow.googleAuthErrorMessage(error, { hostname: location.hostname })}`;
+        }
+      });
+      signOutButton.addEventListener('click', async () => {
+        signOutButton.disabled = true;
+        status.textContent = 'Signing out…';
+        try { await authApi.signOut(auth); location.replace('./index.html'); }
+        catch (error) { signOutButton.disabled = false; status.textContent = flow.googleAuthErrorMessage(error, { hostname: location.hostname }); }
+      });
+    } catch (error) {
+      loading.textContent = location.protocol === 'file:'
+        ? 'Open the published HTTPS site or use VS Code Live Server to restore your account.'
+        : `Your account could not be loaded. ${String(error?.message || 'Check Firebase settings and internet access.')}`;
+    }
+  </script>
+</body>
+</html>

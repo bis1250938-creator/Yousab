@@ -1,0 +1,20 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    function isOwner() {
+      return request.auth != null
+        && request.auth.token.owner == true
+        && request.auth.token.firebase.sign_in_provider == 'google.com'
+        && request.auth.token.email_verified == true;
+    }
+
+    match /portfolio/{ownerUid}/{projectId}/{fileName} {
+      allow read: if true;
+      allow create, update: if isOwner()
+        && ownerUid == request.auth.uid
+        && request.resource.size <= 250 * 1024 * 1024
+        && request.resource.contentType.matches('(audio|video|image)/.*');
+      allow delete: if isOwner() && ownerUid == request.auth.uid;
+    }
+  }
+}

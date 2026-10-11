@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1117">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Sign in — YJ Studios</title>
+  <link rel="icon" href="./icons/yj-icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{color-scheme:dark;--bg:#0b1117;--panel:#121b23;--line:#263842;--text:#eef5f7;--muted:#9aabb2;--cyan:#72e1ef;--orange:#ffd18f;--sans:'DM Sans',sans-serif;--display:'Manrope',sans-serif}
+    *{box-sizing:border-box}body{min-height:100vh;margin:0;display:grid;place-items:center;padding:22px;background:radial-gradient(ellipse at 50% 8%,#17404a66,transparent 45%),var(--bg);color:var(--text);font:14px var(--sans);-webkit-font-smoothing:antialiased}a{color:inherit;text-decoration:none}button{font:inherit;cursor:pointer}.card{width:min(440px,100%);padding:clamp(24px,6vw,42px);border:1px solid var(--line);background:linear-gradient(155deg,#16232b,#10171d);box-shadow:0 28px 100px #0008}.brand{display:flex;align-items:center;gap:12px;margin-bottom:36px}.brand img{width:48px;height:48px;border:1px solid #56d1df;border-radius:50%;object-fit:cover}.brand strong{display:block;font:800 13px var(--display);letter-spacing:.15em}.brand small{display:block;margin-top:5px;color:var(--muted);font-size:9px;letter-spacing:.14em;text-transform:uppercase}.eyebrow{color:var(--cyan);font-size:9px;letter-spacing:.2em;text-transform:uppercase}h1{margin:12px 0 8px;font:600 clamp(26px,7vw,34px)/1.15 var(--display);letter-spacing:-.05em}#intro{margin:0;color:var(--muted);font-size:12px;line-height:1.75}.google{width:100%;min-height:48px;margin-top:24px;display:flex;align-items:center;justify-content:center;gap:12px;border:1px solid #d7d9dd;border-radius:4px;background:#fff;color:#202124;font:600 14px Arial,sans-serif}.google:hover{background:#f4f7fc}.google:disabled{opacity:.6;cursor:wait}.google svg{width:19px;height:19px}.switch{margin:18px 0 0;text-align:center;color:var(--muted);font-size:11px}.switch button{padding:3px;border:0;background:transparent;color:var(--cyan);font-size:11px;text-decoration:underline;text-underline-offset:3px}.status{min-height:40px;margin:16px 0 0;color:var(--orange);font-size:11px;line-height:1.6}.fine-print{margin-top:20px;padding-top:17px;border-top:1px solid var(--line);color:#82939b;font-size:10px;line-height:1.7}.back{display:inline-block;margin-top:22px;color:var(--cyan);font-size:11px}button:focus-visible,a:focus-visible{outline:2px solid var(--cyan);outline-offset:3px}
+  </style>
+</head>
+<body>
+  <main class="card" aria-labelledby="title">
+    <a class="brand" href="./index.html"><img src="./yj-studios-logo.jpg" alt=""><span><strong>YJ STUDIOS</strong><small>Sound engineering & recording</small></span></a>
+    <div class="eyebrow">Your studio account</div>
+    <h1 id="title">Welcome to YJ Studios</h1>
+    <p id="intro">Sign in to your YJ Studios account or create one. Your verified Google identity is ready when you contact the studio; session requests are sent through the booking form.</p>
+    <button class="google" id="google-action" type="button" disabled>
+      <svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.75 7.18l7.73 6C44.43 37.88 46.98 31.7 46.98 24.55z"/><path fill="#FBBC05" d="M10.54 28.41A14.43 14.43 0 0 1 9.8 24c0-1.53.26-3.01.74-4.41l-7.98-6.19A23.91 23.91 0 0 0 0 24c0 3.86.93 7.5 2.56 10.6l7.98-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.92-2.13 15.89-5.8l-7.73-6c-2.15 1.45-4.91 2.3-8.16 2.3-6.26 0-11.57-4.22-13.46-9.9l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+      <span id="action-label">Continue with Google</span>
+    </button>
+    <p class="switch"><span id="switch-text">New to YJ Studios?</span> <button id="mode-toggle" type="button">Create an account</button></p>
+    <p class="status" id="status" role="status" aria-live="polite">Loading secure sign-in…</p>
+    <div class="fine-print">Google handles your password on its own secure sign-in page. YJ Studios never sees or stores your Google password. Use the same account on each device.</div>
+    <a class="back" href="./index.html">← Back to the studio</a>
+  </main>
+  <script type="module">
+    const button = document.getElementById('google-action');
+    const status = document.getElementById('status');
+    const toggle = document.getElementById('mode-toggle');
+    const actionLabel = document.getElementById('action-label');
+    const title = document.getElementById('title');
+    const intro = document.getElementById('intro');
+    const switchText = document.getElementById('switch-text');
+    let mode = new URLSearchParams(location.search).get('mode') === 'signup' ? 'signup' : 'signin';
+    let authActionPending = false;
+    let auth, authApi, flow;
+
+    function renderMode() {
+      const signingUp = mode === 'signup';
+      document.title = `${signingUp ? 'Create account' : 'Sign in'} — YJ Studios`;
+      title.textContent = signingUp ? 'Create your account' : 'Welcome to YJ Studios';
+      intro.textContent = signingUp
+        ? 'Create your YJ Studios account with Google. Owner permissions are assigned separately by the studio administrator.'
+        : 'Sign in to your YJ Studios account or create one. Your verified Google identity is ready when you contact the studio; session requests are sent through the booking form.';
+      actionLabel.textContent = signingUp ? 'Sign up with Google' : 'Sign in with Google';
+      switchText.textContent = signingUp ? 'Already have an account?' : 'New to YJ Studios?';
+      toggle.textContent = signingUp ? 'Sign in' : 'Create an account';
+      try { history.replaceState(null, '', `${location.pathname}?mode=${mode}`); } catch {}
+    }
+    toggle.addEventListener('click', () => {
+      mode = mode === 'signup' ? 'signin' : 'signup';
+      renderMode();
+      status.textContent = '';
+    });
+
+    function describeOutcome(outcome) {
+      if (outcome === 'not-registered') return 'No account was found. Choose “Create an account” first, then try again.';
+      if (outcome === 'already-registered') return 'This Google account already has a YJ Studios account. Choose “Sign in” instead.';
+      if (outcome === 'cleanup-failed') return 'Sign-in was cancelled safely, but Firebase could not remove its temporary account. Contact the studio administrator before retrying.';
+      return 'Google did not return a valid account. Please try again.';
+    }
+    async function routeUser(user) {
+      const tokenResult = await authApi.getIdTokenResult(user, true);
+      const destination = flow.getAuthenticatedDestination(user, tokenResult);
+      location.replace(`./${destination}`);
+    }
+    async function processCredential(result, intent) {
+      const decision = await flow.resolveGoogleAuthResult({
+        result, intent, auth,
+        api: { getAdditionalUserInfo: authApi.getAdditionalUserInfo, deleteUser: authApi.deleteUser, signOut: authApi.signOut }
+      });
+      if (decision.status !== 'authenticated') {
+        authActionPending = false;
+        status.textContent = describeOutcome(decision.status);
+        button.disabled = false;
+        toggle.disabled = false;
+        return;
+      }
+      status.textContent = 'Checking your secure account…';
+      try { await routeUser(decision.user); }
+      catch (error) {
+        authActionPending = false;
+        await authApi.signOut(auth).catch(() => {});
+        status.textContent = flow.googleAuthErrorMessage(error, { hostname: location.hostname });
+        button.disabled = false;
+        toggle.disabled = false;
+      }
+    }
+
+    try {
+      [authApi, flow, { auth }] = await Promise.all([
+        import('https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js'),
+        import('./auth-flow.mjs'),
+        import('./firebase-client.js')
+      ]);
+      await authApi.setPersistence(auth, authApi.indexedDBLocalPersistence);
+      status.textContent = 'Your session is stored securely on this device.';
+      let hadRedirectIntent = false;
+      try { hadRedirectIntent = sessionStorage.getItem(flow.AUTH_INTENT_KEY) !== null; } catch {}
+      const savedIntent = flow.consumeAuthIntent(sessionStorage);
+      try {
+        const redirectResult = await authApi.getRedirectResult(auth);
+        if (redirectResult) {
+          authActionPending = true;
+          button.disabled = true;
+          toggle.disabled = true;
+          await processCredential(redirectResult, flow.normalizeAuthIntent(savedIntent));
+        } else if (hadRedirectIntent) {
+          await authApi.signOut(auth).catch(() => {});
+          status.textContent = 'Google sign-in was cancelled or did not return a result. Please try again.';
+        }
+      } catch (error) {
+        if (hadRedirectIntent) await authApi.signOut(auth).catch(() => {});
+        status.textContent = flow.googleAuthErrorMessage(error, { hostname: location.hostname });
+      }
+
+      const provider = new authApi.GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: 'select_account' });
+      button.addEventListener('click', async () => {
+        const intent = mode;
+        button.disabled = true;
+        toggle.disabled = true;
+        authActionPending = true;
+        status.textContent = 'Connecting securely to Google…';
+        try {
+          if (window.matchMedia('(max-width: 680px)').matches) {
+            if (!flow.saveAuthIntent(sessionStorage, intent)) throw Object.assign(new Error('Allow session storage to continue.'), { code: 'auth/web-storage-unsupported' });
+            await authApi.signInWithRedirect(auth, provider);
+            return;
+          }
+          try { sessionStorage.removeItem(flow.AUTH_INTENT_KEY); } catch {}
+          const result = await authApi.signInWithPopup(auth, provider);
+          await processCredential(result, intent);
+        } catch (error) {
+          authActionPending = false;
+          try { sessionStorage.removeItem(flow.AUTH_INTENT_KEY); } catch {}
+          status.textContent = flow.googleAuthErrorMessage(error, { hostname: location.hostname });
+          button.disabled = false;
+          toggle.disabled = false;
+        }
+      });
+
+      authApi.onAuthStateChanged(auth, async (user) => {
+        if (authActionPending) return;
+        if (!user) {
+          button.disabled = false;
+          toggle.disabled = false;
+          return;
+        }
+        authActionPending = true;
+        status.textContent = 'Restoring your secure session…';
+        try { await routeUser(user); }
+        catch (error) {
+          await authApi.signOut(auth).catch(() => {});
+          authActionPending = false;
+          status.textContent = flow.googleAuthErrorMessage(error, { hostname: location.hostname });
+          button.disabled = false;
+          toggle.disabled = false;
+        }
+      });
+    } catch (error) {
+      button.disabled = true;
+      status.textContent = String(error?.message || '').includes('exact authDomain and projectId')
+        ? 'Secure sign-in is not configured. Check the Firebase Web app settings in firebase-config.js.'
+        : location.protocol === 'file:'
+          ? 'Google sign-in needs HTTPS. Publish the site or open it with VS Code Live Server.'
+          : 'Secure sign-in could not load. Check the Firebase configuration and your internet connection.';
+      console.error('YJ Studios authentication could not initialize:', error);
+    }
+    renderMode();
+  </script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+[
+  {
+    "origin": [
+      "https://yjstudio.com",
+      "https://www.yjstudio.com",
+      "http://localhost:5500",
+      "http://127.0.0.1:5500"
+    ],
+    "method": ["GET", "HEAD"],
+    "responseHeader": ["Content-Type", "Content-Length", "Content-Range", "Accept-Ranges"],
+    "maxAgeSeconds": 3600
+  }
+]
