@@ -1,0 +1,1080 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#090b0e">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="YJ Studios">
+  <meta name="description" content="Book recording at YJ Studios for 500 EGP per hour. Mixing, mastering and editing are 1,000 EGP each. Explore the portfolio and request a session.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="YJ Studios | Recording & Sound Engineering">
+  <meta property="og:description" content="Recording, mixing, mastering and editing. Clear rates, selected work, and a simple session request.">
+  <meta property="og:url" content="https://yjstudio.com/">
+  <meta property="og:image" content="https://yjstudio.com/yj-studios-logo.jpg">
+  <link rel="canonical" href="https://yjstudio.com/">
+  <title>YJ Studios | Recording, Mixing & Sound Engineering</title>
+  <link rel="manifest" href="./site.webmanifest">
+  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+  <script>if (location.hash === '#dashboard') location.replace('./dashboard.html');</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: dark;
+      --ink: #090b0e;
+      --panel: #101419;
+      --panel-2: #141a20;
+      --line: rgba(232, 242, 248, .11);
+      --muted: #9ba5ad;
+      --white: #f3f6f7;
+      --cyan: #61e6f6;
+      --cyan-2: #a0f4fb;
+      --green: #7de5bd;
+      --sans: 'DM Sans', sans-serif;
+      --display: 'Manrope', sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 96px; }
+    body { margin: 0; background: var(--ink); color: var(--white); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
+    a { color: inherit; text-decoration: none; }
+    button, input, select, textarea { font: inherit; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    ::selection { color: var(--ink); background: var(--cyan); }
+    .shell { width: min(1160px, calc(100% - 56px)); margin: 0 auto; }
+    .topbar { position: sticky; top: 0; z-index: 10; height: 78px; border-bottom: 1px solid rgba(255,255,255,.07); background: rgba(9,11,14,.84); backdrop-filter: blur(18px); }
+    .nav { height: 100%; display: flex; align-items: center; justify-content: space-between; }
+    .brand { display: inline-flex; align-items: center; gap: 11px; min-width: 185px; }
+    .brand img { display: block; width: 43px; height: 43px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(97,230,246,.65); box-shadow: 0 0 20px rgba(67,222,245,.18); }
+    .brand-lockup { display: grid; gap: 1px; }
+    .brand-name { font: 800 14px/1 var(--display); letter-spacing: .16em; }
+    .brand-sub { color: var(--muted); font-size: 8px; letter-spacing: .16em; text-transform: uppercase; }
+    .nav-links { display: flex; align-items: center; gap: 35px; color: #bec6cb; font-size: 12px; }
+    .nav-links a:not(.nav-cta):hover { color: var(--cyan); }
+    .nav-cta { border: 1px solid rgba(97,230,246,.55); color: var(--cyan-2); padding: 11px 16px; border-radius: 3px; transition: background .2s, color .2s; }
+    .nav-cta:hover { background: var(--cyan); color: var(--ink); }
+    .install-button { font: inherit; background: transparent; cursor: pointer; }
+    .menu-toggle { display: none; color: var(--white); background: none; border: 0; padding: 8px; cursor: pointer; }
+
+    .hero { min-height: 690px; padding: 85px 0 68px; position: relative; overflow: hidden; display: flex; align-items: center; }
+    .hero::before { content: ''; position: absolute; width: 710px; height: 710px; right: -155px; top: -27px; border-radius: 50%; background: radial-gradient(circle, rgba(29,122,142,.13) 0, rgba(21,69,81,.08) 34%, transparent 68%); pointer-events: none; }
+    .hero-grid { display: grid; grid-template-columns: 1.06fr .94fr; align-items: center; gap: 55px; position: relative; z-index: 1; }
+    .eyebrow { display: flex; align-items: center; gap: 11px; color: var(--cyan); font-size: 10px; letter-spacing: .21em; text-transform: uppercase; }
+    .eyebrow::before { content: ''; width: 28px; height: 1px; background: currentColor; }
+    h1, h2, h3, p { margin-top: 0; }
+    .hero h1 { max-width: 680px; margin: 25px 0 22px; font: 600 clamp(54px, 7.1vw, 91px)/.99 var(--display); letter-spacing: -.075em; }
+    .hero h1 span { color: var(--cyan); }
+    .hero-copy { max-width: 470px; color: #a7b0b6; font-size: 15px; line-height: 1.8; }
+    .hero-actions { display: flex; align-items: center; gap: 25px; margin-top: 32px; }
+    .button { min-height: 47px; display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 0 19px; background: var(--cyan); color: #061014; border: 1px solid var(--cyan); border-radius: 3px; font-weight: 700; font-size: 12px; transition: transform .2s, box-shadow .2s, background .2s; cursor: pointer; }
+    .button:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(58,213,235,.2); background: var(--cyan-2); }
+    .text-link { display: inline-flex; align-items: center; gap: 8px; color: #cbd3d7; font-size: 12px; }
+    .text-link:hover { color: var(--cyan); }
+    .arrow { font-size: 17px; line-height: 0; }
+    .hero-meta { display: flex; gap: 26px; margin-top: 58px; }
+    .meta-item { display: grid; gap: 5px; }
+    .meta-item strong { font: 600 13px var(--display); }
+    .meta-item span { color: #808a91; font-size: 10px; letter-spacing: .07em; text-transform: uppercase; }
+    .hero-art { min-height: 430px; position: relative; display: grid; place-items: center; }
+    .hero-orbit { position: absolute; width: min(410px, 90%); aspect-ratio: 1; border: 1px solid rgba(97,230,246,.12); border-radius: 50%; box-shadow: 0 0 70px rgba(35,155,174,.08), inset 0 0 70px rgba(35,155,174,.04); }
+    .hero-orbit::before, .hero-orbit::after { content: ''; position: absolute; inset: 17px; border: 1px dashed rgba(97,230,246,.16); border-radius: 50%; }
+    .hero-orbit::after { inset: 47px; border-style: solid; opacity: .42; }
+    .hero-logo { position: relative; width: min(290px, 65%); aspect-ratio: 1; border-radius: 50%; border: 1px solid rgba(126,235,249,.6); box-shadow: 0 0 60px rgba(29,201,226,.16), 0 23px 90px rgba(0,0,0,.68); overflow: hidden; }
+    .hero-logo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .float-tag { position: absolute; display: flex; align-items: center; gap: 9px; padding: 12px 14px; background: rgba(16,20,25,.9); border: 1px solid var(--line); color: #dce4e7; border-radius: 3px; box-shadow: 0 15px 36px rgba(0,0,0,.28); font-size: 10px; letter-spacing: .05em; }
+    .float-tag svg { width: 15px; height: 15px; color: var(--cyan); }
+    .tag-one { top: 57px; right: -1px; }
+    .tag-two { bottom: 67px; left: -4px; }
+    .art-note { position: absolute; right: 5%; bottom: 19px; color: #78858c; font-size: 9px; letter-spacing: .14em; text-transform: uppercase; }
+    .wave-rule { height: 41px; display: flex; align-items: center; gap: 3px; opacity: .63; overflow: hidden; border-top: 1px solid rgba(255,255,255,.055); border-bottom: 1px solid rgba(255,255,255,.055); }
+    .wave-rule i { display: block; flex: 0 0 3px; height: var(--h); border-radius: 3px; background: linear-gradient(180deg, rgba(96,230,246,.25), rgba(96,230,246,.85), rgba(96,230,246,.25)); }
+
+    section { padding: 110px 0; }
+    .section-head { display: flex; align-items: end; justify-content: space-between; gap: 35px; margin-bottom: 44px; }
+    .section-head h2 { margin: 15px 0 0; font: 600 clamp(36px, 5vw, 59px)/1.06 var(--display); letter-spacing: -.065em; }
+    .section-head h2 span { color: var(--cyan); }
+    .section-intro { max-width: 370px; margin: 0 0 4px; color: #98a2a9; font-size: 13px; line-height: 1.8; }
+    .work-section { padding-top: 80px; }
+    .work-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 17px; }
+    .work-card { min-width: 0; border: 1px solid var(--line); background: #0d1115; overflow: hidden; transition: transform .25s, border-color .25s; }
+    .work-card:hover { transform: translateY(-5px); border-color: rgba(97,230,246,.34); }
+    .work-art { height: 280px; position: relative; overflow: hidden; display: grid; place-items: center; background: radial-gradient(ellipse at 50% 40%, #17252b 0, #11171c 43%, #0b0f12 80%); }
+    .work-card:nth-child(2) .work-art { background: radial-gradient(ellipse at 50% 37%, #1a2426 0, #13191a 42%, #0c1011 82%); }
+    .work-card:nth-child(3) .work-art { background: radial-gradient(ellipse at 50% 43%, #1a202c 0, #141820 42%, #0b0f13 82%); }
+    .art-index { position: absolute; top: 17px; left: 18px; color: #7f8a90; font: 500 10px var(--display); letter-spacing: .15em; }
+    .art-label { position: absolute; top: 17px; right: 18px; color: rgba(210,224,229,.67); font-size: 9px; letter-spacing: .16em; text-transform: uppercase; }
+    .mic-illustration { width: 160px; height: 220px; filter: drop-shadow(0 7px 28px rgba(46,218,237,.18)); }
+    .tracks { width: 78%; display: grid; gap: 13px; transform: rotate(-7deg); }
+    .track { height: 25px; border-radius: 3px; background: rgba(5,9,11,.62); border: 1px solid rgba(122,223,232,.16); display: flex; align-items: center; gap: 3px; padding: 0 10px; position: relative; }
+    .track::before { content: ''; position: absolute; left: 0; width: 3px; top: 0; bottom: 0; background: var(--cyan); opacity: .75; }
+    .track span { width: 3px; height: var(--h); background: rgba(93,224,235,var(--o)); border-radius: 2px; }
+    .track:nth-child(2) span { background: rgba(136,215,173,var(--o)); }
+    .track:nth-child(3) span { background: rgba(124,163,237,var(--o)); }
+    .disc { width: 188px; aspect-ratio: 1; border-radius: 50%; position: relative; display: grid; place-items: center; background: repeating-radial-gradient(circle, #131b22 0 3px, #19242a 4px 5px, #10161d 6px 8px); border: 1px solid rgba(175,226,233,.24); box-shadow: 0 18px 44px rgba(0,0,0,.5), 0 0 50px rgba(70,171,193,.1); }
+    .disc::before { content: ''; width: 52px; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle, #071014 0 5px, #5fe0ef 6px 7px, #16333b 8px 100%); border: 1px solid rgba(97,230,246,.48); }
+    .disc::after { content: ''; position: absolute; inset: -17px; border: 1px solid rgba(97,230,246,.15); border-radius: 50%; }
+    .work-info { padding: 22px 22px 24px; }
+    .work-type { color: var(--cyan); font-size: 9px; letter-spacing: .17em; text-transform: uppercase; }
+    .work-info h3 { margin: 9px 0 8px; font: 600 19px var(--display); letter-spacing: -.035em; }
+    .work-info p { margin: 0; color: #8f9aa0; font-size: 12px; line-height: 1.7; }
+    .work-caption { color: #768188; font-size: 10px; margin-top: 22px; }
+
+    .portfolio-section { padding: 91px 0 76px; background: linear-gradient(180deg, rgba(13,17,21,.76), rgba(9,11,14,0)); border-top: 1px solid rgba(255,255,255,.055); }
+    .portfolio-section { padding-top: 92px; }
+    .portfolio-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin: -15px 0 25px; }
+    .portfolio-note { margin: 0; color: #7f8b91; font-size: 10px; }
+    .portfolio-filters { display: flex; align-items: center; gap: 7px; }
+    .portfolio-filter { padding: 8px 11px; border: 1px solid rgba(255,255,255,.1); border-radius: 2px; color: #9aa5ab; background: transparent; font-size: 10px; cursor: pointer; transition: color .2s, border-color .2s, background .2s; }
+    .portfolio-filter:hover, .portfolio-filter[aria-pressed="true"] { color: var(--cyan-2); border-color: rgba(97,230,246,.48); background: rgba(97,230,246,.06); }
+    .portfolio-controls { display: flex; align-items: center; gap: 13px; }
+    .portfolio-add { min-height: 34px; padding: 0 11px; color: var(--cyan-2); background: rgba(97,230,246,.07); border: 1px solid rgba(97,230,246,.38); border-radius: 2px; font-size: 10px; cursor: pointer; white-space: nowrap; }
+    .portfolio-add:hover { background: rgba(97,230,246,.14); border-color: var(--cyan); }
+    .portfolio-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .portfolio-card { position: relative; z-index: 0; min-width: 0; border: 1px solid var(--line); background: #0d1115; transform: scale(1); transform-origin: center; transition: transform .28s cubic-bezier(.2,.8,.2,1), border-color .22s, box-shadow .22s; }
+    @media (hover: hover) and (pointer: fine) {
+      .portfolio-card:hover { z-index: 3; transform: translateY(-4px) scale(1.045); border-color: rgba(97,230,246,.48); box-shadow: 0 18px 42px rgba(0,0,0,.38), 0 0 24px rgba(97,230,246,.07); }
+    }
+    .portfolio-card:focus-within { z-index: 3; transform: translateY(-3px) scale(1.025); border-color: rgba(97,230,246,.4); }
+    .portfolio-card[hidden] { display: none; }
+    .portfolio-art { min-height: 255px; display: grid; place-items: center; position: relative; overflow: hidden; background: radial-gradient(ellipse at 50% 44%, rgba(53,140,153,.18), rgba(17,23,28,.75) 45%, #0b0f12 82%); }
+    .portfolio-card[data-kind="video"] .portfolio-art { background: radial-gradient(ellipse at 50% 44%, rgba(96,133,116,.19), rgba(17,23,28,.75) 45%, #0b0f12 82%); }
+    .portfolio-card[data-kind="image"] .portfolio-art { background: radial-gradient(ellipse at 50% 44%, rgba(91,105,158,.2), rgba(17,23,28,.75) 45%, #0b0f12 82%); }
+    .portfolio-art::before { content: ''; position: absolute; inset: 15px; border: 1px dashed rgba(178,208,215,.16); pointer-events: none; }
+    .portfolio-topline { position: absolute; z-index: 2; top: 26px; left: 27px; right: 27px; display: flex; justify-content: space-between; color: #a4b1b6; font-size: 9px; letter-spacing: .12em; text-transform: uppercase; }
+    .audio-art { width: 78%; height: 126px; position: relative; display: flex; align-items: center; justify-content: center; gap: 3px; margin-top: 12px; }
+    .audio-art::before { content: ''; position: absolute; top: 50%; left: -8%; right: -8%; border-top: 1px solid rgba(97,230,246,.2); }
+    .audio-art i { position: relative; z-index: 1; width: 3px; height: var(--bar); border-radius: 3px; background: linear-gradient(180deg, rgba(95,224,239,.38), #70edf6, rgba(95,224,239,.38)); box-shadow: 0 0 10px rgba(97,230,246,.28); }
+    .audio-art i:nth-child(5n) { background: linear-gradient(180deg, rgba(125,229,189,.35), #7de5bd, rgba(125,229,189,.35)); }
+    .audio-core { position: absolute; z-index: 3; left: 50%; top: 50%; width: 52px; height: 52px; transform: translate(-50%,-50%); border: 1px solid rgba(97,230,246,.54); background: rgba(8,13,16,.82); border-radius: 50%; display: grid; place-items: center; color: var(--cyan); box-shadow: 0 0 30px rgba(97,230,246,.17); }
+    .audio-core svg { width: 18px; height: 18px; }
+    .video-frame { position: relative; width: 74%; aspect-ratio: 16 / 9; display: grid; place-items: center; margin-top: 15px; border: 1px solid rgba(158,222,186,.37); background: linear-gradient(145deg, rgba(120,192,151,.14), rgba(7,13,15,.86)), url('yj-studios-logo.jpg') center 45% / 40% no-repeat; box-shadow: 0 16px 45px rgba(0,0,0,.4); }
+    .video-frame::before, .video-frame::after { content: ''; position: absolute; width: 15px; height: 15px; border-color: rgba(178,237,201,.65); border-style: solid; }
+    .video-frame::before { top: -6px; left: -6px; border-width: 1px 0 0 1px; }
+    .video-frame::after { bottom: -6px; right: -6px; border-width: 0 1px 1px 0; }
+    .video-play { width: 43px; height: 43px; display: grid; place-items: center; padding-left: 3px; border: 1px solid rgba(198,241,214,.57); border-radius: 50%; color: #e1ffea; background: rgba(9,17,15,.57); }
+    .video-play svg { width: 13px; height: 13px; }
+    .image-collage { width: 73%; height: 150px; position: relative; margin-top: 15px; }
+    .image-print { position: absolute; width: 54%; height: 100%; overflow: hidden; border: 1px solid rgba(191,205,242,.32); background: #111923; box-shadow: 0 17px 40px rgba(0,0,0,.5); }
+    .image-print:first-child { left: 3%; top: 0; transform: rotate(-8deg); background: radial-gradient(circle at 51% 47%, rgba(97,230,246,.63) 0 2px, transparent 4px), repeating-radial-gradient(circle at 51% 47%, rgba(149,215,229,.15) 0 1px, transparent 2px 7px), linear-gradient(140deg, #293d48, #0a1118 72%); }
+    .image-print:last-child { right: 3%; top: 3px; transform: rotate(8deg); background: linear-gradient(145deg, rgba(48,99,115,.4), rgba(7,11,16,.9)), url('yj-studios-logo.jpg') center / cover; }
+    .image-print:last-child::after { content: ''; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(5,8,11,.43), transparent 65%); }
+    .portfolio-hint { position: absolute; bottom: 25px; left: 0; right: 0; text-align: center; color: #829097; font-size: 9px; letter-spacing: .13em; text-transform: uppercase; }
+    .portfolio-info { padding: 18px 20px 20px; }
+    .portfolio-info > span { color: var(--cyan); font-size: 9px; letter-spacing: .16em; text-transform: uppercase; }
+    .portfolio-info h3 { margin: 8px 0 6px; font: 600 16px var(--display); }
+    .portfolio-info p { margin: 0; color: #89949a; font-size: 10px; line-height: 1.7; }
+    .portfolio-meta { display: flex; align-items: center; gap: 8px; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); color: #707d83; font-size: 9px; }
+    .portfolio-dialog { width: min(560px, calc(100% - 30px)); max-height: min(90vh, 760px); padding: 0; border: 1px solid rgba(97,230,246,.28); border-radius: 4px; background: #101419; color: var(--white); box-shadow: 0 28px 100px rgba(0,0,0,.7); }
+    .portfolio-dialog::backdrop { background: rgba(2,5,7,.78); backdrop-filter: blur(5px); }
+    .upload-dialog-inner { padding: 25px; }
+    .upload-dialog-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; padding-bottom: 18px; border-bottom: 1px solid var(--line); margin-bottom: 20px; }
+    .upload-dialog-head h3 { margin: 7px 0 0; font: 600 23px var(--display); letter-spacing: -.04em; }
+    .upload-dialog-head p { margin: 0; color: #89969c; font-size: 10px; line-height: 1.6; }
+    .upload-close { flex: 0 0 32px; width: 32px; height: 32px; color: #b6c0c4; background: transparent; border: 1px solid var(--line); cursor: pointer; }
+    .upload-close:hover { color: var(--cyan); border-color: rgba(97,230,246,.48); }
+    .upload-field { display: grid; gap: 7px; margin-bottom: 15px; }
+    .upload-field label { color: #c6d0d4; font-size: 10px; }
+    .upload-field input[type="text"], .upload-field textarea { width: 100%; border: 1px solid rgba(255,255,255,.11); background: #0b1014; color: var(--white); padding: 11px; font: 11px var(--sans); outline: none; }
+    .upload-field input[type="text"]:focus, .upload-field textarea:focus { border-color: rgba(97,230,246,.65); }
+    .upload-field textarea { resize: vertical; min-height: 63px; line-height: 1.5; }
+    .upload-drop { display: grid; place-items: center; min-height: 134px; padding: 17px; text-align: center; border: 1px dashed rgba(97,230,246,.4); background: rgba(97,230,246,.035); transition: background .2s, border-color .2s; }
+    .upload-drop.dragging { background: rgba(97,230,246,.1); border-color: var(--cyan); }
+    .upload-drop svg { width: 23px; height: 23px; color: var(--cyan); margin-bottom: 8px; }
+    .upload-drop strong { font-size: 11px; font-weight: 600; }
+    .upload-drop small { color: #87949a; font-size: 9px; margin-top: 5px; }
+    .upload-picker { max-width: 100%; margin-top: 11px; color: #9dabb1; font-size: 10px; }
+    .upload-picker::file-selector-button { margin-right: 8px; padding: 7px 9px; color: var(--cyan-2); border: 1px solid rgba(97,230,246,.38); background: rgba(97,230,246,.07); cursor: pointer; }
+    .upload-selection { max-height: 85px; overflow: auto; margin-top: 9px; color: #aab6bb; font-size: 9px; line-height: 1.7; }
+    .upload-local-note { margin: 14px 0 0; color: #77858b; font-size: 9px; line-height: 1.65; }
+    .upload-submit { width: 100%; margin-top: 16px; }
+    .upload-message { min-height: 14px; margin: 11px 0 0; color: var(--green); font-size: 10px; line-height: 1.5; }
+    .uploaded-media { position: absolute; inset: 0; overflow: hidden; background: #080b0e; }
+    .uploaded-image, .uploaded-video { display: block; width: 100%; height: 100%; object-fit: cover; }
+    .uploaded-image { cursor: zoom-in; }
+    .uploaded-audio-art { position: absolute; inset: 0; display: grid; place-items: center; background: radial-gradient(circle at 50% 42%, rgba(73,209,224,.17), transparent 58%), linear-gradient(145deg, #151c22, #090d10); }
+    .uploaded-audio-art::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(5,9,12,.08), rgba(5,9,12,.56)); pointer-events: none; }
+    .audio-spectrum { position: relative; z-index: 1; display: block; width: 78%; height: 112px; pointer-events: none; filter: drop-shadow(0 0 8px rgba(97,230,246,.24)); }
+    .uploaded-audio-art.is-playing .audio-spectrum { filter: drop-shadow(0 0 13px rgba(97,230,246,.48)); }
+    .uploaded-cover { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; object-fit: cover; opacity: .6; cursor: zoom-in; }
+    .uploaded-audio { position: absolute; z-index: 2; left: 6%; bottom: 24px; width: 88%; height: 34px; }
+    .cover-picker { max-width: 100%; color: #9dabb1; font-size: 10px; }
+    .cover-picker::file-selector-button { margin-right: 8px; padding: 7px 9px; color: var(--cyan-2); border: 1px solid rgba(97,230,246,.38); background: rgba(97,230,246,.07); cursor: pointer; }
+    .cover-selection { color: #89969c; font-size: 9px; }
+    .uploaded-remove { display: block; margin-top: 12px; padding: 0; border: 0; color: #85939a; background: transparent; font-size: 9px; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+    .uploaded-remove:hover { color: #f2b8ad; }
+    .media-lightbox { position: relative; width: min(94vw, 1200px); max-width: none; max-height: 94vh; padding: 48px 20px 16px; overflow: visible; border: 1px solid rgba(97,230,246,.3); background: #090d10; color: var(--white); }
+    .media-lightbox::backdrop { background: rgba(2,4,6,.88); backdrop-filter: blur(7px); }
+    .lightbox-image { display: block; max-width: 100%; max-height: calc(94vh - 94px); width: auto; height: auto; margin: 0 auto; object-fit: contain; box-shadow: 0 22px 70px rgba(0,0,0,.55); }
+    .lightbox-caption { margin: 12px 0 0; color: #b7c2c7; font-size: 11px; text-align: center; }
+    .lightbox-close { position: absolute; z-index: 1; top: 9px; right: 9px; width: 31px; height: 31px; color: var(--white); border: 1px solid rgba(255,255,255,.2); background: rgba(10,14,17,.86); font-size: 20px; cursor: pointer; }
+    .lightbox-close:hover { color: var(--cyan); border-color: rgba(97,230,246,.6); }
+    .portfolio-meta span:first-child { width: 6px; height: 6px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 9px rgba(97,230,246,.45); }
+
+    .services-section { background: #0d1115; border-block: 1px solid rgba(255,255,255,.055); }
+    .service-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 13px; }
+    .service-card { min-height: 267px; display: flex; flex-direction: column; padding: 24px 21px 21px; border: 1px solid var(--line); background: linear-gradient(145deg, rgba(255,255,255,.025), rgba(255,255,255,0)); }
+    .service-no { color: #707c82; font-size: 10px; letter-spacing: .12em; }
+    .service-icon { height: 55px; display: flex; align-items: center; color: var(--cyan); }
+    .service-icon svg { width: 27px; height: 27px; stroke-width: 1.3; }
+    .service-card h3 { font: 600 17px var(--display); margin: 4px 0 8px; }
+    .service-card p { min-height: 41px; color: #8e989f; font-size: 11px; line-height: 1.65; margin-bottom: 20px; }
+    .price { margin-top: auto; padding-top: 14px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+    .price strong { font: 700 19px var(--display); }
+    .price span { color: #89949a; font-size: 10px; }
+    .price-note { color: #78858b; font-size: 10px; margin: 17px 0 0; }
+
+    .about-grid { display: grid; grid-template-columns: .86fr 1.14fr; gap: 94px; align-items: center; }
+    .about-mark { min-height: 360px; position: relative; display: grid; place-items: center; border: 1px solid var(--line); background: radial-gradient(circle at 50% 50%, rgba(68,200,221,.09), rgba(15,20,25,.5) 46%, rgba(10,13,16,.8)); overflow: hidden; }
+    .about-mark::before, .about-mark::after { content: ''; position: absolute; width: 360px; height: 360px; border-radius: 50%; border: 1px solid rgba(97,230,246,.16); }
+    .about-mark::after { width: 292px; height: 292px; border-style: dashed; opacity: .72; }
+    .about-mark img { position: relative; z-index: 1; width: 184px; height: 184px; object-fit: cover; border-radius: 50%; border: 1px solid rgba(97,230,246,.55); box-shadow: 0 0 45px rgba(97,230,246,.13); }
+    .about-copy h2 { margin: 15px 0 20px; font: 600 clamp(36px, 4.5vw, 53px)/1.08 var(--display); letter-spacing: -.065em; }
+    .about-copy h2 span { color: var(--cyan); }
+    .about-copy > p { color: #9aa4aa; font-size: 13px; line-height: 1.9; max-width: 490px; }
+    .about-points { display: grid; grid-template-columns: 1fr 1fr; gap: 15px 22px; margin-top: 27px; }
+    .about-point { display: flex; align-items: center; gap: 9px; font-size: 11px; color: #c9d0d3; }
+    .about-point svg { color: var(--green); width: 14px; height: 14px; flex: 0 0 14px; }
+
+    .booking-section { background: linear-gradient(180deg, #0d1115, #090b0e); border-top: 1px solid rgba(255,255,255,.05); }
+    .booking-grid { display: grid; grid-template-columns: .7fr 1.3fr; gap: 76px; align-items: start; }
+    .booking-aside { position: sticky; top: 110px; }
+    .booking-aside h2 { margin: 15px 0 16px; font: 600 clamp(38px, 4.8vw, 56px)/1.05 var(--display); letter-spacing: -.07em; }
+    .booking-aside h2 span { color: var(--cyan); }
+    .booking-aside > p { max-width: 300px; color: #97a1a7; font-size: 13px; line-height: 1.8; }
+    .booking-aside-note { display: flex; gap: 11px; margin-top: 27px; padding-top: 19px; border-top: 1px solid var(--line); color: #8f9ba1; font-size: 10px; line-height: 1.7; }
+    .booking-aside-note svg { flex: 0 0 16px; width: 16px; color: var(--cyan); }
+    .booking-form { border: 1px solid var(--line); background: #11161b; padding: 28px; }
+    .form-top { display: flex; align-items: center; justify-content: space-between; padding-bottom: 17px; margin-bottom: 23px; border-bottom: 1px solid var(--line); }
+    .form-top strong { font: 600 14px var(--display); }
+    .form-top span { color: #859097; font-size: 10px; }
+    .form-label { display: block; margin: 0 0 11px; color: #cbd2d5; font-size: 11px; }
+    .choice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-bottom: 21px; }
+    .choice { position: relative; display: flex; align-items: flex-start; gap: 10px; min-height: 67px; padding: 13px; border: 1px solid rgba(255,255,255,.1); cursor: pointer; transition: border .2s, background .2s; }
+    .choice:has(input:checked) { border-color: rgba(97,230,246,.63); background: rgba(97,230,246,.055); }
+    .choice input { position: absolute; opacity: 0; pointer-events: none; }
+    .checkmark { flex: 0 0 14px; width: 14px; height: 14px; border: 1px solid #728087; margin-top: 2px; display: grid; place-items: center; }
+    .choice input:checked + .checkmark { border-color: var(--cyan); background: var(--cyan); }
+    .choice input:checked + .checkmark::after { content: '✓'; color: #091114; font-size: 10px; font-weight: 800; }
+    .choice-text { display: grid; gap: 5px; }
+    .choice-text strong { font-size: 11px; font-weight: 600; }
+    .choice-text small { color: #8d999f; font-size: 9px; }
+    .choice-price { margin-left: auto; white-space: nowrap; color: #dce7e9; font-size: 10px; }
+    .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; margin-bottom: 16px; }
+    .field { display: grid; gap: 7px; }
+    .field label { color: #aeb8bd; font-size: 10px; }
+    .field input, .field select, .field textarea { min-width: 0; width: 100%; border: 1px solid rgba(255,255,255,.11); border-radius: 2px; background: #0c1014; color: var(--white); padding: 12px 11px; font-size: 11px; outline: none; }
+    .field input:focus, .field select:focus, .field textarea:focus { border-color: rgba(97,230,246,.65); }
+    .field input::placeholder, .field textarea::placeholder { color: #59646a; }
+    .field textarea { resize: vertical; min-height: 81px; line-height: 1.5; }
+    .field.full { grid-column: 1 / -1; }
+    .duration-row { display: none; margin: -7px 0 18px; }
+    .duration-row.visible { display: grid; }
+    .estimate { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 22px 0 16px; padding: 16px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .estimate-label { display: grid; gap: 4px; }
+    .estimate-label strong { font-size: 11px; }
+    .estimate-label span { color: #829097; font-size: 9px; }
+    .estimate output { color: var(--cyan); font: 700 24px var(--display); }
+    .form-submit { width: 100%; }
+    .form-footnote { margin: 12px 0 0; color: #738087; font-size: 9px; line-height: 1.7; text-align: center; }
+    .request-preview { display: none; margin-top: 18px; padding: 16px; background: rgba(97,230,246,.06); border: 1px solid rgba(97,230,246,.23); }
+    .request-preview.visible { display: block; }
+    .request-preview h3 { margin: 0 0 8px; color: var(--cyan); font: 600 13px var(--display); }
+    .request-preview p { white-space: pre-line; margin: 0 0 13px; color: #c6d0d4; font-size: 10px; line-height: 1.7; }
+    .copy-button { min-height: 35px; padding: 0 12px; background: transparent; border: 1px solid rgba(97,230,246,.55); color: var(--cyan-2); font-size: 10px; cursor: pointer; }
+    .copy-button:hover { background: rgba(97,230,246,.09); }
+    .form-status { color: #f2b8ad; font-size: 10px; margin: 11px 0 0; min-height: 15px; }
+
+    .footer { padding: 28px 0; border-top: 1px solid rgba(255,255,255,.07); }
+    .footer-inner { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+    .footer-brand { display: flex; align-items: center; gap: 9px; color: #bbc4c8; font: 700 10px var(--display); letter-spacing: .14em; }
+    .footer-brand img { width: 29px; height: 29px; object-fit: cover; border-radius: 50%; }
+    .footer p { color: #747f85; font-size: 9px; margin: 0; }
+    .footer-links { display: flex; gap: 19px; color: #9aa4aa; font-size: 10px; }
+    .footer-links a:hover { color: var(--cyan); }
+    .reveal { opacity: 0; transform: translateY(16px); transition: opacity .65s ease, transform .65s ease; }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+
+    @media (max-width: 900px) {
+      .hero { min-height: unset; padding: 72px 0 56px; }
+      .hero-grid { grid-template-columns: 1fr .84fr; gap: 22px; }
+      .hero-art { min-height: 355px; }
+      .hero-orbit { width: 95%; }
+      .hero-logo { width: 68%; }
+      .tag-one { right: -4px; top: 34px; }
+      .tag-two { left: -9px; bottom: 40px; }
+      .work-art { height: 235px; }
+      .portfolio-art { min-height: 220px; }
+      .portfolio-toolbar { align-items: flex-start; flex-direction: column; }
+      .portfolio-controls { width: 100%; flex-wrap: wrap; gap: 9px; }
+      .service-grid { grid-template-columns: repeat(2, 1fr); }
+      .service-card { min-height: 235px; }
+      .about-grid { gap: 44px; }
+      .booking-grid { gap: 34px; grid-template-columns: .72fr 1.28fr; }
+      .booking-form { padding: 22px; }
+    }
+    @media (max-width: 650px) {
+      .shell { width: min(100% - 36px, 500px); }
+      .topbar { height: 68px; }
+      .brand { min-width: 0; }
+      .brand img { width: 39px; height: 39px; }
+      .menu-toggle { display: block; }
+      .nav-links { position: absolute; display: none; top: 67px; left: 0; right: 0; padding: 20px 22px 24px; background: rgba(9,11,14,.97); border-bottom: 1px solid var(--line); flex-direction: column; align-items: stretch; gap: 18px; }
+      .nav-links.open { display: flex; }
+      .nav-links a { padding: 4px 0; }
+      .nav-cta { text-align: center; padding: 12px; }
+      .hero { padding: 58px 0 40px; }
+      .hero-grid { grid-template-columns: 1fr; gap: 20px; }
+      .hero h1 { font-size: clamp(54px, 13vw, 76px); margin-top: 22px; }
+      .hero-copy { font-size: 13px; }
+      .hero-art { min-height: 300px; margin: -4px 0 0; }
+      .hero-orbit { width: 275px; }
+      .hero-logo { width: 192px; }
+      .tag-one { right: max(0px, calc((100vw - 375px) / 2)); top: 24px; }
+      .tag-two { left: max(0px, calc((100vw - 375px) / 2)); bottom: 23px; }
+      .art-note { display: none; }
+      .hero-meta { margin-top: 36px; gap: 20px; justify-content: space-between; }
+      .meta-item strong { font-size: 12px; }
+      .meta-item span { font-size: 8px; }
+      .wave-rule { height: 31px; gap: 2px; }
+      section { padding: 76px 0; }
+      .work-section { padding-top: 68px; }
+      .portfolio-section { padding: 68px 0 58px; }
+      .portfolio-toolbar { gap: 12px; margin: -6px 0 21px; }
+      .portfolio-filters { width: 100%; flex-wrap: wrap; }
+      .portfolio-filter { padding: 8px 10px; }
+      .portfolio-controls { gap: 8px; }
+      .upload-dialog-inner { padding: 19px 16px; }
+      .portfolio-note { line-height: 1.6; }
+      .section-head { display: block; margin-bottom: 28px; }
+      .section-head h2 { margin-top: 14px; font-size: 42px; }
+      .section-intro { margin-top: 15px; font-size: 12px; }
+      .work-grid { grid-template-columns: 1fr; gap: 13px; }
+      .portfolio-grid { grid-template-columns: 1fr; gap: 11px; }
+      .portfolio-art { min-height: 215px; }
+      .work-art { height: 255px; }
+      .work-info { padding: 19px; }
+      .work-caption { margin-top: 16px; }
+      .service-grid { gap: 9px; }
+      .service-card { min-height: 237px; padding: 18px 15px 16px; }
+      .service-card h3 { font-size: 15px; }
+      .service-card p { font-size: 10px; }
+      .price { align-items: flex-start; flex-direction: column; gap: 4px; }
+      .about-grid { grid-template-columns: 1fr; gap: 31px; }
+      .about-mark { min-height: 280px; }
+      .about-mark::before { width: 285px; height: 285px; }
+      .about-mark::after { width: 235px; height: 235px; }
+      .about-mark img { width: 148px; height: 148px; }
+      .about-copy h2 { font-size: 43px; }
+      .booking-grid { grid-template-columns: 1fr; gap: 27px; }
+      .booking-aside { position: static; }
+      .booking-aside h2 { font-size: 45px; }
+      .booking-aside > p { max-width: 420px; }
+      .booking-aside-note { margin-top: 19px; }
+      .booking-form { padding: 18px 15px; }
+      .form-top span { text-align: right; }
+      .choice-grid { gap: 7px; }
+      .choice { padding: 10px 8px; min-height: 67px; gap: 7px; }
+      .choice-text strong { font-size: 10px; }
+      .choice-price { font-size: 9px; }
+      .field-grid { gap: 11px; }
+      .field input, .field select, .field textarea { padding: 11px 9px; font-size: 10px; }
+      .about-points { gap: 13px 12px; }
+      .about-point { font-size: 10px; }
+      .footer-inner { flex-wrap: wrap; }
+      .footer-inner > p { order: 3; width: 100%; }
+      .footer-links { gap: 13px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+      .reveal { opacity: 1; transform: none; }
+    }
+    /* Final visual system: calmer surfaces, clear focus, and phone-first form sizing. */
+    :root { --line: rgba(205,230,235,.14); --muted: #a6b1b7; --white: #f4f7f8; --cyan: #70dce9; --cyan-2: #b2f2f5; }
+    body { font-size: 14px; line-height: 1.6; }
+    :focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
+    .topbar { border-bottom-color: rgba(205,230,235,.12); }
+    .hero { min-height: 650px; }
+    .hero h1 { max-width: 710px; font-size: clamp(56px, 7.4vw, 96px); }
+    .hero-copy { max-width: 510px; font-size: 15px; line-height: 1.85; }
+    .hero-meta { gap: clamp(16px, 3vw, 34px); }
+    .meta-item strong { font-size: 14px; }
+    section { padding-block: 104px; }
+    .section-head { margin-bottom: 38px; }
+    .portfolio-section { background: linear-gradient(180deg, #0e1419 0%, #0a0d10 100%); }
+    .portfolio-card, .work-card, .service-card, .booking-form { border-radius: 5px; }
+    .portfolio-art { min-height: 270px; }
+    .portfolio-info { padding: 20px 21px 22px; }
+    .portfolio-info > span, .work-type { color: var(--cyan-2); }
+    .portfolio-filter { min-height: 38px; border-radius: 3px; }
+    .portfolio-add, .button, .nav-cta { border-radius: 4px; }
+    .service-card { background: linear-gradient(150deg, rgba(255,255,255,.035), rgba(255,255,255,.008)); }
+    .price strong { letter-spacing: -.025em; }
+    .booking-section { background: linear-gradient(180deg, #0e1419, #090b0e); }
+    .booking-form { background: #11181e; box-shadow: 0 24px 65px rgba(0,0,0,.2); }
+    .choice { border-radius: 3px; }
+    .choice:has(input:focus-visible) { outline: 2px solid var(--cyan); outline-offset: 2px; }
+    .field input, .field select, .field textarea { min-height: 45px; border-radius: 3px; font-size: 12px; }
+    .field textarea { min-height: 90px; }
+    .button:disabled { opacity: .65; cursor: wait; transform: none; box-shadow: none; }
+    .footer { background: #080a0d; }
+    @media (max-width: 900px) {
+      .hero { min-height: auto; }
+      section { padding-block: 88px; }
+    }
+    @media (max-width: 650px) {
+      section { padding-block: 74px; }
+      .hero { padding-top: 52px; }
+      .hero h1 { font-size: clamp(54px, 13vw, 76px); }
+      .hero-copy { font-size: 14px; }
+      .hero-meta { margin-top: 31px; }
+      .section-head { margin-bottom: 26px; }
+      .portfolio-art { min-height: 235px; }
+      .portfolio-filter { min-height: 40px; }
+    }
+    @media (max-width: 430px) {
+      .field-grid, .choice-grid { grid-template-columns: 1fr; }
+      .field.full { grid-column: auto; }
+      .service-grid { grid-template-columns: 1fr; }
+      .service-card { min-height: 0; }
+      .service-card p { min-height: 0; }
+      .price { align-items: baseline; flex-direction: row; }
+      .about-points { grid-template-columns: 1fr; }
+      .form-top { align-items: flex-start; flex-direction: column; gap: 5px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="shell nav">
+      <a class="brand" href="#home" aria-label="YJ Studios home">
+        <img src="yj-studios-logo.jpg" alt="YJ Studios logo">
+        <span class="brand-lockup"><span class="brand-name">YJ STUDIOS</span><span class="brand-sub">Sound engineering</span></span>
+      </a>
+      <button class="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 7h18M3 12h18M3 17h18"/></svg>
+      </button>
+      <nav class="nav-links" aria-label="Main navigation">
+        <a href="#work">Studio work</a>
+        <a href="#services">Services</a>
+        <a href="#studio">The studio</a>
+        <a href="auth.html">Sign in / create account</a>
+        <a class="nav-cta" href="#book">Book a session <span class="arrow">↗</span></a>
+        <button class="nav-cta install-button" id="install-app" type="button" hidden>Save to phone ↗</button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" id="home">
+      <div class="shell hero-grid">
+        <div class="hero-content">
+          <div class="eyebrow">YJ Studios · Sound engineering & recording</div>
+          <h1>Make room for<br>the <span>music.</span></h1>
+          <p class="hero-copy">Recording, mixing, mastering and editing for artists who care about the details. Bring your idea from the first take to a finished sound, with clear rates from the start.</p>
+          <div class="hero-actions">
+            <a class="button" href="#book">Book a session <span class="arrow">↗</span></a>
+            <a class="text-link" href="#work">Explore selected work <span class="arrow">↓</span></a>
+          </div>
+          <div class="hero-meta">
+            <div class="meta-item"><strong>500 EGP</strong><span>Recording / hour</span></div>
+            <div class="meta-item"><strong>1,000 EGP</strong><span>Per post-production service</span></div>
+            <div class="meta-item"><strong>From idea</strong><span>To final master</span></div>
+          </div>
+        </div>
+        <div class="hero-art" aria-label="YJ Studios emblem">
+          <div class="hero-orbit"></div>
+          <div class="hero-logo"><img src="yj-studios-logo.jpg" alt="YJ Studios sound engineering and recording emblem"></div>
+          <div class="float-tag tag-one"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M12 3v18M8 7v10M4 10v4M16 7v10M20 10v4"/></svg>Sound with intention</div>
+          <div class="float-tag tag-two"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="12" cy="12" r="8"/><path d="M12 8v5l3 2"/></svg>Made around your session</div>
+          <div class="art-note">Feel every detail · YJ Studios</div>
+        </div>
+      </div>
+    </section>
+    <div class="wave-rule" aria-hidden="true" id="wave-rule"></div>
+
+    <section class="portfolio-section" id="work">
+      <div class="shell">
+        <div class="section-head reveal">
+          <div><div class="eyebrow">01 — Portfolio</div><h2>Sound, frame<br>& <span>feeling.</span></h2></div>
+          <p class="section-intro">A growing collection of audio, video and images from YJ Studios. New projects appear here as they’re added.</p>
+        </div>
+        <div class="portfolio-toolbar reveal">
+          <p class="portfolio-note">Choose a format to explore the portfolio.</p>
+          <div class="portfolio-controls">
+            <div class="portfolio-filters" role="group" aria-label="Filter portfolio by media type">
+              <button class="portfolio-filter" type="button" data-filter="all" aria-pressed="true">All work</button>
+              <button class="portfolio-filter" type="button" data-filter="audio" aria-pressed="false">Audio</button>
+              <button class="portfolio-filter" type="button" data-filter="video" aria-pressed="false">Video</button>
+              <button class="portfolio-filter" type="button" data-filter="image" aria-pressed="false">Images</button>
+            </div>
+          </div>
+        </div>
+        <div class="portfolio-grid" id="portfolio-grid" aria-live="polite">
+          <article class="portfolio-card reveal" data-kind="audio" data-placeholder="true">
+            <div class="portfolio-art audio-portfolio-art">
+              <div class="portfolio-topline"><span>Audio portfolio</span><span>MP3 · WAV</span></div>
+              <div class="audio-art" id="portfolio-wave" aria-hidden="true"><span class="audio-core"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 10v4m4-8v12m4-16v20m4-14v8m4-11v14"/></svg></span></div>
+              <span class="portfolio-hint">Selected recordings · mixes · masters</span>
+            </div>
+            <div class="portfolio-info"><span>Audio · Recording · Mix</span><h3>Audio projects</h3><p>Recordings, mixes and masters will be featured here.</p><div class="portfolio-meta"><span></span><span>Audio portfolio</span></div></div>
+            <!-- Replace the audio artwork above with: <audio controls src="media/your-track.mp3"></audio> -->
+          </article>
+          <article class="portfolio-card reveal" data-kind="video" data-placeholder="true">
+            <div class="portfolio-art video-portfolio-art">
+              <div class="portfolio-topline"><span>Video portfolio</span><span>MP4 · MOV</span></div>
+              <div class="video-frame" aria-hidden="true"><span class="video-play"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M5 3.5a.7.7 0 0 1 1.08-.59l6.1 4.5a.72.72 0 0 1 0 1.18l-6.1 4.5A.7.7 0 0 1 5 12.5z"/></svg></span></div>
+              <span class="portfolio-hint">Performances · sessions · moving image</span>
+            </div>
+            <div class="portfolio-info"><span>Video · Session · Performance</span><h3>Video projects</h3><p>Performance films and session videos will be featured here.</p><div class="portfolio-meta"><span></span><span>Video portfolio</span></div></div>
+            <!-- Replace .video-frame with a <video controls poster="media/poster.jpg"> element and source. -->
+          </article>
+          <article class="portfolio-card reveal" data-kind="image" data-placeholder="true">
+            <div class="portfolio-art image-portfolio-art">
+              <div class="portfolio-topline"><span>Image portfolio</span><span>JPG · PNG</span></div>
+              <div class="image-collage" aria-hidden="true"><div class="image-print"></div><div class="image-print"></div></div>
+              <span class="portfolio-hint">Artwork · release images · studio stills</span>
+            </div>
+            <div class="portfolio-info"><span>Images · Artwork · Studio</span><h3>Image projects</h3><p>Release artwork and images from the studio will be featured here.</p><div class="portfolio-meta"><span></span><span>Image portfolio</span></div></div>
+            <!-- Replace .image-collage with one or more <img src="media/your-image.jpg"> elements. -->
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <dialog class="media-lightbox" id="media-lightbox" aria-label="Expanded portfolio image">
+      <button class="lightbox-close" id="lightbox-close" type="button" aria-label="Close enlarged image">×</button>
+      <img class="lightbox-image" id="lightbox-image" alt="">
+      <p class="lightbox-caption" id="lightbox-caption"></p>
+    </dialog>
+
+    <section class="work-section" id="craft">
+      <div class="shell">
+        <div class="section-head reveal">
+          <div><div class="eyebrow">02 — The craft</div><h2>Made for the<br><span>feeling.</span></h2></div>
+          <p class="section-intro">The small decisions matter: a comfortable recording take, an edit that keeps its life, a mix that lets every part breathe. Here’s what goes into the sound.</p>
+        </div>
+        <div class="work-grid">
+          <article class="work-card reveal">
+            <div class="work-art">
+              <span class="art-index">CRAFT / 01</span><span class="art-label">Capture</span>
+              <svg class="mic-illustration" viewBox="0 0 160 220" fill="none" aria-hidden="true">
+                <defs><linearGradient id="micBody" x1="70" y1="25" x2="105" y2="180" gradientUnits="userSpaceOnUse"><stop stop-color="#e3f8fa"/><stop offset=".17" stop-color="#7feaf3"/><stop offset=".25" stop-color="#172e35"/><stop offset=".76" stop-color="#10181c"/><stop offset=".9" stop-color="#78dbe8"/><stop offset="1" stop-color="#17272d"/></linearGradient><linearGradient id="micStand" x1="81" y1="140" x2="84" y2="205" gradientUnits="userSpaceOnUse"><stop stop-color="#9cf4f8"/><stop offset=".15" stop-color="#263b40"/><stop offset=".8" stop-color="#11191e"/><stop offset="1" stop-color="#79d5e2"/></linearGradient><filter id="micGlow" x="5" y="5" width="150" height="210"><feGaussianBlur stdDeviation="6"/></filter></defs>
+                <ellipse cx="80" cy="105" rx="47" ry="81" fill="#4ee5f3" opacity=".08" filter="url(#micGlow)"/>
+                <rect x="55" y="24" width="50" height="111" rx="25" fill="url(#micBody)" stroke="#a4f3f8" stroke-opacity=".6"/>
+                <path d="M64 53h32M62 62h36M61 71h38M61 80h38M62 89h36M64 98h32M67 107h26" stroke="#091114" stroke-opacity=".6" stroke-width="2"/>
+                <path d="M42 86v12c0 25 17 44 38 44s38-19 38-44V86" stroke="#8aeaf2" stroke-width="3" stroke-linecap="round"/>
+                <path d="M80 142v32m-18 0h36" stroke="url(#micStand)" stroke-width="6" stroke-linecap="round"/>
+                <path d="M54 193h52" stroke="#75dce7" stroke-opacity=".74" stroke-width="4" stroke-linecap="round"/>
+                <circle cx="80" cy="80" r="57" stroke="#7ee9f3" stroke-opacity=".12"/>
+              </svg>
+            </div>
+            <div class="work-info"><div class="work-type">Recording · Vocal sessions</div><h3>Get the take you came for.</h3><p>A relaxed room to focus, find the right performance and capture a vocal worth building around.</p><div class="work-caption">A closer, more considered recording experience.</div></div>
+          </article>
+          <article class="work-card reveal">
+            <div class="work-art">
+              <span class="art-index">CRAFT / 02</span><span class="art-label">Shape</span>
+              <div class="tracks" aria-hidden="true" id="track-art"></div>
+            </div>
+            <div class="work-info"><div class="work-type">Editing · Mixing</div><h3>Keep the life in it.</h3><p>Clean edits and thoughtful balance bring focus and movement without sanding away the character.</p><div class="work-caption">Clear choices, made in service of the song.</div></div>
+          </article>
+          <article class="work-card reveal">
+            <div class="work-art">
+              <span class="art-index">CRAFT / 03</span><span class="art-label">Finish</span>
+              <div class="disc" aria-hidden="true"></div>
+            </div>
+            <div class="work-info"><div class="work-type">Mastering · Final polish</div><h3>Ready for the outside world.</h3><p>A final pass for a confident, cohesive sound that translates across the places people listen.</p><div class="work-caption">One last listen before it leaves the room.</div></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="services-section" id="services">
+      <div class="shell">
+        <div class="section-head reveal">
+          <div><div class="eyebrow">03 — Services & rates</div><h2>Pick up where<br><span>you are.</span></h2></div>
+          <p class="section-intro">Come in with a rough idea or a nearly finished track. Choose one service, or build the session around what your music needs.</p>
+        </div>
+        <div class="service-grid">
+          <article class="service-card reveal">
+            <span class="service-no">01 / RECORD</span>
+            <div class="service-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="8" y="2" width="8" height="13" rx="4"/><path d="M5 10v2a7 7 0 0014 0v-2M12 19v3m-4 0h8"/></svg></div>
+            <h3>Recording</h3><p>Vocal and audio recording with time to settle in and get the performance right.</p>
+            <div class="price"><strong>500 EGP</strong><span>per hour</span></div>
+          </article>
+          <article class="service-card reveal">
+            <span class="service-no">02 / BALANCE</span>
+            <div class="service-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 20V9m5 11V4m5 16v-7m5 7V6M2 9h4m1-5h4m1 9h4m1-7h4"/></svg></div>
+            <h3>Mixing</h3><p>Balance, depth and definition, shaped around the character of your track.</p>
+            <div class="price"><strong>1,000 EGP</strong><span>per service</span></div>
+          </article>
+          <article class="service-card reveal">
+            <span class="service-no">03 / POLISH</span>
+            <div class="service-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 3v2m9 7h-2m-7 9v-2M3 12h2"/></svg></div>
+            <h3>Mastering</h3><p>A final, cohesive finish to help your music translate beyond the studio.</p>
+            <div class="price"><strong>1,000 EGP</strong><span>per service</span></div>
+          </article>
+          <article class="service-card reveal">
+            <span class="service-no">04 / REFINE</span>
+            <div class="service-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 4l16 16M20 4L4 20M3 12h4m10 0h4M12 3v4m0 10v4"/></svg></div>
+            <h3>Editing</h3><p>Careful timing and cleanup that keep the performance feeling natural.</p>
+            <div class="price"><strong>1,000 EGP</strong><span>per service</span></div>
+          </article>
+        </div>
+        <p class="price-note">Mixing, mastering and editing are each priced at 1,000 EGP. Final scope and delivery details are confirmed with the studio.</p>
+      </div>
+    </section>
+
+    <section id="studio">
+      <div class="shell about-grid">
+        <div class="about-mark reveal"><img src="yj-studios-logo.jpg" alt="YJ Studios logo"></div>
+        <div class="about-copy reveal">
+          <div class="eyebrow">04 — A little about the room</div>
+          <h2>Your sound,<br>with <span>room to grow.</span></h2>
+          <p>YJ Studios is a sound engineering and recording studio built around the music. Whether you're tracking a first vocal or giving a finished production its final polish, each session starts with listening — to you, and to what the song needs.</p>
+          <div class="about-points">
+            <div class="about-point"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="m3 8 3 3 7-7"/></svg>Time to find the right take</div>
+            <div class="about-point"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="m3 8 3 3 7-7"/></svg>Careful, detailed post-production</div>
+            <div class="about-point"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="m3 8 3 3 7-7"/></svg>Clear rates before you book</div>
+            <div class="about-point"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="m3 8 3 3 7-7"/></svg>Your vision at the center</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="booking-section" id="book">
+      <div class="shell booking-grid">
+        <div class="booking-aside reveal">
+          <div class="eyebrow">05 — Start a session</div>
+          <h2>Let’s make<br>something <span>real.</span></h2>
+          <p>Tell us what you’re working on and when you’d like to come in. Your estimate updates as you choose services.</p>
+          <div class="booking-aside-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="12" cy="12" r="9"/><path d="M12 11v5m0-8h.01"/></svg><span>Estimate is based on the listed rates. Recording is hourly; other selected services are 1,000 EGP each. The studio confirms final scope and time.</span></div>
+        </div>
+        <form class="booking-form reveal" id="booking-form">
+          <div class="form-top"><strong>Session request</strong><span>Choose one or more services</span></div>
+          <span class="form-label" id="service-label">What would you like help with?</span>
+          <div class="choice-grid" role="group" aria-labelledby="service-label">
+            <label class="choice"><input type="checkbox" name="service" value="recording" data-price="500"><span class="checkmark"></span><span class="choice-text"><strong>Recording</strong><small>Hourly session</small></span><span class="choice-price">500 EGP / hr</span></label>
+            <label class="choice"><input type="checkbox" name="service" value="mixing" data-price="1000"><span class="checkmark"></span><span class="choice-text"><strong>Mixing</strong><small>Per service</small></span><span class="choice-price">1,000 EGP</span></label>
+            <label class="choice"><input type="checkbox" name="service" value="mastering" data-price="1000"><span class="checkmark"></span><span class="choice-text"><strong>Mastering</strong><small>Per service</small></span><span class="choice-price">1,000 EGP</span></label>
+            <label class="choice"><input type="checkbox" name="service" value="editing" data-price="1000"><span class="checkmark"></span><span class="choice-text"><strong>Editing</strong><small>Per service</small></span><span class="choice-price">1,000 EGP</span></label>
+          </div>
+          <div class="field-grid duration-row" id="duration-row">
+            <div class="field"><label for="hours">Recording hours</label><select id="hours" name="hours"><option value="1">1 hour</option><option value="2">2 hours</option><option value="3">3 hours</option><option value="4">4 hours</option><option value="5">5 hours</option><option value="6">6 hours</option></select></div>
+          </div>
+          <div class="field-grid">
+            <div class="field"><label for="name">Your name</label><input id="name" name="name" autocomplete="name" maxlength="100" placeholder="Name" required></div>
+            <div class="field"><label for="contact">Email or phone</label><input id="contact" name="contact" autocomplete="on" maxlength="160" placeholder="Email address or phone number" required></div>
+            <div class="field"><label for="date">Preferred date</label><input id="date" name="date" type="date" required></div>
+            <div class="field"><label for="time">Preferred time</label><select id="time" name="time"><option value="Flexible">Flexible</option><option>Morning</option><option>Afternoon</option><option>Evening</option></select></div>
+            <div class="field full"><label for="project">A little about your project</label><textarea id="project" name="project" maxlength="500" placeholder="Track, genre, where you're at so far — anything that helps us prepare."></textarea></div>
+          </div>
+          <div class="estimate"><div class="estimate-label"><strong>Estimated total</strong><span>Final scope confirmed by the studio</span></div><output id="estimate" aria-live="polite">Choose a service</output></div>
+          <button class="button form-submit" type="submit">Send session request <span class="arrow">↗</span></button>
+          <p class="form-footnote">Requests are inquiries, not confirmed bookings. The studio will reply to confirm the session details.</p>
+          <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
+          <div class="request-preview" id="request-preview" aria-live="polite">
+            <h3>Your request is ready</h3><p id="request-text"></p><button class="copy-button" type="button" id="copy-request">Copy request</button>
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="shell footer-inner">
+      <a class="footer-brand" href="#home"><img src="yj-studios-logo.jpg" alt="">YJ STUDIOS</a>
+      <p>Sound engineering & recording · © <span id="year"></span> YJ Studios</p>
+      <div class="footer-links"><a href="#work">Studio work</a><a href="#services">Services</a><a href="#book">Book a session ↗</a><a href="auth.html">My account</a></div>
+    </div>
+  </footer>
+  <script>
+    const wave = document.getElementById('wave-rule');
+    const waveHeights = [4,7,10,6,14,22,10,17,29,12,8,19,34,13,8,24,15,38,13,8,21,30,12,7,17,26,10,6,16,31,10,7,21,37,15,8,18,27,10,5,14,23,8,6,20,34,12,7,17,25,9,5,13,29,10,6,18,36,12,7,21,31,11,5,15,25,9,6,18,33,12,7,23,39,13,8,16,28,10,5,19,30,10,6,14,24,9,5,18,34,12,7,20,29,10,5,15,26,8,6,19,37,14,8,22,30,12,6,17,27,9,4,14,22];
+    waveHeights.forEach((height) => { const bar = document.createElement('i'); bar.style.setProperty('--h', height + 'px'); wave.appendChild(bar); });
+
+    const trackArt = document.getElementById('track-art');
+    [0,1,2,3].forEach((row) => {
+      const track = document.createElement('div'); track.className = 'track';
+      for (let i = 0; i < 37; i++) {
+        const bar = document.createElement('span');
+        const height = 3 + Math.round(Math.abs(Math.sin(i * 1.71 + row * 2.2) * Math.cos(i * .42 + row)) * 19);
+        bar.style.setProperty('--h', height + 'px'); bar.style.setProperty('--o', (.42 + ((i + row) % 5) * .11).toFixed(2)); track.appendChild(bar);
+      }
+      trackArt.appendChild(track);
+    });
+
+    const portfolioWave = document.getElementById('portfolio-wave');
+    for (let i = 0; i < 55; i++) {
+      const bar = document.createElement('i');
+      const height = 8 + Math.round(Math.abs(Math.sin(i * .72) * Math.cos(i * .31 + .8)) * 62);
+      bar.style.setProperty('--bar', height + 'px');
+      portfolioWave.appendChild(bar);
+    }
+
+    const portfolioGrid = document.getElementById('portfolio-grid');
+    const previewUrls = new Map();
+    let activePortfolioFilter = 'all';
+
+    const mediaDatabase = new Promise((resolve, reject) => {
+      if (!('indexedDB' in window)) { reject(new Error('Browser storage is unavailable.')); return; }
+      const request = indexedDB.open('yj-studios-portfolio', 2);
+      request.onupgradeneeded = () => {
+        if (!request.result.objectStoreNames.contains('media')) request.result.createObjectStore('media', { keyPath: 'id' });
+      };
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error || new Error('Could not open browser storage.'));
+    });
+    async function readSavedUploads() {
+      try {
+        const db = await mediaDatabase;
+        const saved = await new Promise((resolve, reject) => {
+          const request = db.transaction('media', 'readonly').objectStore('media').getAll();
+          request.onsuccess = () => resolve(request.result);
+          request.onerror = () => reject(request.error);
+        });
+        return saved;
+      } catch { return []; }
+    }
+    function identifyMedia(file) {
+      const mime = (file.type || '').toLowerCase();
+      if (mime.startsWith('audio/')) return 'audio';
+      if (mime.startsWith('video/')) return 'video';
+      if (mime.startsWith('image/')) return 'image';
+      const extension = file.name.split('.').pop().toLowerCase();
+      if (['mp3','wav','m4a','aac','ogg','flac'].includes(extension)) return 'audio';
+      if (['mp4','mov','webm','m4v','ogv'].includes(extension)) return 'video';
+      if (['jpg','jpeg','png','webp','gif','avif'].includes(extension)) return 'image';
+      return '';
+    }
+    function formatFileSize(bytes) {
+      if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+      return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+    }
+    let audioContext = null;
+    function setupAudioVisualizer(audio, canvas, artwork) {
+      const context = canvas.getContext('2d');
+      if (!context) return;
+      let analyser = null;
+      let frequencyData = null;
+      let animationFrame = 0;
+      function draw() {
+        const bounds = canvas.getBoundingClientRect();
+        if (!bounds.width || !bounds.height) return;
+        const scale = Math.min(window.devicePixelRatio || 1, 2);
+        const width = Math.round(bounds.width * scale);
+        const height = Math.round(bounds.height * scale);
+        if (canvas.width !== width || canvas.height !== height) { canvas.width = width; canvas.height = height; }
+        context.clearRect(0, 0, width, height);
+        if (analyser && !audio.paused) analyser.getByteFrequencyData(frequencyData);
+        const count = 52;
+        const gap = Math.max(2 * scale, width * .009);
+        const barWidth = Math.max(2 * scale, (width - gap * (count - 1)) / count);
+        const progress = Number.isFinite(audio.duration) && audio.duration > 0 ? audio.currentTime / audio.duration : 0;
+        for (let index = 0; index < count; index++) {
+          const sampleIndex = analyser ? Math.min(frequencyData.length - 1, Math.floor(index * frequencyData.length / count)) : 0;
+          const liveLevel = analyser && !audio.paused ? frequencyData[sampleIndex] / 255 : 0;
+          const idleLevel = .12 + Math.abs(Math.sin(index * .69) * Math.cos(index * .27)) * .27;
+          const barHeight = Math.max(4 * scale, height * (analyser && !audio.paused ? .08 + liveLevel * .82 : idleLevel));
+          const x = index * (barWidth + gap);
+          const y = (height - barHeight) / 2;
+          context.fillStyle = index / count < progress ? '#7de5bd' : (index % 5 === 0 ? '#9af2f7' : '#61e6f6');
+          context.globalAlpha = index / count < progress ? .95 : .78;
+          context.fillRect(x, y, barWidth, barHeight);
+        }
+        context.globalAlpha = 1;
+        if (progress > 0) {
+          context.fillStyle = 'rgba(245,250,251,.84)';
+          context.fillRect(Math.min(width - 2 * scale, width * progress), 0, 2 * scale, height);
+        }
+      }
+      function animate() {
+        if (animationFrame || audio.paused) return;
+        const tick = () => { draw(); animationFrame = audio.paused ? 0 : requestAnimationFrame(tick); };
+        tick();
+      }
+      audio.addEventListener('play', async () => {
+        document.querySelectorAll('.uploaded-audio').forEach((other) => { if (other !== audio && !other.paused) other.pause(); });
+        artwork.classList.add('is-playing');
+        if (!analyser) {
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          if (AudioContextClass) {
+            try {
+              audioContext ||= new AudioContextClass();
+              analyser = audioContext.createAnalyser();
+              analyser.fftSize = 128;
+              analyser.smoothingTimeConstant = .82;
+              frequencyData = new Uint8Array(analyser.frequencyBinCount);
+              const source = audioContext.createMediaElementSource(audio);
+              source.connect(analyser);
+              analyser.connect(audioContext.destination);
+            } catch { analyser = null; }
+          }
+        }
+        if (audioContext?.state === 'suspended') { try { await audioContext.resume(); } catch { /* Native controls still work if analysis is unavailable. */ } }
+        animate();
+      });
+      audio.addEventListener('pause', () => { artwork.classList.remove('is-playing'); if (animationFrame) cancelAnimationFrame(animationFrame); animationFrame = 0; draw(); });
+      audio.addEventListener('ended', () => { artwork.classList.remove('is-playing'); if (animationFrame) cancelAnimationFrame(animationFrame); animationFrame = 0; draw(); });
+      audio.addEventListener('timeupdate', draw);
+      audio.addEventListener('seeked', draw);
+      draw();
+    }
+    function createUploadedCard(record) {
+      const url = record.mediaUrl || URL.createObjectURL(record.file);
+      if (record.file) previewUrls.set(record.id, url);
+      const coverUrl = record.coverUrl || (record.coverFile ? URL.createObjectURL(record.coverFile) : '');
+      if (record.coverFile) previewUrls.set(`${record.id}:cover`, coverUrl);
+      const card = document.createElement('article');
+      card.className = 'portfolio-card reveal in';
+      card.dataset.kind = record.kind;
+      card.dataset.uploadId = record.id;
+      card.dataset.fileName = record.fileName;
+
+      const art = document.createElement('div');
+      art.className = 'portfolio-art';
+      const media = document.createElement('div');
+      media.className = 'uploaded-media';
+      let audioVisualConfig = null;
+      if (record.kind === 'image') {
+        const image = document.createElement('img');
+        image.className = 'uploaded-image'; image.src = url; image.alt = record.title;
+        image.tabIndex = 0; image.setAttribute('role', 'button'); image.setAttribute('aria-label', `Enlarge ${record.title}`);
+        media.appendChild(image);
+      } else if (record.kind === 'video') {
+        const video = document.createElement('video');
+        video.className = 'uploaded-video'; video.src = url; video.controls = true; video.playsInline = true; video.preload = 'metadata';
+        if (coverUrl) video.poster = coverUrl;
+        video.setAttribute('aria-label', `${record.title} video preview`);
+        media.appendChild(video);
+      } else {
+        const audioArtwork = document.createElement('div');
+        audioArtwork.className = 'uploaded-audio-art';
+        if (coverUrl) {
+          const cover = document.createElement('img');
+          cover.className = 'uploaded-cover uploaded-image'; cover.src = coverUrl; cover.alt = `Cover art for ${record.title}`;
+          cover.tabIndex = 0; cover.setAttribute('role', 'button'); cover.setAttribute('aria-label', `Enlarge cover art for ${record.title}`);
+          audioArtwork.appendChild(cover);
+        }
+        const spectrum = document.createElement('canvas');
+        spectrum.className = 'audio-spectrum'; spectrum.setAttribute('aria-hidden', 'true');
+        const audio = document.createElement('audio');
+        audio.className = 'uploaded-audio'; audio.controls = true; audio.preload = 'metadata';
+        if (record.mediaUrl) audio.crossOrigin = 'anonymous';
+        audio.src = url;
+        audio.setAttribute('aria-label', `${record.title} audio preview`);
+        audioArtwork.appendChild(spectrum);
+        media.append(audioArtwork, audio);
+        audioVisualConfig = { audio, canvas: spectrum, artwork: audioArtwork };
+      }
+      const topLine = document.createElement('div');
+      topLine.className = 'portfolio-topline';
+      const kindLabel = document.createElement('span');
+      kindLabel.textContent = `${record.kind} · PREVIEW`;
+      const fileLabel = document.createElement('span');
+      fileLabel.textContent = record.fileName.split('.').pop().toUpperCase();
+      topLine.append(kindLabel, fileLabel);
+      art.append(media, topLine);
+
+      const info = document.createElement('div');
+      info.className = 'portfolio-info';
+      const type = document.createElement('span');
+      type.textContent = record.kind === 'image' ? 'Image · Studio / Release' : `${record.kind} · Studio work`;
+      const title = document.createElement('h3'); title.textContent = record.title;
+      const caption = document.createElement('p'); caption.textContent = record.caption || record.fileName;
+      const meta = document.createElement('div'); meta.className = 'portfolio-meta';
+      const dot = document.createElement('span');
+      const details = document.createElement('span'); details.textContent = `${formatFileSize(record.size || record.file?.size || 0)} · ${record.mediaUrl ? 'Cloud portfolio' : 'Saved in this browser'}${coverUrl ? ' · Cover art attached' : ''}`;
+      meta.append(dot, details);
+      info.append(type, title, caption, meta);
+      card.append(art, info);
+      portfolioGrid.insertBefore(card, portfolioGrid.firstChild);
+      if (audioVisualConfig) setupAudioVisualizer(audioVisualConfig.audio, audioVisualConfig.canvas, audioVisualConfig.artwork);
+    }
+    function refreshPortfolioVisibility() {
+      const uploadedKinds = new Set([...portfolioGrid.querySelectorAll('[data-upload-id]')].map((card) => card.dataset.kind));
+      portfolioGrid.querySelectorAll('.portfolio-card').forEach((card) => {
+        const hidePlaceholder = card.dataset.placeholder === 'true' && uploadedKinds.has(card.dataset.kind);
+        const hideByFilter = activePortfolioFilter !== 'all' && card.dataset.kind !== activePortfolioFilter;
+        card.hidden = hidePlaceholder || hideByFilter;
+      });
+    }
+    async function restoreUploads() {
+      const saved = await readSavedUploads();
+      saved.sort((a, b) => a.createdAt - b.createdAt).forEach(createUploadedCard);
+      refreshPortfolioVisibility();
+    }
+    restoreUploads();
+    window.YJPortfolio = {
+      async renderRemoteProjects(records) {
+        const remoteIds = new Set(records.map((record) => record.id));
+        portfolioGrid.querySelectorAll('[data-upload-id]').forEach((card) => {
+          if (remoteIds.has(card.dataset.uploadId)) card.remove();
+        });
+        portfolioGrid.querySelectorAll('[data-remote-project="true"]').forEach((card) => card.remove());
+        records.slice().reverse().forEach((record) => {
+          if (!record.mediaUrl) return;
+          createUploadedCard(record);
+          const card = portfolioGrid.querySelector(`[data-upload-id="${CSS.escape(record.id)}"]`);
+          if (card) card.dataset.remoteProject = 'true';
+        });
+        refreshPortfolioVisibility();
+      }
+    };
+
+    document.querySelectorAll('.portfolio-filter').forEach((button) => {
+      button.addEventListener('click', () => {
+        activePortfolioFilter = button.dataset.filter;
+        document.querySelectorAll('.portfolio-filter').forEach((filterButton) => filterButton.setAttribute('aria-pressed', String(filterButton === button)));
+        refreshPortfolioVisibility();
+      });
+    });
+
+    const mediaLightbox = document.getElementById('media-lightbox');
+    const lightboxImage = document.getElementById('lightbox-image');
+    portfolioGrid.addEventListener('click', (event) => {
+      const image = event.target.closest('img.uploaded-image');
+      if (!image) return;
+      lightboxImage.src = image.src;
+      lightboxImage.alt = image.alt;
+      document.getElementById('lightbox-caption').textContent = image.alt;
+      mediaLightbox.showModal();
+    });
+    portfolioGrid.addEventListener('keydown', (event) => {
+      if ((event.key === 'Enter' || event.key === ' ') && event.target.matches('img.uploaded-image')) {
+        event.preventDefault(); event.target.click();
+      }
+    });
+    document.getElementById('lightbox-close').addEventListener('click', () => mediaLightbox.close());
+    mediaLightbox.addEventListener('click', (event) => { if (event.target === mediaLightbox) mediaLightbox.close(); });
+    mediaLightbox.addEventListener('close', () => lightboxImage.removeAttribute('src'));
+
+    const menu = document.querySelector('.menu-toggle');
+    const navLinks = document.querySelector('.nav-links');
+    menu.addEventListener('click', () => { const open = navLinks.classList.toggle('open'); menu.setAttribute('aria-expanded', open); });
+    navLinks.querySelectorAll('a').forEach((link) => link.addEventListener('click', () => { navLinks.classList.remove('open'); menu.setAttribute('aria-expanded', 'false'); }));
+
+    const revealItems = document.querySelectorAll('.reveal');
+    if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const observer = new IntersectionObserver((entries) => entries.forEach((entry) => { if (entry.isIntersecting) { entry.target.classList.add('in'); observer.unobserve(entry.target); } }), { threshold: .12 });
+      revealItems.forEach((item) => observer.observe(item));
+    } else revealItems.forEach((item) => item.classList.add('in'));
+
+    const form = document.getElementById('booking-form');
+    const serviceInputs = [...form.querySelectorAll('input[name="service"]')];
+    const hoursInput = document.getElementById('hours');
+    const durationRow = document.getElementById('duration-row');
+    const estimate = document.getElementById('estimate');
+    const formStatus = document.getElementById('form-status');
+    const requestPreview = document.getElementById('request-preview');
+    const requestText = document.getElementById('request-text');
+    const currency = new Intl.NumberFormat('en-US');
+    function selectedServices() { return serviceInputs.filter((input) => input.checked); }
+    function updateEstimate() {
+      const selected = selectedServices();
+      const recording = selected.find((input) => input.value === 'recording');
+      durationRow.classList.toggle('visible', Boolean(recording));
+      const total = selected.reduce((sum, input) => sum + Number(input.dataset.price) * (input.value === 'recording' ? Number(hoursInput.value) : 1), 0);
+      estimate.textContent = selected.length ? currency.format(total) + ' EGP' : 'Choose a service';
+      return total;
+    }
+    serviceInputs.forEach((input) => input.addEventListener('change', updateEstimate));
+    hoursInput.addEventListener('change', updateEstimate);
+    updateEstimate();
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      formStatus.textContent = '';
+      const selected = selectedServices();
+      if (!selected.length) { formStatus.textContent = 'Choose at least one service to prepare your request.'; return; }
+      const data = new FormData(form);
+      const services = selected.map((input) => input.value === 'recording' ? `Recording (${data.get('hours')} hour${Number(data.get('hours')) === 1 ? '' : 's'})` : input.value[0].toUpperCase() + input.value.slice(1));
+      const total = updateEstimate();
+      const details = [
+        `Session request for YJ Studios`,
+        `Name: ${data.get('name')}`,
+        `Contact: ${data.get('contact')}`,
+        `Services: ${services.join(', ')}`,
+        `Preferred date: ${data.get('date')}`,
+        `Preferred time: ${data.get('time')}`,
+        `Estimated total: ${currency.format(total)} EGP`,
+        data.get('project') ? `Project: ${data.get('project')}` : ''
+      ].filter(Boolean).join('\n');
+      requestText.textContent = details;
+      document.querySelector('#request-preview h3').textContent = 'Your request is ready';
+      const submitButton = form.querySelector('[type="submit"]');
+      submitButton.disabled = true;
+      formStatus.style.color = 'var(--muted)';
+      formStatus.textContent = 'Sending your request…';
+      requestPreview.classList.add('visible');
+      requestPreview.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      const recording = selected.some((input) => input.value === 'recording');
+      const booking = {
+        name: String(data.get('name')).trim(),
+        contact: String(data.get('contact')).trim(),
+        services: selected.map((input) => input.value),
+        hours: recording ? Number(data.get('hours')) : 0,
+        date: String(data.get('date')),
+        time: String(data.get('time')),
+        project: String(data.get('project') || '').trim(),
+        total: Math.round(total)
+      };
+      try {
+        if (!window.YJCloud?.submitBooking) throw new Error('Online booking inbox is not available.');
+        const requestId = await window.YJCloud.submitBooking(booking);
+        requestText.textContent = `${details}\nRequest reference: ${requestId}`;
+        formStatus.style.color = 'var(--green)';
+        formStatus.textContent = 'Request sent to the studio inbox. The session is not confirmed until YJ Studios replies.';
+        form.reset();
+        updateEstimate();
+      } catch {
+        formStatus.style.color = '#f2b8ad';
+        formStatus.textContent = 'The request could not be sent. Copy it here and share it directly with YJ Studios.';
+      } finally { submitButton.disabled = false; }
+    });
+    document.getElementById('copy-request').addEventListener('click', async () => {
+      try { await navigator.clipboard.writeText(requestText.textContent); formStatus.style.color = 'var(--green)'; formStatus.textContent = 'Request copied. Share it with YJ Studios to confirm your session.'; }
+      catch { formStatus.style.color = '#f2b8ad'; formStatus.textContent = 'Copy wasn’t available here. Select the request text and copy it manually.'; }
+    });
+
+    const installButton = document.getElementById('install-app');
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    const isInstalled = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+    const isInstallableOrigin = location.protocol === 'https:' || (location.protocol === 'http:' && ['localhost', '127.0.0.1'].includes(location.hostname));
+    let installPrompt = null;
+    if (isIOS && !isInstalled) installButton.hidden = false;
+    window.addEventListener('beforeinstallprompt', (event) => {
+      event.preventDefault();
+      installPrompt = event;
+      installButton.hidden = false;
+    });
+    installButton.addEventListener('click', async () => {
+      navLinks.classList.remove('open');
+      menu.setAttribute('aria-expanded', 'false');
+      if (installPrompt) {
+        await installPrompt.prompt();
+        installPrompt = null;
+        installButton.hidden = true;
+      } else if (!isInstallableOrigin) {
+        alert('Host YJ Studios on an HTTPS website first. Then use this button, or add the site to your phone’s Home Screen.');
+      } else if (isIOS) {
+        alert('In Safari, tap Share, then choose “Add to Home Screen” to keep YJ Studios on your phone.');
+      } else {
+        alert('Open your browser menu and choose “Install app” or “Add to Home screen.”');
+      }
+    });
+    window.addEventListener('appinstalled', () => { installButton.hidden = true; });
+
+    if ('serviceWorker' in navigator && isInstallableOrigin) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
+    }
+
+    const dateField = document.getElementById('date');
+    const today = new Date();
+    dateField.min = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+  <script type="module" src="./site-cloud.js"></script>
+</body>
+</html>
