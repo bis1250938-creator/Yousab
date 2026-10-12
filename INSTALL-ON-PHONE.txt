@@ -1,15 +1,10 @@
-YJ STUDIOS — INSTALL ON YOUR PHONE
+YJ Studios — phone and direct portfolio uploads
 
-1. Upload the contents of this package to an HTTPS website. Keep the dashboard, Firebase config, manifests, service worker, icons, and pages in their supplied paths.
-2. Open the public website on your phone while online and let it finish loading once. Add it to the Home Screen for quick access to the studio site.
-3. To keep the owner dashboard as its own phone app, open `https://YOUR-DOMAIN/dashboard.html` while online. Sign in, or use “Add dashboard to phone” on the sign-in screen.
-4. Android: accept the install prompt, or choose Install app / Add to Home screen from the browser menu.
-5. iPhone: open the dashboard in Safari, tap Share, choose Add to Home Screen, then tap Add.
+1. Open the published website over HTTPS on your phone. Sign-in and uploads do not work when opening index.html from a files app.
+2. Scroll to Studio Work and choose + Add Project. Sign in using the authorized Firebase account when prompted.
+3. Select an audio, image, or video file from your device, complete the project details, preview it, then save as a draft or publish it.
+4. Upload progress and status appear in the form. Published projects appear in Studio Work; edit, unpublish, and delete actions appear on project cards while signed in.
 
-The home-screen app caches the site shell for offline use after the first online visit. Projects saved in the browser remain local to that browser. Publishing media across devices requires a configured cloud storage provider.
+Firebase setup is required first: enable the selected Authentication provider, add the website domain to Authorized domains, grant the Firebase UID its trusted custom claim from a trusted environment, enable/initialize Storage on the approved billing plan, and deploy Firestore and Storage rules. See FIREBASE_SETUP.md for exact commands and limitations.
 
-When Firebase Firestore is enabled and its security rules are deployed, website booking requests appear in the owner dashboard. Requests are inquiries only; YJ Studios still confirms each session. If sending fails, visitors can copy and share their request.
-
-For owner sign-in, enable Email/Password in Firebase Authentication, add the published hostname to Authorized domains, create/verify the administrator account, and assign its custom owner claim with the trusted tool described in `FIREBASE_SETUP.md`. Firestore rules and indexes are in this folder. Firebase Cloud Storage currently requires the Blaze pay-as-you-go plan; this project has not enabled billing. See `FIREBASE_SETUP.md` for details.
-
-Opening either HTML file directly from a files app does not install the app or enable offline caching. PWA installation and service workers require HTTPS (localhost is suitable only for local development). The owner dashboard still requires an internet connection to sign in and load bookings.
+The service worker caches the public site only. Project management needs an internet connection. Do not publish admin-tools or credentials with the site.

@@ -23,7 +23,6 @@
   <title>YJ Studios | Recording, Mixing & Sound Engineering</title>
   <link rel="manifest" href="./site.webmanifest">
   <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
-  <script>if (location.hash === '#dashboard') location.replace('./dashboard.html');</script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -141,6 +140,45 @@
     .portfolio-controls { display: flex; align-items: center; gap: 13px; }
     .portfolio-add { min-height: 34px; padding: 0 11px; color: var(--cyan-2); background: rgba(97,230,246,.07); border: 1px solid rgba(97,230,246,.38); border-radius: 2px; font-size: 10px; cursor: pointer; white-space: nowrap; }
     .portfolio-add:hover { background: rgba(97,230,246,.14); border-color: var(--cyan); }
+    .owner-portfolio-controls { display:flex; align-items:center; gap:8px; }
+    .owner-portfolio-controls[hidden],.owner-card-actions[hidden] { display:none; }
+    .owner-inline-status { color:var(--muted); font-size:9px; }
+    .owner-card-actions { display:flex; flex-wrap:wrap; gap:6px; margin-top:12px; }
+    .owner-card-actions button { min-height:28px; padding:0 9px; border:1px solid rgba(97,230,246,.3); color:var(--cyan-2); background:transparent; font-size:9px; cursor:pointer; }
+    .owner-card-actions button:hover { background:rgba(97,230,246,.08); }
+    .owner-card-actions .owner-delete { border-color:rgba(239,128,112,.4); color:#f2a89d; }
+    .studio-project-dialog { width:min(550px,calc(100% - 24px)); max-height:90vh; overflow:auto; padding:24px; border:1px solid #365660; background:#10181e; color:var(--white); box-shadow:0 25px 100px #000b; }
+    .studio-project-dialog::backdrop { background:rgba(2,5,7,.8); backdrop-filter:blur(5px); }
+    .studio-project-dialog h2 { margin:0 0 8px; font:600 23px var(--display); }
+    .studio-project-dialog p { color:#9aaab0; font-size:11px; line-height:1.7; }
+    .studio-project-dialog label { display:grid; gap:6px; margin:12px 0; color:#bdcbd0; font-size:10px; }
+    .studio-project-dialog input,.studio-project-dialog select,.studio-project-dialog textarea { width:100%; min-height:39px; padding:10px; border:1px solid var(--line); background:#0b1217; color:var(--white); font:inherit; font-size:11px; }
+    .studio-project-dialog textarea { min-height:72px; resize:vertical; }
+    .owner-form-actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+    .owner-form-actions button { min-height:38px; padding:0 13px; border:1px solid #3e737c; color:var(--cyan-2); background:#101e23; font-size:10px; }
+    .owner-form-actions .owner-submit { color:#071115; background:var(--cyan); border-color:var(--cyan); font-weight:700; }
+    .owner-form-message { min-height:18px; margin:10px 0 0!important; color:var(--cyan-2)!important; }
+    .owner-form-message[data-error="true"] { color:#f2a89d!important; }
+    .owner-preview { display:block; max-width:100%; max-height:220px; margin-top:9px; object-fit:contain; }
+    .project-type-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin:18px 0; }
+    .project-type-card { display:grid; grid-template-columns:38px 1fr; gap:9px; align-items:center; min-height:82px; padding:12px; text-align:left; color:var(--white); border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.025); cursor:pointer; transition:border-color .18s,background .18s,transform .18s; }
+    .project-type-card:hover { transform:translateY(-2px); border-color:rgba(97,230,246,.55); }
+    .project-type-card[aria-pressed="true"] { border-color:var(--cyan); background:rgba(97,230,246,.1); box-shadow:inset 0 0 0 1px rgba(97,230,246,.2); }
+    .project-type-icon { display:grid; place-items:center; width:36px; height:36px; color:var(--cyan-2); border:1px solid rgba(97,230,246,.25); border-radius:50%; font-size:19px; }
+    .project-type-card strong { display:block; margin-bottom:4px; font-size:11px; }
+    .project-type-card small { display:block; color:var(--muted); font-size:9px; line-height:1.45; }
+    .project-form-step[hidden],.project-type-step[hidden] { display:none; }
+    .project-step-header { display:flex; align-items:center; gap:11px; margin:12px 0 18px; }
+    .project-back { border:0; color:var(--cyan-2); background:transparent; cursor:pointer; font:inherit; }
+    .project-selected-type { color:var(--muted); font-size:10px; }
+    .project-dynamic-field[hidden] { display:none!important; }
+    .project-form-actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; }
+    .project-form-actions button { min-height:40px; padding:0 14px; border:1px solid #3e737c; color:var(--cyan-2); background:#101e23; font-size:10px; cursor:pointer; }
+    .project-form-actions .project-publish { color:#071115; background:var(--cyan); border-color:var(--cyan); font-weight:700; }
+    .project-form-actions button:disabled { opacity:.55; cursor:wait; }
+    .project-compare { display:grid; gap:6px; margin-top:10px; }
+    .project-compare audio { width:100%; }
+    .project-lyrics { margin-top:8px; color:var(--muted); font-size:10px; white-space:pre-wrap; }
     .portfolio-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
     .portfolio-card[data-placeholder="true"] { display: none; }
     .portfolio-empty { grid-column: 1/-1; padding: 30px; border: 1px solid var(--line); color: var(--muted); text-align: center; font-size: 11px; line-height: 1.7; }
@@ -332,6 +370,8 @@
       .portfolio-art { min-height: 220px; }
       .portfolio-toolbar { align-items: flex-start; flex-direction: column; }
       .portfolio-controls { width: 100%; flex-wrap: wrap; gap: 9px; }
+      .owner-portfolio-controls { width:100%; flex-wrap:wrap; }
+      .project-type-grid { grid-template-columns:1fr; }
       .service-grid { grid-template-columns: repeat(2, 1fr); }
       .service-card { min-height: 235px; }
       .about-grid { gap: 44px; }
@@ -348,6 +388,10 @@
       .nav-links.open { display: flex; }
       .nav-links a { padding: 4px 0; }
       .nav-cta { text-align: center; padding: 12px; }
+      .portfolio-controls { align-items: stretch; }
+      .portfolio-search { min-width:0; }
+      .owner-inline-status { flex-basis:100%; }
+      .studio-project-dialog { padding:19px; }
       .hero { padding: 58px 0 40px; }
       .hero-grid { grid-template-columns: 1fr; gap: 20px; }
       .hero h1 { font-size: clamp(54px, 13vw, 76px); margin-top: 22px; }
@@ -482,6 +526,9 @@
     :root[data-theme="light"] .portfolio-search,:root[data-theme="light"] .field input,:root[data-theme="light"] .field select,:root[data-theme="light"] .field textarea{background:#fff;color:#1b2a30;border-color:#bdcbd0}
     :root[data-theme="light"] .field label,:root[data-theme="light"] .field-hint{color:#455b63}
     :root[data-theme="light"] .request-preview,:root[data-theme="light"] .portfolio-empty{background:#f7fafa;color:#43575e;border-color:#d1dfe1}
+    :root[data-theme="light"] .studio-project-dialog{background:#f8fbfb;color:#1b2a30;border-color:#b9cdd1}
+    :root[data-theme="light"] .studio-project-dialog p,:root[data-theme="light"] .studio-project-dialog label{color:#455b63}
+    :root[data-theme="light"] .studio-project-dialog input,:root[data-theme="light"] .studio-project-dialog select,:root[data-theme="light"] .studio-project-dialog textarea{background:#fff;color:#1b2a30;border-color:#bdcbd0}
     :root[data-theme="light"] .footer{background:#e8eff0;border-color:#d2dddf}
     :root[data-theme="light"] .footer-brand,:root[data-theme="light"] .footer-links{color:#3f555c}
     :root[data-theme="light"] .nav-links{background:transparent}
@@ -509,7 +556,6 @@
         <a href="#work">Studio work</a>
         <a href="#services">Services</a>
         <a href="#studio">The studio</a>
-        <a href="dashboard.html">Owner login</a>
         <label class="sr-only" for="site-theme-mode">Color theme</label><select class="theme-select" id="site-theme-mode" aria-label="Color theme"><option value="system">Device theme</option><option value="dark">Dark theme</option><option value="light">Light theme</option></select>
         <a class="nav-cta" href="#book">Book a session <span class="arrow">↗</span></a>
         <button class="nav-cta install-button" id="install-app" type="button" hidden>Save to phone ↗</button>
@@ -564,6 +610,7 @@
               <button class="portfolio-filter" type="button" data-filter="category:Coptic Hymns" aria-pressed="false">Coptic Hymns</button>
             </div>
             <label class="sr-only" for="portfolio-search">Search studio work</label><input class="portfolio-search" id="portfolio-search" type="search" placeholder="Search titles, artists, categories…" autocomplete="off">
+            <div class="owner-portfolio-controls" id="owner-portfolio-controls"><button class="portfolio-add" id="owner-add-project" type="button">+ Add Project</button><span class="owner-inline-status" id="owner-portfolio-status" role="status" aria-live="polite"></span><button class="portfolio-add" id="owner-sign-out" type="button" hidden>Sign out</button></div>
           </div>
         </div>
         <div class="portfolio-grid" id="portfolio-grid" aria-live="polite">
@@ -605,6 +652,55 @@
       <button class="lightbox-nav lightbox-next" id="lightbox-next" type="button" aria-label="Next image">›</button>
       <img class="lightbox-image" id="lightbox-image" alt="">
       <p class="lightbox-caption" id="lightbox-caption"></p>
+    </dialog>
+
+    <dialog class="studio-project-dialog" id="portfolio-sign-in-dialog" aria-labelledby="portfolio-sign-in-title">
+      <form id="portfolio-sign-in-form"><h2 id="portfolio-sign-in-title">Sign in to add projects</h2><p>Use the authorized YJ Studios account to manage portfolio projects.</p>
+        <label>Email<input id="portfolio-owner-email" type="email" autocomplete="username" required></label>
+        <label>Password<input id="portfolio-owner-password" type="password" autocomplete="current-password" required></label>
+        <div class="owner-form-actions"><button class="owner-submit" type="submit">Sign in securely</button><button id="portfolio-google-sign-in" type="button">Sign in with Google</button><button id="portfolio-sign-in-close" type="button">Cancel</button></div>
+        <p class="owner-form-message" id="portfolio-sign-in-message" role="status" aria-live="polite"></p>
+      </form>
+    </dialog>
+    <dialog class="studio-project-dialog" id="portfolio-project-dialog" aria-labelledby="portfolio-project-title">
+      <form id="portfolio-project-form" novalidate>
+        <h2 id="portfolio-project-title">Add a Studio Work project</h2>
+        <p>Choose a project type to see the fields for your work.</p>
+        <section class="project-type-step" id="project-type-step" aria-label="Choose project type">
+          <div class="project-type-grid" role="group" aria-label="Project type">
+            <button class="project-type-card" type="button" data-project-type="audio-track" aria-pressed="false"><span class="project-type-icon" aria-hidden="true">🎵</span><span><strong>Audio Track</strong><small>Recording, performance, or release audio.</small></span></button>
+            <button class="project-type-card" type="button" data-project-type="video-project" aria-pressed="false"><span class="project-type-icon" aria-hidden="true">🎬</span><span><strong>Video Project</strong><small>Session films, performances, and video work.</small></span></button>
+            <button class="project-type-card" type="button" data-project-type="image-cover" aria-pressed="false"><span class="project-type-icon" aria-hidden="true">🖼️</span><span><strong>Image / Cover Art</strong><small>Artwork, studio stills, and release images.</small></span></button>
+            <button class="project-type-card" type="button" data-project-type="mixing" aria-pressed="false"><span class="project-type-icon" aria-hidden="true">🎚️</span><span><strong>Mixing Project</strong><small>Showcase the mix and optional comparison.</small></span></button>
+            <button class="project-type-card" type="button" data-project-type="mastering" aria-pressed="false"><span class="project-type-icon" aria-hidden="true">🎧</span><span><strong>Mastering Project</strong><small>Present the finished master and source comparison.</small></span></button>
+            <button class="project-type-card" type="button" data-project-type="coptic-hymn" aria-pressed="false"><span class="project-type-icon" aria-hidden="true">⛪</span><span><strong>Coptic Hymn</strong><small>Hymns, taraneem, choirs, and lyrics.</small></span></button>
+          </div>
+          <div class="project-form-actions"><button id="project-type-cancel-start" type="button">Cancel</button></div>
+        </section>
+        <section class="project-form-step" id="project-form-step" hidden>
+          <div class="project-step-header"><button class="project-back" id="project-type-back" type="button">← Back</button><span class="project-selected-type" id="project-selected-type"></span></div>
+          <input id="owner-project-type" type="hidden" value="audio-track">
+          <input id="owner-project-media-type" type="hidden" value="audio">
+          <label id="owner-project-title-label">Project title<input id="owner-project-title" maxlength="100" required></label>
+          <label class="project-dynamic-field" data-show-for="artist"><span id="owner-project-artist-label">Artist name</span><input id="owner-project-artist" maxlength="100"></label>
+          <label class="project-dynamic-field" data-show-for="media">Media file<input id="owner-project-file" type="file" accept="audio/mpeg,audio/wav,audio/aac,audio/mp4,audio/ogg,audio/flac,.mp3,.wav,.aac,.m4a,.ogg,.flac,video/mp4,video/webm,video/quicktime,.mp4,.webm,.mov,image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp"></label>
+          <div id="owner-project-preview" class="form-note project-dynamic-field" data-show-for="media">Select a file to preview it here.</div>
+          <label class="project-dynamic-field" data-show-for="cover">Cover image / thumbnail (optional)<input id="owner-project-cover" type="file" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp"></label>
+          <div id="owner-cover-preview" class="form-note project-dynamic-field" data-show-for="cover"></div>
+          <label class="project-dynamic-field" data-show-for="external"><span id="owner-project-url-label">External media URL (optional)</span><input id="owner-project-url" type="url" maxlength="2048" placeholder="https://…"></label>
+          <label class="project-dynamic-field" data-show-for="genre">Genre (optional)<input id="owner-project-genre" maxlength="80" placeholder="e.g. Taraneem"></label>
+          <label class="project-dynamic-field" data-show-for="tags">Tags (comma separated, optional)<input id="owner-project-tags" maxlength="480"></label>
+          <div class="project-dynamic-field" data-show-for="comparison"><label>Before / original audio file or URL (optional)<input id="owner-project-before-file" type="file" accept="audio/mpeg,audio/wav,audio/aac,audio/mp4,audio/ogg,audio/flac,.mp3,.wav,.aac,.m4a,.ogg,.flac"><input id="owner-project-before" type="url" maxlength="2048" placeholder="Or paste an HTTPS audio URL"></label><div id="owner-project-before-preview" class="form-note"></div><label>After / final audio file or URL (optional)<input id="owner-project-after-file" type="file" accept="audio/mpeg,audio/wav,audio/aac,audio/mp4,audio/ogg,audio/flac,.mp3,.wav,.aac,.m4a,.ogg,.flac"><input id="owner-project-after" type="url" maxlength="2048" placeholder="Or paste an HTTPS audio URL"></label><div id="owner-project-after-preview" class="form-note"></div></div>
+          <label class="project-dynamic-field" data-show-for="lyrics">Lyrics (optional)<textarea id="owner-project-lyrics" maxlength="4000"></textarea></label>
+          <label>Description<textarea id="owner-project-description" maxlength="1000"></textarea></label>
+          <input id="owner-project-category" type="hidden" value="Audio">
+          <label>Project date (optional)<input id="owner-project-date" type="date"></label>
+          <label>Display order<input id="owner-project-order" type="number" min="0" max="9999" value="100"></label>
+          <progress id="owner-upload-progress" max="100" value="0" hidden></progress>
+          <div class="project-form-actions"><button id="owner-project-cancel" type="button">Cancel</button><button id="owner-upload-cancel" type="button" hidden>Cancel upload</button><button id="owner-project-draft" type="button">Save as Draft</button><button class="project-publish" id="owner-project-publish" type="button">Publish Project</button></div>
+          <p class="owner-form-message" id="owner-project-message" role="status" aria-live="polite"></p>
+        </section>
+      </form>
     </dialog>
 
     <section class="work-section" id="craft">
@@ -744,7 +840,7 @@
     <div class="shell footer-inner">
       <a class="footer-brand" href="#home"><img src="yj-studios-logo.jpg" alt="">YJ STUDIOS</a>
       <p>Sound engineering & recording · © <span id="year"></span> YJ Studios</p>
-      <div class="footer-links"><a href="#work">Studio work</a><a href="#services">Services</a><a href="#book">Book a session ↗</a><a href="dashboard.html">Owner login</a></div>
+      <div class="footer-links"><a href="#work">Studio work</a><a href="#services">Services</a><a href="#book">Book a session ↗</a></div>
     </div>
   </footer>
   <script>
@@ -772,10 +868,15 @@
     }
 
     const portfolioGrid = document.getElementById('portfolio-grid');
+    const projectTypeNames = { 'audio-track':'Audio Track', 'video-project':'Video Project', 'image-cover':'Image / Cover Art', mixing:'Mixing Project', mastering:'Mastering Project', 'coptic-hymn':'Coptic Hymn' };
     const portfolioEmpty = document.getElementById('portfolio-empty');
     const previewUrls = new Map();
     let activePortfolioFilter = 'all';
     let portfolioDataStatus = 'Loading published studio work…';
+    let portfolioOwnerTools = false;
+    let portfolioOwnerHandlers = {};
+    let publicProjectRecords = [];
+    let ownerProjectRecords = null;
 
     const mediaDatabase = new Promise((resolve, reject) => {
       if (!('indexedDB' in window)) { reject(new Error('Browser storage is unavailable.')); return; }
@@ -934,7 +1035,7 @@
       card.dataset.uploadId = record.id;
       card.dataset.fileName = record.fileName;
       card.dataset.category = record.category || '';
-      card.dataset.search = [record.title, record.artist, record.category, record.caption, record.credits, ...(record.tags || [])].filter(Boolean).join(' ').toLocaleLowerCase();
+      card.dataset.search = [record.title, record.artist, record.category, record.projectType, record.genre, record.caption, record.credits, ...(record.tags || [])].filter(Boolean).join(' ').toLocaleLowerCase();
 
       const art = document.createElement('div');
       art.className = 'portfolio-art';
@@ -991,14 +1092,43 @@
       const info = document.createElement('div');
       info.className = 'portfolio-info';
       const type = document.createElement('span');
-      type.textContent = record.category || (record.kind === 'image' ? 'Image · Studio / Release' : `${record.kind} · Studio work`);
+      type.textContent = projectTypeNames[record.projectType] || record.category || (record.kind === 'image' ? 'Image · Studio / Release' : `${record.kind} · Studio work`);
       const title = document.createElement('h3'); title.textContent = record.title || record.fileName || 'Studio project'; title.dir = 'auto';
       const caption = document.createElement('p'); caption.textContent = record.caption || record.fileName || ''; caption.dir = 'auto';
       const meta = document.createElement('div'); meta.className = 'portfolio-meta';
       const dot = document.createElement('span');
-      const details = document.createElement('span'); details.textContent = `${record.projectDate ? `${record.projectDate} · ` : ''}${formatFileSize(record.size || record.file?.size || 0)} · ${record.mediaUrl ? 'Cloud portfolio' : 'Saved in this browser'}${coverUrl ? ' · Cover art attached' : ''}`;
+      const detailParts = [record.artist, record.genre, record.projectDate, formatFileSize(record.size || record.file?.size || 0), record.mediaUrl ? 'Cloud portfolio' : 'Saved in this browser'];
+      if (coverUrl) detailParts.push('Cover art attached');
+      const details = document.createElement('span'); details.textContent = detailParts.filter(Boolean).join(' · ');
       meta.append(dot, details);
       info.append(type, title, caption, meta);
+      const comparisons = [
+        ['Before / original', record.comparisonBeforeUrl],
+        ['After / final', record.comparisonAfterUrl]
+      ].filter(([, source]) => source && /^https:\/\//i.test(source));
+      if (comparisons.length) {
+        const comparison = document.createElement('details'); comparison.className = 'project-compare';
+        const summary = document.createElement('summary'); summary.textContent = 'Listen to project comparisons'; comparison.appendChild(summary);
+        comparisons.forEach(([label, source]) => {
+          const heading = document.createElement('span'); heading.textContent = label;
+          const player = document.createElement('audio'); player.controls = true; player.preload = 'none'; player.src = source;
+          comparison.append(heading, player);
+        });
+        info.appendChild(comparison);
+      }
+      if (record.lyrics) {
+        const lyrics = document.createElement('details'); lyrics.className = 'project-lyrics';
+        const summary = document.createElement('summary'); summary.textContent = 'View lyrics';
+        const text = document.createElement('p'); text.textContent = record.lyrics; text.dir = 'auto';
+        lyrics.append(summary, text); info.appendChild(lyrics);
+      }
+      if (portfolioOwnerTools && record.id && !record.file) {
+        const actions = document.createElement('div'); actions.className = 'owner-card-actions';
+        const edit = document.createElement('button'); edit.type = 'button'; edit.textContent = 'Edit'; edit.addEventListener('click', () => portfolioOwnerHandlers.onEdit?.(record));
+        const visibility = document.createElement('button'); visibility.type = 'button'; visibility.textContent = record.published ? 'Unpublish' : 'Publish'; visibility.addEventListener('click', () => portfolioOwnerHandlers.onPublish?.(record, !record.published));
+        const remove = document.createElement('button'); remove.type = 'button'; remove.className = 'owner-delete'; remove.textContent = 'Delete'; remove.addEventListener('click', () => portfolioOwnerHandlers.onDelete?.(record));
+        actions.append(edit, visibility, remove); info.appendChild(actions);
+      }
       card.append(art, info);
       portfolioGrid.insertBefore(card, portfolioGrid.firstChild);
       if (audioVisualConfig) setupAudioVisualizer(audioVisualConfig.audio, audioVisualConfig.canvas, audioVisualConfig.artwork);
@@ -1026,6 +1156,26 @@
       refreshPortfolioVisibility();
     }
     restoreUploads();
+    async function renderPortfolioRecords(records) {
+      portfolioDataStatus = 'No published studio work yet.';
+      portfolioGrid.querySelectorAll('[data-placeholder="true"]').forEach((card) => card.remove());
+      const remoteIds = new Set(records.map((record) => record.id));
+      portfolioGrid.querySelectorAll('[data-upload-id]').forEach((card) => {
+        if (remoteIds.has(card.dataset.uploadId)) card.remove();
+      });
+      portfolioGrid.querySelectorAll('[data-remote-project="true"]').forEach((card) => card.remove());
+      records.slice().sort((a, b) => {
+        const aOrder = Number.isFinite(a.sortOrder) ? a.sortOrder : Number.POSITIVE_INFINITY;
+        const bOrder = Number.isFinite(b.sortOrder) ? b.sortOrder : Number.POSITIVE_INFINITY;
+        return aOrder - bOrder || (b.createdAt || 0) - (a.createdAt || 0);
+      }).reverse().forEach((record) => {
+        if (!record.mediaUrl) return;
+        createUploadedCard(record);
+        const card = portfolioGrid.querySelector(`[data-upload-id="${CSS.escape(record.id)}"]`);
+        if (card) card.dataset.remoteProject = 'true';
+      });
+      refreshPortfolioVisibility();
+    }
     window.YJPortfolio = {
       showError(message) {
         portfolioDataStatus = message;
@@ -1037,24 +1187,18 @@
         refreshPortfolioVisibility();
       },
       async renderRemoteProjects(records) {
-        portfolioDataStatus = 'No published studio work yet.';
-        portfolioGrid.querySelectorAll('[data-placeholder="true"]').forEach((card) => card.remove());
-        const remoteIds = new Set(records.map((record) => record.id));
-        portfolioGrid.querySelectorAll('[data-upload-id]').forEach((card) => {
-          if (remoteIds.has(card.dataset.uploadId)) card.remove();
-        });
-        portfolioGrid.querySelectorAll('[data-remote-project="true"]').forEach((card) => card.remove());
-        records.slice().sort((a, b) => {
-          const aOrder = Number.isFinite(a.sortOrder) ? a.sortOrder : Number.POSITIVE_INFINITY;
-          const bOrder = Number.isFinite(b.sortOrder) ? b.sortOrder : Number.POSITIVE_INFINITY;
-          return aOrder - bOrder || (b.createdAt || 0) - (a.createdAt || 0);
-        }).reverse().forEach((record) => {
-          if (!record.mediaUrl) return;
-          createUploadedCard(record);
-          const card = portfolioGrid.querySelector(`[data-upload-id="${CSS.escape(record.id)}"]`);
-          if (card) card.dataset.remoteProject = 'true';
-        });
-        refreshPortfolioVisibility();
+        publicProjectRecords = records;
+        await renderPortfolioRecords(portfolioOwnerTools && ownerProjectRecords ? ownerProjectRecords : records);
+      },
+      async renderAdminProjects(records) {
+        ownerProjectRecords = records;
+        if (portfolioOwnerTools) await renderPortfolioRecords(records);
+      },
+      setOwnerTools(enabled, handlers = {}) {
+        portfolioOwnerTools = Boolean(enabled);
+        portfolioOwnerHandlers = handlers;
+        if (!portfolioOwnerTools) ownerProjectRecords = null;
+        renderPortfolioRecords(portfolioOwnerTools && ownerProjectRecords ? ownerProjectRecords : publicProjectRecords);
       }
     };
 
@@ -1254,5 +1398,8 @@
     document.getElementById('year').textContent = new Date().getFullYear();
   </script>
   <script type="module" src="./site-cloud.js"></script>
+  <script type="module" src="./studio-projects.js"></script>
 </body>
 </html>
+
+

@@ -27,7 +27,7 @@ export function consumeAuthIntent(storage) {
   }
 }
 
-export function canUseOwnerDashboard(user, tokenResult) {
+export function hasStudioProjectAccess(user, tokenResult) {
   const claims = tokenResult?.claims;
   const provider = claims?.firebase?.sign_in_provider;
   const verifiedProvider = ['google.com', 'password'].includes(provider)
@@ -39,9 +39,9 @@ export function canUseOwnerDashboard(user, tokenResult) {
     && verifiedProvider);
 }
 
-export async function verifyOwnerSession(user, getIdTokenResult) {
+export async function verifyStudioProjectSession(user, getIdTokenResult) {
   const tokenResult = await getIdTokenResult(user, true);
-  return { authorized: canUseOwnerDashboard(user, tokenResult), tokenResult };
+  return { authorized: hasStudioProjectAccess(user, tokenResult), tokenResult };
 }
 
 export function googleAuthErrorMessage(error, { hostname }) {
@@ -51,7 +51,7 @@ export function googleAuthErrorMessage(error, { hostname }) {
     case 'auth/invalid-api-key': return 'Firebase rejected the Web API key. Check the apiKey in firebase-config.js against the Firebase Web app config.';
     case 'auth/network-request-failed': return 'Google sign-in could not reach Firebase. Check the internet connection and try again.';
     case 'auth/web-storage-unsupported': return 'This browser is blocking the storage Google sign-in needs. Try a standard browser window with site storage enabled.';
-    case 'auth/unsupported-persistence-type': return 'This browser cannot provide the secure persistent session storage required by the owner dashboard. Try a standard browser with IndexedDB enabled.';
+    case 'auth/unsupported-persistence-type': return 'This browser cannot provide the secure persistent session storage required for owner sign-in. Try a standard browser with IndexedDB enabled.';
     case 'auth/popup-blocked': return 'The browser blocked the Google sign-in popup. Allow popups for this website and try again.';
     case 'auth/popup-closed-by-user': return 'The Google sign-in window was closed before sign-in finished. Try again when ready.';
     case 'auth/cancelled-popup-request': return 'Another Google sign-in request replaced this one. Use the latest sign-in window.';
@@ -110,3 +110,4 @@ export async function resolveGoogleAuthResult({ result, intent, auth, api }) {
 
   return { status: 'authenticated', user, googleSub: googleIdentity.uid, intent: action };
 }
+

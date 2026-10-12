@@ -10,6 +10,6 @@ export const firebaseConfig = {
   measurementId: "G-JJ4E1W0RDM"
 };
 
-// File uploads use the Firebase Storage bucket configured above.
-// Storage must be initialized in Firebase Console and the Storage Rules deployed.
-export const mediaStorageProvider = 'firebase-storage';
+// Set to the deployed Cloudflare Worker API base URL. This value is public;
+// R2 credentials remain only in the Worker environment.
+export const r2WorkerUrl = 'https://SET-YOUR-WORKER-URL.workers.dev';

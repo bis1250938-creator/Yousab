@@ -13,7 +13,9 @@ service firebase.storage {
       let objectPath = 'portfolio/' + ownerUid + '/' + projectId + '/' + fileName;
       return project.data.published == true
         && ((fileName.matches('media-.*') && (project.data.filePath == objectPath || project.data.mediaPath == objectPath))
-          || (fileName.matches('cover-.*') && (project.data.coverPath == objectPath || project.data.thumbnailPath == objectPath)));
+          || (fileName.matches('cover-.*') && (project.data.coverPath == objectPath || project.data.thumbnailPath == objectPath))
+          || (fileName.matches('before-.*') && project.data.keys().hasAny(['beforePath']) && project.data.beforePath == objectPath)
+          || (fileName.matches('after-.*') && project.data.keys().hasAny(['afterPath']) && project.data.afterPath == objectPath));
     }
 
     match /portfolio/{ownerUid}/{projectId}/{fileName} {
@@ -23,10 +25,13 @@ service firebase.storage {
         && ownerUid == request.auth.uid
         && ((fileName.matches('media-.*')
               && request.resource.size <= 250 * 1024 * 1024
-              && request.resource.contentType.matches('(audio/(mpeg|wav|mp4|aac|ogg|flac|webm|opus)|video/(mp4|webm|ogg)|image/(jpeg|png|webp|avif|gif))'))
+              && request.resource.contentType.matches('(audio/(mpeg|wav|mp4|aac|ogg|flac|webm|opus)|video/(mp4|webm|ogg|quicktime)|image/(jpeg|png|webp|avif|gif))'))
           || (fileName.matches('cover-.*')
               && request.resource.size <= 20 * 1024 * 1024
-              && request.resource.contentType.matches('image/(jpeg|png|webp|avif|gif)')));
+              && request.resource.contentType.matches('image/(jpeg|png|webp|avif|gif)'))
+          || ((fileName.matches('before-.*') || fileName.matches('after-.*'))
+              && request.resource.size <= 250 * 1024 * 1024
+              && request.resource.contentType.matches('audio/(mpeg|wav|mp4|aac|ogg|flac|webm|opus)')));
       allow delete: if isOwner() && ownerUid == request.auth.uid;
     }
   }

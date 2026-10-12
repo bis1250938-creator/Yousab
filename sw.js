@@ -1,17 +1,17 @@
-const CACHE_NAME = 'yj-studios-shell-v27';
+const CACHE_NAME = 'yj-studios-shell-v32';
 const BASE_URL = new URL('./', self.registration.scope);
 const APP_URL = new URL('index.html', BASE_URL).href;
 const SHELL_FILES = [
   './',
   './index.html',
-  './dashboard.html',
   './auth-flow.mjs',
   './firebase-config.js',
   './firebase-client.js',
   './media-storage.js',
+  './r2-uploader.js',
   './site-cloud.js',
+  './studio-projects.js',
   './site.webmanifest',
-  './dashboard.webmanifest',
   './yj-studios-logo.jpg',
   './icons/yj-icon-192.png',
   './icons/yj-icon-512.png',
@@ -63,3 +63,7 @@ self.addEventListener('fetch', (event) => {
     })
   );
 });
+
+
+
+

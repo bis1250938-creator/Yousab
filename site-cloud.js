@@ -56,7 +56,7 @@ async function startCloudFeatures() {
         if (!snapshot.size) {
           if (portfolioNote) portfolioNote.textContent = 'Published studio work will appear here as projects are added.';
         } else if (!records.length) {
-          const message = 'Published projects were found, but their media URL or media type is missing or invalid. Edit the project in the dashboard and save a valid HTTPS media URL.';
+          const message = 'Published projects were found, but their media URL or media type is missing or invalid. Edit the project while signed in and save a valid HTTPS media URL.';
           window.YJPortfolio.showStatus?.(message);
           if (portfolioNote) portfolioNote.textContent = 'Some published project records need valid media details.';
         } else {
@@ -83,3 +83,4 @@ async function startCloudFeatures() {
 }
 
 startCloudFeatures();
+
