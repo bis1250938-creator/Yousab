@@ -36,6 +36,7 @@ export async function deleteR2Objects(keys,auth){if(!keys?.length)return;const t
 export async function setR2Visibility(keys,published,auth){if(!keys?.length)return;const token=await auth.currentUser.getIdToken();return request('/api/objects/visibility',token,{method:'POST',body:{keys,published}});}
 function mimeFromName(name,kind){const ext=name.split('.').pop().toLowerCase();const map={mp3:'audio/mpeg',wav:'audio/wav',flac:'audio/flac',m4a:'audio/mp4',aac:'audio/aac',mp4:'video/mp4',webm:kind==='audio'?'audio/webm':'video/webm',mov:'video/quicktime',jpg:'image/jpeg',jpeg:'image/jpeg',png:'image/png',webp:'image/webp',avif:'image/avif'};return map[ext]||'';}
 function apiBase(){
+  function apiBase(){
   if(!/^https:\/\//.test(r2WorkerUrl)||r2WorkerUrl.includes('SET-YOUR'))
     throw new Error('Cloudflare R2 Worker URL is not configured in firebase-config.js.');
   ...
