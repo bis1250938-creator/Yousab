@@ -2,14 +2,14 @@ YJ STUDIOS — INSTALL ON YOUR PHONE
 
 1. Upload the contents of this package to an HTTPS website. Keep the dashboard, Firebase config, manifests, service worker, icons, and pages in their supplied paths.
 2. Open the public website on your phone while online and let it finish loading once. Add it to the Home Screen for quick access to the studio site.
-3. To keep the owner dashboard as its own phone app, open `https://YOUR-DOMAIN/dashboard.html` while online. Sign in through the shared account page, then use “Add dashboard to phone” in the dashboard.
+3. To keep the owner dashboard as its own phone app, open `https://YOUR-DOMAIN/dashboard.html` while online. Sign in, or use “Add dashboard to phone” on the sign-in screen.
 4. Android: accept the install prompt, or choose Install app / Add to Home screen from the browser menu.
 5. iPhone: open the dashboard in Safari, tap Share, choose Add to Home Screen, then tap Add.
 
-The home-screen app caches the site shell for offline use after the first online visit. New projects save metadata in Firestore and media in Firebase Cloud Storage, then appear in the public gallery across devices. Older projects from previous browser-only versions remain available in the owner dashboard until you choose Publish beside each one. Cloud media needs an internet connection to play on other devices.
+The home-screen app caches the site shell for offline use after the first online visit. Projects saved in the browser remain local to that browser. Publishing media across devices requires a configured cloud storage provider.
 
 When Firebase Firestore is enabled and its security rules are deployed, website booking requests appear in the owner dashboard. Requests are inquiries only; YJ Studios still confirms each session. If sending fails, visitors can copy and share their request.
 
-For account sign-in and booking requests, enable the Google provider, add your published hostname in Authentication → Settings → Authorized domains, and configure Firestore and Storage rules using `firestore.rules`, `firestore.indexes.json`, and `storage.rules`. `firebase-config.js` needs the exact `authDomain` and `projectId` from Firebase Console; do not guess them. Firebase Cloud Storage currently requires the Blaze pay-as-you-go plan. Use the shared account page; an owner account with the trusted role opens the private dashboard after sign-in. Google handles passwords directly. See `README.md` for details.
+For owner sign-in, enable Email/Password in Firebase Authentication, add the published hostname to Authorized domains, create/verify the administrator account, and assign its custom owner claim with the trusted tool described in `FIREBASE_SETUP.md`. Firestore rules and indexes are in this folder. Firebase Cloud Storage currently requires the Blaze pay-as-you-go plan; this project has not enabled billing. See `FIREBASE_SETUP.md` for details.
 
 Opening either HTML file directly from a files app does not install the app or enable offline caching. PWA installation and service workers require HTTPS (localhost is suitable only for local development). The owner dashboard still requires an internet connection to sign in and load bookings.

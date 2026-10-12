@@ -7,6 +7,13 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="YJ Owner">
+  <script>
+    (() => {
+      const mode = localStorage.getItem('yj-studios-theme-mode') || 'system';
+      const resolved = mode === 'system' ? (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark') : mode;
+      document.documentElement.dataset.theme = resolved;
+    })();
+  </script>
   <meta name="robots" content="noindex, nofollow">
   <title>Owner dashboard — YJ Studios</title>
   <link rel="manifest" href="./dashboard.webmanifest">
@@ -16,11 +23,29 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root{color-scheme:dark;--bg:#0b1117;--side:#0d141b;--panel:#121b23;--panel2:#17232c;--line:#22313b;--text:#edf4f6;--muted:#91a1aa;--cyan:#66e1f2;--green:#77e0b5;--orange:#ffcc83;--red:#ff9e98;--sans:'DM Sans',sans-serif;--display:'Manrope',sans-serif}
+    :root[data-theme="light"]{color-scheme:light;--bg:#edf2f3;--side:#f8fbfb;--panel:#fff;--panel2:#f2f6f7;--line:#cbd7da;--text:#17262c;--muted:#586a71;--cyan:#087f91;--green:#167a5a;--orange:#8a5700;--red:#a9342d}
+    :root[data-theme="light"] body{background:var(--bg);color:var(--text)}
+    :root[data-theme="light"] .gate{background:radial-gradient(ellipse at 50% 18%,rgba(49,151,170,.12),transparent 42%),var(--bg)}
+    :root[data-theme="light"] .gate-card,:root[data-theme="light"] .modal{background:#fff;color:var(--text);box-shadow:0 20px 60px rgba(22,44,52,.14)}
+    :root[data-theme="light"] .sidebar{background:var(--side)}
+    :root[data-theme="light"] .side-nav a,:root[data-theme="light"] .side-action,:root[data-theme="light"] .icon-button,:root[data-theme="light"] .ghost-button{color:#43565e}
+    :root[data-theme="light"] .side-nav a.active,:root[data-theme="light"] .side-nav a:hover,:root[data-theme="light"] .side-action:hover{background:#e6f1f2;border-color:#bfdadd;color:#17383e}
+    :root[data-theme="light"] .owner-mini,:root[data-theme="light"] .panel,:root[data-theme="light"] .activity-item,:root[data-theme="light"] .project-row,:root[data-theme="light"] .booking-row{background:#fff;color:var(--text)}
+    :root[data-theme="light"] .metric{background:linear-gradient(145deg,#fff,#f2f7f8);color:var(--text)}
+    :root[data-theme="light"] .notice{background:#edf6f1;color:#345347;border-color:#c7dfd1}
+    :root[data-theme="light"] .field input,:root[data-theme="light"] .field textarea,:root[data-theme="light"] .field select,:root[data-theme="light"] .project-tools input,:root[data-theme="light"] .project-tools select,:root[data-theme="light"] .booking-actions select{background:#fff;color:#17262c;border-color:#bccbd0}
+    :root[data-theme="light"] .project-tools{background:#f7fafa}
+    :root[data-theme="light"] .tag{background:#e8f4f4;color:#166c78}
+    :root[data-theme="light"] .empty{background:#f7fafa;color:#52636b}
+    :root[data-theme="light"] .form-note,:root[data-theme="light"] .gate-foot,:root[data-theme="light"] .gate-foot code{color:#53656c}
+    :root[data-theme="light"] .avatar{color:#fff}
+    :root[data-theme="light"] .primary-button{color:#fff;border-color:#087f91;background:#087f91}
+    :root[data-theme="light"] .theme-select{min-height:35px;padding:0 9px;border:1px solid var(--line);background:var(--panel);color:var(--text);font-size:10px}
     *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:13px var(--sans);-webkit-font-smoothing:antialiased}button,input,textarea{font:inherit}button,a{-webkit-tap-highlight-color:transparent}a{color:inherit;text-decoration:none}button{cursor:pointer}[hidden]{display:none!important}.hidden{display:none!important}
-    .gate{min-height:100vh;display:grid;place-items:center;padding:24px;background:radial-gradient(ellipse at 50% 18%,rgba(49,151,170,.14),transparent 42%),var(--bg)}.gate-card{width:min(460px,100%);padding:35px;border:1px solid var(--line);background:linear-gradient(155deg,#15212a,#10171d);box-shadow:0 25px 90px #0008}.eyebrow{color:var(--cyan);font-size:9px;letter-spacing:.19em;text-transform:uppercase}.gate h1{margin:12px 0;font:600 32px/1.15 var(--display);letter-spacing:-.05em}.gate-card>p{color:var(--muted);font-size:12px;line-height:1.7}.text-link{display:inline-block;margin-top:22px;color:var(--cyan);font-size:11px}
+    .gate{min-height:100vh;display:grid;place-items:center;padding:24px;background:radial-gradient(ellipse at 50% 18%,rgba(49,151,170,.14),transparent 42%),var(--bg)}.gate-card{width:min(460px,100%);padding:35px;border:1px solid var(--line);background:linear-gradient(155deg,#15212a,#10171d);box-shadow:0 25px 90px #0008}.gate-brand{display:flex;align-items:center;gap:12px;margin-bottom:32px}.gate-brand img{width:48px;height:48px;border-radius:50%;border:1px solid #54cddc;object-fit:cover}.brand-name{font:800 13px var(--display);letter-spacing:.16em}.brand-sub{margin-top:4px;color:var(--muted);font-size:9px;letter-spacing:.13em;text-transform:uppercase}.eyebrow{color:var(--cyan);font-size:9px;letter-spacing:.19em;text-transform:uppercase}.gate h1{margin:12px 0;font:600 32px/1.15 var(--display);letter-spacing:-.05em}.gate-card>p{color:var(--muted);font-size:12px;line-height:1.7}.google-button,.primary-button{display:inline-flex;align-items:center;justify-content:center;gap:11px;min-height:45px;padding:0 16px;border:1px solid #67d8e6;background:var(--cyan);color:#071115;font-weight:700;border-radius:3px}.google-button{width:100%;margin:16px 0 0}.google-button:disabled{opacity:.48;cursor:not-allowed}.google-mark{width:18px;height:18px;display:grid;place-items:center;border-radius:50%;background:white;color:#4285f4;font:bold 13px Arial}.gate-message{min-height:22px;margin:14px 0 0!important;color:var(--orange)!important;font-size:11px!important}.gate-foot{padding-top:17px;border-top:1px solid var(--line);color:#778991;font-size:10px;line-height:1.7}.gate-foot code{color:#c8d3d7;font-size:10px}.text-link{display:inline-block;margin-top:22px;color:var(--cyan);font-size:11px}
     .app{min-height:100vh;grid-template-columns:238px 1fr}.app.visible{display:grid}.sidebar{position:sticky;top:0;height:100vh;display:flex;flex-direction:column;padding:24px 15px;background:var(--side);border-right:1px solid var(--line)}.side-brand{display:flex;align-items:center;gap:10px;padding:0 9px 25px;border-bottom:1px solid var(--line)}.side-brand img{width:37px;height:37px;object-fit:cover;border-radius:50%;border:1px solid #4ebfd0}.side-brand strong{display:block;font:800 11px var(--display);letter-spacing:.14em}.side-brand small{display:block;margin-top:4px;color:var(--muted);font-size:8px;letter-spacing:.12em;text-transform:uppercase}.side-label{margin:24px 10px 9px;color:#70818a;font-size:8px;letter-spacing:.17em;text-transform:uppercase}.side-nav{display:grid;gap:4px}.side-nav a,.side-action{display:flex;align-items:center;gap:11px;padding:11px 10px;border:1px solid transparent;color:#a8b5bc;font-size:11px;background:transparent;text-align:left}.side-nav a span,.side-action span{width:16px;color:#7e929c;text-align:center;font-size:14px}.side-nav a.active,.side-nav a:hover,.side-action:hover{border-color:#27414b;background:#13232a;color:#e7f8fa}.side-nav a.active span{color:var(--cyan)}.side-bottom{margin-top:auto}.owner-mini{display:flex;align-items:center;gap:9px;margin:10px 4px 9px;padding:12px 9px;border:1px solid var(--line);background:#111a21}.avatar{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;color:#052027;background:var(--cyan);font-weight:700}.owner-mini strong{display:block;max-width:132px;overflow:hidden;text-overflow:ellipsis;font-size:10px}.owner-mini small{display:block;margin-top:4px;color:var(--green);font-size:9px}.main{min-width:0;padding:27px clamp(20px,4.2vw,58px) 50px}.topline{display:flex;justify-content:space-between;align-items:center;gap:20px;margin-bottom:31px;color:var(--muted);font-size:10px}.top-actions{display:flex;align-items:center;gap:10px}.icon-button,.ghost-button{min-height:35px;padding:0 11px;border:1px solid var(--line);background:transparent;color:#b5c2c7;font-size:10px}.icon-button:hover,.ghost-button:hover{border-color:#39717b;color:var(--cyan)}.welcome{display:flex;justify-content:space-between;align-items:end;gap:20px;margin-bottom:24px}.welcome h1{margin:9px 0 7px;font:600 clamp(25px,3vw,37px)/1.1 var(--display);letter-spacing:-.055em}.welcome p{margin:0;color:var(--muted);font-size:11px}.primary-button:hover{filter:brightness(1.08);transform:translateY(-1px)}.primary-button svg{width:15px;height:15px}
     .notice{display:flex;align-items:flex-start;gap:10px;margin-bottom:23px;padding:12px 14px;border:1px solid #354a36;background:#171f1d;color:#c8dbd1;font-size:10px;line-height:1.6}.notice b{color:var(--green)}.notice .notice-dot{color:var(--green)}.metric-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:24px}.metric{min-height:113px;padding:17px;border:1px solid var(--line);background:linear-gradient(145deg,#16232b,#121a21)}.metric-head{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:9px}.metric-icon{width:27px;height:27px;display:grid;place-items:center;border:1px solid #2b444e;color:var(--cyan);font-size:13px}.metric strong{display:block;margin-top:13px;font:600 25px var(--display);letter-spacing:-.04em}.metric small{display:block;margin-top:3px;color:#74868e;font-size:9px}.content-grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(250px,.8fr);gap:15px}.panel{min-width:0;border:1px solid var(--line);background:var(--panel)}.panel-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 17px;border-bottom:1px solid var(--line)}.panel-head h2{margin:0;font:600 13px var(--display)}.panel-head p{margin:5px 0 0;color:var(--muted);font-size:9px}.panel-link{color:var(--cyan);font-size:10px}.project-list{display:grid}.project-row{display:grid;grid-template-columns:48px minmax(80px,1fr) 75px 90px 30px;align-items:center;gap:11px;padding:11px 14px;border-bottom:1px solid rgba(34,49,59,.68)}.project-row:last-child{border-bottom:0}.project-thumb{width:46px;height:38px;display:grid;place-items:center;overflow:hidden;border:1px solid #30414a;background:linear-gradient(145deg,#19333c,#121a20);color:var(--cyan);font-size:14px}.project-thumb img{width:100%;height:100%;object-fit:cover}.project-name{min-width:0}.project-name strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px}.project-name small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:5px;color:var(--muted);font-size:9px}.tag{justify-self:start;padding:5px 7px;border:1px solid #2c414a;color:#b0c5ca;font-size:8px;text-transform:uppercase;letter-spacing:.08em}.project-date{color:#8a9aa1;font-size:9px}.delete-project{width:27px;height:27px;border:0;color:#75858d;background:transparent;font-size:15px}.delete-project:hover{color:var(--red)}.empty{padding:30px 18px;text-align:center;color:var(--muted);font-size:10px;line-height:1.7}.side-stack{display:grid;align-content:start;gap:14px}.service-list{padding:4px 16px 12px}.service-line{display:flex;justify-content:space-between;gap:10px;padding:11px 0;border-bottom:1px solid rgba(34,49,59,.72);color:#b7c3c8;font-size:10px}.service-line:last-child{border:0}.service-line strong{color:var(--text);font-weight:600}.inbox-note{padding:15px 16px 17px;color:#9aaab0;font-size:10px;line-height:1.7}.inbox-state{display:flex;gap:8px;align-items:center;margin-bottom:8px;color:var(--orange);font-weight:600}.inbox-state i{width:6px;height:6px;border-radius:50%;background:var(--orange)}.activity{padding:2px 16px 13px}.activity-item{display:flex;gap:10px;padding:11px 0;border-bottom:1px solid rgba(34,49,59,.6)}.activity-item:last-child{border:0}.activity-icon{flex:0 0 25px;width:25px;height:25px;display:grid;place-items:center;border-radius:50%;background:#142c31;color:var(--cyan);font-size:11px}.activity-item strong{display:block;font-size:9px}.activity-item small{display:block;margin-top:4px;color:var(--muted);font-size:8px}
-    .modal{width:min(680px,calc(100% - 24px));max-height:92vh;padding:0;border:1px solid #3a6470;background:#121b23;color:var(--text);box-shadow:0 25px 100px #000b;overflow:auto}.modal::backdrop{background:#03070bc9;backdrop-filter:blur(4px)}.modal-inner{padding:22px}.modal-head{display:flex;justify-content:space-between;align-items:start;margin-bottom:18px}.modal-head h2{margin:6px 0 0;font:600 20px var(--display)}.close-button{width:30px;height:30px;border:1px solid var(--line);background:transparent;color:var(--muted);font-size:18px}.field{display:grid;gap:7px;margin:13px 0}.field label{color:#bdcbd0;font-size:10px}.field input,.field textarea,.field select{width:100%;padding:11px;border:1px solid var(--line);outline:none;background:#0d141a;color:var(--text);font-size:11px}.field input:focus,.field textarea:focus,.field select:focus{border-color:#4db4c2}.field textarea{min-height:65px;resize:vertical}.field small{color:#829198;font-size:9px;line-height:1.5}.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 14px}.field.full{grid-column:1/-1}.dropbox{padding:14px;border:1px dashed #426a73;background:#102027}.dropbox.dragging{border-color:var(--cyan);background:#15323a}.dropbox input{width:100%;color:var(--muted);font-size:10px}.drop-help{color:#8c9da4;font-size:9px;line-height:1.5}.selected-preview{min-height:42px;margin-top:10px;color:#9fb0b7;font-size:10px}.selected-preview img,.selected-preview video{display:block;max-width:100%;max-height:230px;margin:8px auto;object-fit:contain}.selected-preview audio{width:100%;margin-top:8px}.upload-progress{width:100%;height:5px;margin-top:10px;accent-color:var(--cyan)}.check-row{display:flex;align-items:flex-start;gap:9px;margin:12px 0;color:#b8c6ca;font-size:10px;line-height:1.5}.check-row input{margin-top:2px;accent-color:var(--cyan)}.form-note{color:#84949a;font-size:9px;line-height:1.6}.form-message{min-height:15px;margin:10px 0 0;color:var(--green);font-size:10px}.form-message.error{color:var(--red)}.modal-actions{display:flex;gap:9px;align-items:center;margin-top:13px}.secondary-button,.row-button{min-height:36px;padding:0 12px;border:1px solid #36525c;background:#101a20;color:#c6d6db;font-size:10px}.secondary-button:hover,.row-button:hover{border-color:var(--cyan);color:var(--cyan)}.project-actions{display:flex;align-items:center;justify-self:end;gap:4px;flex-wrap:wrap}.project-row{grid-template-columns:48px minmax(80px,1fr) 75px 90px minmax(160px,auto)}.row-button{min-height:28px;padding:0 7px;font-size:8px}.row-button.danger{color:#eaa8a1}.row-button[aria-pressed="true"]{color:var(--green);border-color:#436457}.project-preview-dialog{width:min(760px,calc(100% - 24px));max-height:92vh;padding:0;overflow:auto;border:1px solid #3a6470;background:#10191f;color:var(--text)}.project-preview-dialog::backdrop{background:#03070bc9;backdrop-filter:blur(4px)}.preview-media{display:grid;place-items:center;min-height:170px;max-height:60vh;overflow:hidden;background:#070b0e}.preview-media img,.preview-media video{max-width:100%;max-height:60vh;object-fit:contain}.preview-media audio{width:min(100% - 32px,600px)}.preview-copy{padding:15px 20px 20px}.preview-copy h3{margin:0 0 7px;font:600 18px var(--display)}.preview-copy p{margin:0;color:#9aaab0;font-size:10px;line-height:1.7}.mobilebar{display:none}
+    .modal{width:min(560px,calc(100% - 24px));max-height:90vh;padding:0;border:1px solid #3a6470;background:#121b23;color:var(--text);box-shadow:0 25px 100px #000b}.modal::backdrop{background:#03070bc9;backdrop-filter:blur(4px)}.modal-inner{padding:22px}.modal-head{display:flex;justify-content:space-between;align-items:start;margin-bottom:18px}.modal-head h2{margin:6px 0 0;font:600 20px var(--display)}.close-button{width:30px;height:30px;border:1px solid var(--line);background:transparent;color:var(--muted);font-size:18px}.field{display:grid;gap:7px;margin:13px 0}.field label{color:#bdcbd0;font-size:10px}.field input,.field textarea,.field select{width:100%;padding:11px;border:1px solid var(--line);outline:none;background:#0d141a;color:var(--text);font-size:11px}.field input:focus,.field textarea:focus,.field select:focus{border-color:#4db4c2}.field textarea{min-height:65px;resize:vertical}.dropbox{padding:14px;border:1px dashed #426a73;background:#102027}.dropbox input{width:100%;color:var(--muted);font-size:10px}.form-note{color:#84949a;font-size:9px;line-height:1.6}.form-message{min-height:15px;margin:10px 0 0;color:var(--green);font-size:10px}.mobilebar{display:none}
     @media(max-width:1080px){.app{grid-template-columns:205px 1fr}.metric-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.content-grid{grid-template-columns:1fr}.side-stack{grid-template-columns:repeat(2,minmax(0,1fr))}.project-row{grid-template-columns:45px minmax(80px,1fr) 68px 80px 27px}}
     @media(max-width:680px){.app.visible{display:block}.sidebar{display:none}.main{padding:19px 14px 84px}.topline{margin-bottom:24px}.topline>span{max-width:40%;line-height:1.5}.top-actions{gap:6px}.icon-button,.ghost-button{min-height:32px;padding:0 8px;font-size:9px}.welcome{align-items:flex-start;flex-direction:column}.welcome .primary-button{width:100%}.metric-grid{gap:8px}.metric{min-height:101px;padding:13px}.metric strong{font-size:22px}.content-grid{gap:10px}.side-stack{grid-template-columns:1fr}.project-row{grid-template-columns:39px minmax(75px,1fr) auto 26px;gap:8px;padding:10px}.project-thumb{width:38px;height:34px}.project-date{display:none}.tag{font-size:7px}.panel-head{padding:14px}.mobilebar{position:fixed;z-index:5;bottom:0;left:0;right:0;display:flex;justify-content:space-around;padding:9px max(10px,env(safe-area-inset-left)) calc(9px + env(safe-area-inset-bottom));border-top:1px solid var(--line);background:#0e161df2;backdrop-filter:blur(12px)}.mobilebar a,.mobilebar button{display:grid;justify-items:center;gap:3px;border:0;background:transparent;color:#9babb2;font-size:8px}.mobilebar b{font-size:16px;color:var(--cyan)}.gate-card{padding:25px 20px}}
     @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important}}
@@ -28,17 +53,32 @@
     @media(max-width:1080px){.metric-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
     @media(max-width:680px){.metric-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
     .project-row{grid-template-columns:48px minmax(80px,1fr) 75px 90px auto}.project-actions{display:flex;align-items:center;justify-self:end;gap:3px}.publish-project{min-height:27px;padding:0 7px;border:1px solid #34717a;background:#112b30;color:var(--cyan);font-size:8px}.publish-project:hover{background:#183a40}.publish-project:disabled{opacity:.55;cursor:wait}.project-error{color:var(--red)!important}
+    .project-tools{display:flex;gap:8px;padding:12px 14px;border-bottom:1px solid var(--line)}.project-tools input,.project-tools select{min-height:34px;padding:0 10px;border:1px solid var(--line);background:#0d141a;color:var(--text);font-size:10px}.project-tools input{flex:1}.publish-toggle{display:flex;align-items:center;gap:8px;margin:14px 0;color:#bdcbd0;font-size:10px}.publish-toggle input{accent-color:var(--cyan)}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
     @media(max-width:1080px){.project-row{grid-template-columns:45px minmax(80px,1fr) 68px 80px auto}}
     @media(max-width:680px){.project-row{grid-template-columns:39px minmax(75px,1fr) auto auto}.project-actions{gap:1px}.publish-project{min-height:25px;padding:0 5px;font-size:7px}}
-    .avatar img{width:100%;height:100%;border-radius:50%;object-fit:cover}.owner-mini>span:last-child{min-width:0}.owner-mini small{max-width:132px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    .row-button:disabled{opacity:.42;cursor:not-allowed}.row-button:focus-visible,.secondary-button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
-    @media(max-width:1080px){.project-row{grid-template-columns:42px minmax(75px,1fr) 60px auto;gap:8px}.project-date{display:none}}
-    @media(max-width:680px){.modal-inner{padding:17px}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}.project-row{grid-template-columns:38px minmax(0,1fr);gap:7px}.project-row .tag,.project-row .project-date{display:none}.project-actions{grid-column:2;justify-self:start;gap:4px}.row-button{min-height:32px;padding:0 8px;font-size:9px}.preview-media{min-height:130px}.project-preview-dialog .modal-inner{padding:15px}}
+    .gate-switch{display:flex;justify-content:center;gap:5px;align-items:center;margin:13px 0 0;color:var(--muted);font-size:10px}.gate-switch button{padding:2px;border:0;background:transparent;color:var(--cyan);font:600 10px var(--sans);text-decoration:underline;text-underline-offset:3px}.google-button{border-color:#747775;background:#fff;color:#1f1f1f;font-family:Arial,sans-serif;font-size:14px;letter-spacing:.1px;border-radius:4px}.google-button:hover{background:#f8faff;border-color:#8e918f}.google-mark{width:18px;height:18px;display:block;flex:0 0 18px;border-radius:0;background:transparent;color:inherit}.avatar img{width:100%;height:100%;border-radius:50%;object-fit:cover}.owner-mini>span:last-child{min-width:0}.owner-mini small{max-width:132px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   </style>
 </head>
 <body>
-  <section class="gate" id="dashboard-access" aria-labelledby="access-title">
-    <div class="gate-card"><div class="eyebrow">Private studio workspace</div><h1 id="access-title">Checking your account</h1><p id="access-message" role="status" aria-live="polite">Verifying studio permissions…</p><a class="text-link" href="auth.html">Go to your YJ Studios account</a></div>
+  <section class="gate" id="login-gate" aria-labelledby="gate-title">
+    <div class="gate-card">
+      <a class="gate-brand" href="index.html"><img src="yj-studios-logo.jpg" alt=""><span><span class="brand-name">YJ STUDIOS</span><span class="brand-sub">Owner workspace</span></span></a>
+        <div class="eyebrow" id="gate-eyebrow">Private owner sign-in</div>
+        <h1 id="gate-title">Welcome back</h1>
+        <p id="gate-copy">Sign in with the verified Firebase administrator account. Owner access is assigned by a trusted project administrator; sign-in alone never grants the owner role.</p>
+        <form id="password-login-form">
+          <div class="field"><label for="login-email">Administrator email</label><input id="login-email" type="email" autocomplete="username" required></div>
+          <div class="field"><label for="login-password">Password</label><input id="login-password" type="password" autocomplete="current-password" required></div>
+          <button class="primary-button" id="password-login" type="submit" disabled>Sign in securely</button>
+        </form>
+        <p class="gate-foot">The Firebase account and verified email must be assigned the administrator role by the project owner. The dashboard never grants its own privileges.</p>
+        <details><summary>Use Google sign-in</summary><button class="google-button" id="google-login" type="button" disabled><svg class="google-mark" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.75 7.18l7.73 6C44.43 37.88 46.98 31.7 46.98 24.55z"/><path fill="#FBBC05" d="M10.54 28.41A14.43 14.43 0 0 1 9.8 24c0-1.53.26-3.01.74-4.41l-7.98-6.19A23.91 23.91 0 0 0 0 24c0 3.86.93 7.5 2.56 10.6l7.98-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.92-2.13 15.89-5.8l-7.73-6c-2.15 1.45-4.91 2.3-8.16 2.3-6.26 0-11.57-4.22-13.46-9.9l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg><span id="google-login-label">Sign in with Google</span></button></details>
+        <p class="gate-switch"><span id="gate-switch-prompt">Need to create the Firebase account first?</span><button id="gate-mode-toggle" type="button">Set up with Google</button></p>
+      <p class="gate-message" id="gate-message" role="status" aria-live="polite">Checking secure sign-in setup…</p>
+        <div class="gate-foot"><strong>Access:</strong> Only an explicitly authorized, verified Firebase identity can use this private workspace.<br>Use the published HTTPS address to sign in.</div>
+      <button class="primary-button" id="install-app" type="button" hidden>＋ Add dashboard to phone</button>
+      <a class="text-link" href="index.html">← Back to the public site</a>
+    </div>
   </section>
 
   <div class="app hidden" id="dashboard-app">
@@ -49,9 +89,9 @@
       <div class="side-bottom"><div class="side-label">Studio</div><a class="side-action" href="index.html" target="_blank" rel="noopener"><span>↗</span>Open public website</a><div class="owner-mini"><span class="avatar" id="owner-avatar">Y</span><span><strong id="owner-name">Studio owner</strong><small id="owner-email">Signed in · private</small></span></div><button class="side-action" id="sidebar-logout" type="button"><span>⇥</span>Sign out</button></div>
     </aside>
     <main class="main" id="overview">
-      <div class="topline"><span>YJ STUDIOS&nbsp; / &nbsp;STUDIO OVERVIEW</span><div class="top-actions"><span id="today-label"></span><button class="icon-button" id="dashboard-install" type="button" hidden>＋ Install</button><button class="icon-button" id="refresh-data" type="button">↻ Refresh</button><button class="ghost-button" id="top-logout" type="button">Sign out</button></div></div>
+      <div class="topline"><span>YJ STUDIOS&nbsp; / &nbsp;STUDIO OVERVIEW</span><div class="top-actions"><span id="today-label"></span><label class="sr-only" for="theme-mode">Color theme</label><select class="theme-select" id="theme-mode"><option value="system">Device</option><option value="dark">Dark</option><option value="light">Light</option></select><button class="icon-button" id="dashboard-install" type="button" hidden>＋ Install</button><button class="icon-button" id="refresh-data" type="button">↻ Refresh</button><button class="ghost-button" id="top-logout" type="button">Sign out</button></div></div>
       <header class="welcome"><div><div class="eyebrow">Good to have you back</div><h1>Studio overview</h1><p>Your portfolio and studio setup, in one place.</p></div><button class="primary-button" id="open-project-modal" type="button"><span>＋</span> Add a project</button></header>
-      <div class="notice"><span class="notice-dot">●</span><span><b>Private owner view.</b> Sign-in is restricted to your Google account. Project details are stored in Firestore and media in Cloud Storage. Published portfolio media is public across devices.</span></div>
+      <div class="notice"><span class="notice-dot">●</span><span><b>Private owner view.</b> A verified account with the trusted owner claim is required. Booking details and drafts are owner-only; published portfolio media is public across devices.</span></div>
       <section class="metric-grid" aria-label="Portfolio summary">
         <article class="metric"><div class="metric-head"><span>Total projects</span><span class="metric-icon">▧</span></div><strong id="total-count">—</strong><small>Cloud and local work</small></article>
         <article class="metric"><div class="metric-head"><span>Audio</span><span class="metric-icon">♫</span></div><strong id="audio-count">—</strong><small>Tracks and mixes</small></article>
@@ -61,7 +101,8 @@
       </section>
       <div class="content-grid">
         <section class="panel" id="projects">
-          <div class="panel-head"><div><h2>Portfolio projects</h2><p>Recent work in the YJ Studios gallery</p></div><a class="panel-link" href="index.html#work" target="_blank" rel="noopener">View gallery ↗</a></div>
+          <div class="panel-head"><div><h2>Portfolio projects</h2><p>Search, organize, and publish studio work</p></div><a class="panel-link" href="index.html#work" target="_blank" rel="noopener">View gallery ↗</a></div>
+          <div class="project-tools"><label class="sr-only" for="project-search">Search projects</label><input id="project-search" type="search" placeholder="Search projects, artists, credits…"><label class="sr-only" for="project-filter">Filter projects</label><select id="project-filter"><option value="all">All projects</option><option value="published">Published</option><option value="draft">Drafts</option><option value="audio">Audio</option><option value="video">Video</option><option value="image">Images</option></select></div>
           <div class="project-list" id="project-list" aria-live="polite"><div class="empty">Loading your saved projects…</div></div>
         </section>
         <div class="side-stack">
@@ -70,37 +111,51 @@
           <section class="panel"><div class="panel-head"><div><h2>Recent activity</h2><p>Projects and session requests</p></div></div><div class="activity" id="activity-feed"><div class="empty">Your recent studio activity will appear here.</div></div></section>
         </div>
       </div>
-      <footer style="margin-top:24px;color:#70818a;font-size:9px">YJ Studios · Portfolio projects sync across devices · Older browser-only uploads can be published here</footer>
+      <footer style="margin-top:24px;color:#70818a;font-size:9px">YJ Studios · Cloud projects sync across devices · Older local uploads stay in this browser until published</footer>
     </main>
     <nav class="mobilebar" aria-label="Dashboard navigation"><a href="#overview"><b>◫</b>Overview</a><a href="#projects"><b>▧</b>Projects</a><a href="#booking-status"><b>◷</b>Bookings</a><a href="index.html"><b>↗</b>Website</a><button id="mobile-logout" type="button"><b>⇥</b>Sign out</button></nav>
   </div>
 
   <dialog class="modal" id="project-modal" aria-labelledby="modal-title"><div class="modal-inner"><div class="modal-head"><div><div class="eyebrow">Portfolio management</div><h2 id="modal-title">Add a project</h2></div><button class="close-button" id="close-project-modal" type="button" aria-label="Close">×</button></div>
-    <form id="project-form" novalidate>
-      <div class="field full"><label for="project-files">Project media</label><div class="dropbox" id="project-dropbox"><input id="project-files" type="file" accept=".mp3,.wav,.m4a,.aac,.ogg,.flac,.mp4,.mov,.webm,.m4v,.ogv,.jpg,.jpeg,.png,.webp,.gif,.avif,audio/mpeg,audio/wav,audio/mp4,audio/aac,audio/ogg,audio/flac,video/mp4,video/quicktime,video/webm,image/jpeg,image/png,image/webp,image/gif,image/avif"><div class="drop-help">Drop one MP3, WAV, AAC, MP4, WebM, JPG, PNG, WebP, or other supported file here. Maximum 250 MB.</div></div><div class="selected-preview" id="selected-preview" aria-live="polite">Choose a file to preview it before saving.</div></div>
-      <div class="form-grid">
-        <div class="field"><label for="project-type">Media type</label><select id="project-type"><option value="audio">Audio</option><option value="video">Video</option><option value="image">Image</option></select></div>
-        <div class="field"><label for="project-title">Project title</label><input id="project-title" type="text" maxlength="100" required placeholder="Project or artist name"></div>
-        <div class="field full"><label for="project-caption">Project description</label><textarea id="project-caption" maxlength="1000" placeholder="Describe the work"></textarea></div>
-        <div class="field"><label for="project-category">Category</label><input id="project-category" type="text" maxlength="60" placeholder="Mixing, live session, artwork"></div>
-        <div class="field"><label for="project-tags">Tags</label><input id="project-tags" type="text" maxlength="240" placeholder="Comma-separated tags"><small>Use up to 12 tags.</small></div>
-        <div class="field"><label for="project-client">Client name (optional)</label><input id="project-client" type="text" maxlength="100"></div>
-        <div class="field"><label for="project-credits">Project credits (optional)</label><input id="project-credits" type="text" maxlength="240"></div>
-        <div class="field full"><label for="project-external-url">External media URL (optional)</label><input id="project-external-url" type="url" maxlength="2048" placeholder="https://…"><small>For a new project without an uploaded file, this URL becomes its media source. Use a direct audio, video, or image URL.</small></div>
-        <div class="field full"><label for="project-cover">Cover image or poster (optional)</label><input id="project-cover" type="file" accept=".jpg,.jpeg,.png,.webp,.gif,.avif,image/jpeg,image/png,image/webp,image/gif,image/avif"><small id="cover-note">Use for audio artwork or a video poster. Maximum 20 MB.</small></div>
-      </div>
-      <label class="check-row"><input id="project-featured" type="checkbox"><span>Feature this project near the top of the public portfolio</span></label>
-      <label class="check-row"><input id="project-published" type="checkbox" checked><span>Publish this project in the public portfolio</span></label>
-      <p class="form-note">Project details and media save to Firebase. If upload is interrupted, retry the save; incomplete uploads are cleaned up automatically. Older projects saved in this browser remain available to publish.</p>
-      <progress class="upload-progress" id="upload-progress" max="100" value="0" hidden aria-label="Upload progress"></progress>
-      <div class="modal-actions"><button class="primary-button" id="save-project" type="submit">Save project</button><button class="secondary-button" id="preview-project" type="button">Preview</button></div><p class="form-message" id="project-message" role="status" aria-live="polite"></p>
+    <form id="project-form"><div class="field"><label for="project-type">Media type</label><select id="project-type"><option value="audio">Audio</option><option value="video">Video</option><option value="image">Image</option></select></div><div class="field"><label for="project-files">Media files (optional when using an external URL)</label><div class="dropbox"><input id="project-files" type="file" accept="audio/*,video/*,image/*" multiple></div><div id="media-preview" class="form-note" aria-live="polite">Choose media to preview it here.</div></div>
+      <div class="field"><label for="project-cover">Optional cover image for audio or video</label><input id="project-cover" type="file" accept="image/*"></div>
+      <div class="field"><label for="project-title">Project title</label><input id="project-title" type="text" maxlength="100" placeholder="Title" required></div>
+      <div class="field"><label for="project-artist">Artist or performer</label><input id="project-artist" type="text" maxlength="100" placeholder="Artist or performer"></div>
+      <div class="field"><label for="project-caption">Description</label><textarea id="project-caption" maxlength="1000" placeholder="Project details" dir="auto"></textarea></div>
+      <div class="field"><label for="project-credits">Credits</label><input id="project-credits" type="text" maxlength="240" placeholder="Recording, mix, mastering credits" dir="auto"></div>
+      <div class="field"><label for="project-category">Category</label><select id="project-category"><option>Recording</option><option>Mixing</option><option>Mastering</option><option>Coptic Hymns</option><option>Taraneem</option><option>Other</option></select></div>
+      <div class="field"><label for="project-external-url">External media URL (optional)</label><input id="project-external-url" type="url" maxlength="2048" placeholder="https://…" inputmode="url"></div>
+      <div class="field"><label for="project-thumbnail-url">Thumbnail URL (optional)</label><input id="project-thumbnail-url" type="url" maxlength="2048" placeholder="https://…" inputmode="url"></div>
+      <div class="field"><label for="project-order">Display order</label><input id="project-order" type="number" min="0" max="9999" step="1" value="100"></div>
+      <label class="publish-toggle"><input id="project-published" type="checkbox" checked> Publish to the public Studio Work section</label>
+      <p class="form-note">Upload audio, video, and image files directly to Firebase Storage, or provide an external HTTPS media URL. File uploads require the Firebase Storage bucket to be initialized and its rules deployed in Firebase Console. The 250 MB media and 20 MB cover limits are this app's policy.</p>
+      <button class="primary-button" type="submit">Save project to library</button><p class="form-message" id="project-message" role="status" aria-live="polite"></p>
     </form></div></dialog>
-  <dialog class="project-preview-dialog" id="project-preview-dialog" aria-labelledby="project-preview-title"><div class="modal-inner"><div class="modal-head"><div><div class="eyebrow">Project preview</div><h2 id="project-preview-title">Project</h2></div><button class="close-button" id="close-project-preview" type="button" aria-label="Close preview">×</button></div><div class="preview-media" id="admin-preview-media"></div><div class="preview-copy"><h3 id="admin-preview-heading"></h3><p id="admin-preview-caption"></p></div></div></dialog>
 
   <script>
-    const installButtons = [...document.querySelectorAll('#dashboard-install')];
-    window.addEventListener('pageshow', (event) => { if (event.persisted) location.reload(); });
-    window.addEventListener('pagehide', () => document.getElementById('dashboard-app').classList.add('hidden'));
+    if (location.protocol === 'file:') {
+      document.getElementById('google-login').disabled = true;
+      document.getElementById('gate-message').textContent = 'Open the published HTTPS site or run this folder with VS Code Live Server to use Google sign-in.';
+    }
+    const themeModeSelect = document.getElementById('theme-mode');
+    const themeMediaQuery = window.matchMedia('(prefers-color-scheme: light)');
+    function applyThemeMode(mode, persist = true) {
+      const resolved = mode === 'system' ? (themeMediaQuery.matches ? 'light' : 'dark') : mode;
+      document.documentElement.dataset.theme = resolved;
+      themeModeSelect.value = mode;
+      document.querySelector('meta[name="theme-color"]')?.setAttribute('content', resolved === 'light' ? '#edf2f3' : '#0b1117');
+      if (persist) localStorage.setItem('yj-studios-theme-mode', mode);
+    }
+    const initialThemeMode = localStorage.getItem('yj-studios-theme-mode') || 'system';
+    applyThemeMode(['system', 'dark', 'light'].includes(initialThemeMode) ? initialThemeMode : 'system', false);
+    themeModeSelect.addEventListener('change', () => applyThemeMode(themeModeSelect.value));
+    themeMediaQuery.addEventListener?.('change', () => {
+      if ((localStorage.getItem('yj-studios-theme-mode') || 'system') === 'system') applyThemeMode('system', false);
+    });
+    window.addEventListener('storage', (event) => {
+      if (event.key === 'yj-studios-theme-mode') applyThemeMode(event.newValue || 'system', false);
+    });
+    const installButtons = [...document.querySelectorAll('#install-app, #dashboard-install')];
     const iosDevice = /iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
     const installedApp = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
     const installableOrigin = location.protocol === 'https:' || (location.protocol === 'http:' && ['localhost', '127.0.0.1'].includes(location.hostname));
@@ -132,7 +187,7 @@
     }
   </script>
   <script type="module">
-    let authApi, firestoreApi, storageApi, firebaseClient, authFlow;
+    let authApi, firestoreApi, storageApi, mediaStorageApi, firebaseClient, authFlow;
     try {
       [authApi, firestoreApi, firebaseClient, authFlow] = await Promise.all([
         import('https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js'),
@@ -144,28 +199,40 @@
         console.error('YJ Studios Storage SDK could not load:', error);
         return null;
       });
+      mediaStorageApi = await import('./media-storage.js');
     } catch (error) {
+      document.getElementById('google-login').disabled = true;
       const setupMessage = String(error?.message || '').includes('exact authDomain and projectId')
-        ? 'Firebase is not configured. Check the Web app settings in firebase-config.js.'
+        ? 'Owner login is not configured yet. Add the exact Firebase authDomain and projectId from Project settings → General → Your apps → Firebase SDK config to firebase-config.js.'
         : location.protocol === 'file:'
-          ? 'Open the published HTTPS dashboard or run this folder with VS Code Live Server.'
+          ? 'This file:// page cannot sign in. Open the published HTTPS dashboard or run the folder with VS Code Live Server.'
           : 'Firebase could not load. Check the Web app configuration and internet connection, then refresh.';
-      document.getElementById('access-message').textContent = setupMessage;
+      document.getElementById('gate-message').textContent = setupMessage;
       console.error('YJ Studios dashboard could not load Firebase:', error);
       throw error;
     }
-    const { getIdTokenResult, indexedDBLocalPersistence, setPersistence, onAuthStateChanged, signOut } = authApi;
-    const { collection, deleteDoc, doc, getDoc, limit, onSnapshot, orderBy, query, serverTimestamp, setDoc, updateDoc, writeBatch } = firestoreApi;
-    const { deleteObject, getDownloadURL, getStorage, ref: storageRef, uploadBytesResumable } = storageApi || {};
-    const { app, auth, db, storageBucket } = firebaseClient;
-    const storage = getStorage && !storageBucket.startsWith('REPLACE_') ? getStorage(app) : null;
+    const { GoogleAuthProvider, getAdditionalUserInfo, getIdTokenResult, getRedirectResult, indexedDBLocalPersistence, setPersistence, signInWithEmailAndPassword, signInWithPopup, signInWithRedirect, onAuthStateChanged, signOut, deleteUser } = authApi;
+    const { collection, deleteDoc, doc, limit, onSnapshot, orderBy, query, serverTimestamp, setDoc, updateDoc } = firestoreApi;
+    const { app, auth, db, storageBucket, mediaStorageProvider } = firebaseClient;
+    const storageProvider = mediaStorageProvider === 'firebase-storage' && storageApi && !storageBucket.startsWith('REPLACE_')
+      ? mediaStorageApi.createFirebaseStorageProvider({ app, bucket: storageBucket, api: storageApi }) : null;
 
-    const accessMessage = document.getElementById('access-message');
+    const gate = document.getElementById('login-gate');
+    const gateMessage = document.getElementById('gate-message');
+    const googleLogin = document.getElementById('google-login');
+    const passwordLogin = document.getElementById('password-login');
+    const gateModeToggle = document.getElementById('gate-mode-toggle');
+    const gateTitle = document.getElementById('gate-title');
+    const gateCopy = document.getElementById('gate-copy');
+    const gateEyebrow = document.getElementById('gate-eyebrow');
+    const gateModePrompt = document.getElementById('gate-switch-prompt');
+    const googleLoginLabel = document.getElementById('google-login-label');
     const appShell = document.getElementById('dashboard-app');
     const projectList = document.getElementById('project-list');
     const activityFeed = document.getElementById('activity-feed');
     const modal = document.getElementById('project-modal');
     const numberFormat = new Intl.NumberFormat('en-US');
+    const { AUTH_INTENT_KEY, consumeAuthIntent, googleAuthErrorMessage, normalizeAuthIntent, passwordAuthErrorMessage, resolveGoogleAuthResult, saveAuthIntent, verifyOwnerSession } = authFlow;
     let databasePromise = null;
     let currentProjects = [];
     let localProjects = [];
@@ -174,7 +241,33 @@
     let stopBookingListener = null;
     let stopProjectListener = null;
     const localUrls = new Map();
+    let gateOverride = '';
+    let ownerAccessMode = 'signin';
+
+    function renderOwnerAccessMode() {
+      const registering = ownerAccessMode === 'register';
+      gateEyebrow.textContent = registering ? 'Firebase account setup' : 'Private owner sign-in';
+      gateTitle.textContent = registering ? 'Set up your account' : 'Welcome back';
+      gateCopy.textContent = registering
+        ? 'Create a Google-linked Firebase account only if the project administrator asked you to. Account creation does not grant owner access.'
+        : 'Sign in with the existing owner Google account. Firebase checks the server-assigned owner role before showing this workspace.';
+      googleLoginLabel.textContent = registering ? 'Set up with Google' : 'Sign in with Google';
+      gateModePrompt.textContent = registering ? 'Already have an account?' : 'Need to create the Firebase account first?';
+      gateModeToggle.textContent = registering ? 'Sign in' : 'Set up with Google';
+    }
+    renderOwnerAccessMode();
+    gateModeToggle.addEventListener('click', () => {
+      ownerAccessMode = ownerAccessMode === 'register' ? 'signin' : 'register';
+      renderOwnerAccessMode();
+      gateError('');
+    });
+
     document.getElementById('today-label').textContent = new Intl.DateTimeFormat('en', { weekday: 'short', month: 'short', day: 'numeric' }).format(new Date());
+
+    function gateError(message) { gateMessage.textContent = message; }
+    function authErrorMessage(error) {
+      return error?.code?.startsWith('auth/') ? (error.code.includes('popup') || error.code.includes('redirect') || error.code.includes('domain') ? googleAuthErrorMessage(error, { hostname: location.hostname }) : passwordAuthErrorMessage(error)) : error?.message || 'Sign-in failed.';
+    }
     function renderOwnerProfile(user) {
       const avatar = document.getElementById('owner-avatar');
       const initial = (user.displayName || user.email || 'Y').trim().charAt(0).toUpperCase();
@@ -192,12 +285,77 @@
       photo.addEventListener('load', () => avatar.replaceChildren(photo), { once: true });
       photo.src = photoUrl.href;
     }
+    let authActionPending = false;
+    let rejectedAuthUid = '';
     let dashboardUserUid = '';
+    async function signOutAndDeny(message, user = auth?.currentUser) {
+      rejectedAuthUid = user?.uid || '';
+      dashboardUserUid = '';
+      if (stopBookingListener) stopBookingListener();
+      if (stopProjectListener) stopProjectListener();
+      stopBookingListener = null;
+      stopProjectListener = null;
+      gate.classList.remove('hidden');
+      appShell.classList.add('hidden');
+      gateOverride = message;
+      gateError(message);
+      if (auth) await signOut(auth).catch(() => {});
+      googleLogin.disabled = false;
+      passwordLogin.disabled = false;
+    }
+
+    function authOutcomeMessage(status, user = null) {
+      switch (status) {
+        case 'not-registered': return 'No account found. Please sign up first.';
+        case 'already-registered': return 'This Google account is already registered. Sign in instead.';
+        case 'not-owner': return `This Google account is signed in, but Firebase UID ${user?.uid || '(unavailable)'} has no owner role. Ask the project administrator to assign the owner role to this UID.`;
+        case 'cleanup-failed': return 'Google created a temporary Firebase profile, but it could not be fully removed. You have been signed out. Check the Firebase Auth user list before trying again.';
+        default: return 'Google did not return a valid account. Check the account and try again.';
+      }
+    }
+    async function finishGoogleResult(result, intent) {
+      const decision = await resolveGoogleAuthResult({
+        result,
+        intent,
+        auth,
+        api: { getAdditionalUserInfo, deleteUser, signOut }
+      });
+      if (decision.status !== 'authenticated') {
+        authActionPending = false;
+        rejectedAuthUid = result?.user?.uid || '';
+        gateOverride = authOutcomeMessage(decision.status);
+        gateError(gateOverride);
+        googleLogin.disabled = false;
+        return;
+      }
+      let ownerSession;
+      try { ownerSession = await verifyOwnerSession(decision.user, getIdTokenResult); }
+      catch (error) {
+        const message = `Google sign-in succeeded, but owner permissions could not be verified. Check the connection and try again. ${authErrorMessage(error)}`;
+        gateOverride = message;
+        await signOutAndDeny(message, decision.user);
+        authActionPending = false;
+        return;
+      }
+      if (!ownerSession.authorized) {
+        const message = authOutcomeMessage('not-owner', decision.user);
+        gateOverride = message;
+        await signOutAndDeny(message, decision.user);
+        authActionPending = false;
+        return;
+      }
+      authActionPending = false;
+      rejectedAuthUid = '';
+      gateOverride = '';
+      ownerAccessMode = 'signin';
+      renderOwnerAccessMode();
+      await showOwnerDashboard(decision.user);
+    }
     async function showOwnerDashboard(user) {
       if (dashboardUserUid === user.uid) return;
       dashboardUserUid = user.uid;
       renderOwnerProfile(user);
-      document.getElementById('dashboard-access').classList.add('hidden');
+      gate.classList.add('hidden');
       appShell.classList.remove('hidden');
       appShell.classList.add('visible');
       try { await refreshDashboard(); }
@@ -210,36 +368,125 @@
     }
 
     try {
-      await setPersistence(auth, indexedDBLocalPersistence);
-      onAuthStateChanged(auth, async (user) => {
-        if (!user) {
-          dashboardUserUid = '';
-          if (stopBookingListener) stopBookingListener();
-          if (stopProjectListener) stopProjectListener();
-          stopBookingListener = null;
-          stopProjectListener = null;
-          currentBookings = [];
-          cloudProjects = [];
-          location.replace('./auth.html?mode=signin');
-          return;
-        }
-        if (dashboardUserUid === user.uid) return;
-        accessMessage.textContent = 'Verifying studio permissions…';
+        // Keep Firebase-managed auth state in IndexedDB. Tokens are not copied into app localStorage.
+        await setPersistence(auth, indexedDBLocalPersistence);
+        passwordLogin.disabled = false;
+        document.getElementById('password-login-form').addEventListener('submit', async (event) => {
+          event.preventDefault();
+          passwordLogin.disabled = true;
+          authActionPending = true;
+          gateError('Checking administrator account…');
+          try {
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value;
+            const credential = await signInWithEmailAndPassword(auth, email, password);
+            const ownerSession = await verifyOwnerSession(credential.user, getIdTokenResult);
+            authActionPending = false;
+            if (!ownerSession.authorized) {
+              await signOutAndDeny(authOutcomeMessage('not-owner', credential.user), credential.user);
+              return;
+            }
+            await showOwnerDashboard(credential.user);
+          } catch (error) {
+            authActionPending = false;
+            await signOut(auth).catch(() => {});
+            gateError(authErrorMessage(error));
+            passwordLogin.disabled = false;
+          }
+        });
+        let hadRedirectIntent = false;
+        try { hadRedirectIntent = sessionStorage.getItem(AUTH_INTENT_KEY) !== null; } catch {}
+        const savedRedirectIntent = consumeAuthIntent(sessionStorage);
         try {
-          const ownerSession = await authFlow.verifyOwnerSession(user, getIdTokenResult);
-          if (!ownerSession.authorized) {
-            location.replace('./account.html');
+          const redirectResult = await getRedirectResult(auth);
+          if (redirectResult) {
+            authActionPending = true;
+            await finishGoogleResult(redirectResult, normalizeAuthIntent(savedRedirectIntent));
+          } else if (hadRedirectIntent) {
+            gateOverride = 'Google sign-in was cancelled or did not return a result. Please try again.';
+            gateError(gateOverride);
+            // A redirect without a validated credential result must never open the dashboard.
+            authActionPending = true;
+            await signOut(auth).catch(() => {});
+            authActionPending = false;
+          }
+        }
+        catch (error) {
+          gateOverride = authErrorMessage(error);
+          gateError(gateOverride);
+          authActionPending = hadRedirectIntent;
+          if (hadRedirectIntent) await signOut(auth).catch(() => {});
+          authActionPending = false;
+        }
+        const provider = new GoogleAuthProvider();
+        provider.setCustomParameters({ prompt: 'select_account' });
+        // Firebase validates OAuth state. The one-use sessionStorage intent only
+        // carries the selected app action across its redirect callback.
+        googleLogin.addEventListener('click', async () => {
+          const intent = ownerAccessMode === 'register' ? 'signup' : 'signin';
+          googleLogin.disabled = true;
+          authActionPending = true;
+          rejectedAuthUid = '';
+          gateError('Connecting to Google…');
+          try {
+            if (window.matchMedia('(max-width: 680px)').matches) {
+              if (!saveAuthIntent(sessionStorage, intent)) throw Object.assign(new Error('This browser cannot safely remember the sign-in action. Allow session storage and try again.'), { code: 'auth/web-storage-unsupported' });
+              await signInWithRedirect(auth, provider);
+              return;
+            }
+            try { sessionStorage.removeItem(AUTH_INTENT_KEY); } catch {}
+            const credential = await signInWithPopup(auth, provider);
+            await finishGoogleResult(credential, intent);
+          } catch (error) {
+            authActionPending = false;
+            try { sessionStorage.removeItem(AUTH_INTENT_KEY); } catch {}
+            gateError(authErrorMessage(error));
+            googleLogin.disabled = false;
+          }
+        });
+        onAuthStateChanged(auth, async (user) => {
+          if (authActionPending) return;
+          if (!user) {
+            dashboardUserUid = '';
+            if (stopBookingListener) stopBookingListener();
+            if (stopProjectListener) stopProjectListener();
+            stopBookingListener = null;
+            stopProjectListener = null;
+            currentBookings = [];
+            cloudProjects = [];
+            gate.classList.remove('hidden'); appShell.classList.add('hidden'); googleLogin.disabled = false;
+            gateError(gateOverride || 'Sign in with the administrator account assigned in Firebase Console.');
+            gateOverride = '';
             return;
           }
+          if (user.uid === rejectedAuthUid) {
+            gate.classList.remove('hidden'); appShell.classList.add('hidden');
+            gateError(gateOverride || authOutcomeMessage('invalid-credential'));
+            signOut(auth).catch(() => {});
+            return;
+          }
+          authActionPending = true;
+          let ownerSession;
+          try { ownerSession = await verifyOwnerSession(user, getIdTokenResult); }
+          catch (error) {
+            await signOutAndDeny(`Owner permissions could not be verified. Check the connection and sign in again. ${authErrorMessage(error)}`, user);
+            authActionPending = false;
+            return;
+          }
+          if (!ownerSession.authorized) {
+            await signOutAndDeny(authOutcomeMessage('not-owner', user), user);
+            authActionPending = false;
+            return;
+          }
+          authActionPending = false;
+          ownerAccessMode = 'signin';
+          renderOwnerAccessMode();
           await showOwnerDashboard(user);
-        } catch (error) {
-          accessMessage.textContent = `Your studio access could not be verified. ${authFlow.googleAuthErrorMessage(error, { hostname: location.hostname })}`;
-          await signOut(auth).catch(() => {});
-          location.replace('./auth.html?mode=signin');
-        }
-      });
+        });
     } catch (error) {
-      accessMessage.textContent = `Firebase session could not be restored. ${authFlow.googleAuthErrorMessage(error, { hostname: location.hostname })}`;
+      googleLogin.disabled = true;
+      passwordLogin.disabled = true;
+      gateError(`Secure Firebase sign-in could not initialize. ${authErrorMessage(error)}`);
     }
 
     function openDatabase() {
@@ -261,6 +508,17 @@
         request.onerror = () => reject(request.error);
       }));
     }
+    function identify(file) {
+      const type = (file.type || '').toLowerCase();
+      if (type.startsWith('audio/')) return 'audio';
+      if (type.startsWith('video/')) return 'video';
+      if (type.startsWith('image/')) return 'image';
+      const ext = file.name.split('.').pop().toLowerCase();
+      if (['mp3','wav','m4a','aac','ogg','flac'].includes(ext)) return 'audio';
+      if (['mp4','webm','m4v','ogv'].includes(ext)) return 'video';
+      if (['jpg','jpeg','png','webp','gif','avif'].includes(ext)) return 'image';
+      return '';
+    }
     function prettySize(size) { return size < 1048576 ? `${Math.max(1, Math.round(size / 1024))} KB` : `${(size / 1048576).toFixed(1)} MB`; }
     function safeDate(value) { return value ? new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(value)) : '—'; }
     function urlFor(key, blob) {
@@ -269,65 +527,75 @@
       return localUrls.get(key);
     }
 
-    function projectDate(value) { return typeof value === 'number' ? value : (value?.toMillis?.() || (value instanceof Date ? value.getTime() : 0)); }
-    function projectTitle(item) { return item.title || item.fileName || 'Untitled project'; }
-    function addRowButton(actions, label, ariaLabel, handler, options = {}) {
-      const button = document.createElement('button');
-      button.type = 'button'; button.className = `row-button${options.danger ? ' danger' : ''}`;
-      button.textContent = label; button.setAttribute('aria-label', ariaLabel);
-      button.disabled = options.disabled === true;
-      if (options.pressed !== undefined) button.setAttribute('aria-pressed', String(options.pressed));
-      button.addEventListener('click', handler); actions.appendChild(button); return button;
-    }
     function renderProjects() {
       document.getElementById('total-count').textContent = numberFormat.format(currentProjects.length);
       for (const kind of ['audio', 'video', 'image']) document.getElementById(`${kind}-count`).textContent = numberFormat.format(currentProjects.filter((item) => item.kind === kind).length);
       if (!currentProjects.length) {
         projectList.innerHTML = '<div class="empty">No projects saved here yet.<br>Add audio, video, or images to start building the gallery.</div>';
-        renderActivityFeed(); return;
+        renderActivityFeed();
+        return;
       }
       projectList.replaceChildren();
-      currentProjects.forEach((item, index) => {
+      const term = document.getElementById('project-search').value.trim().toLocaleLowerCase();
+      const filter = document.getElementById('project-filter').value;
+      const visibleProjects = currentProjects.filter((item) => {
+        const statusMatch = filter === 'all' || (filter === 'published' ? item.published : filter === 'draft' ? !item.published : item.kind === filter);
+        const searchMatch = !term || [item.title, item.fileName, item.artist, item.description, item.caption, item.category, item.credits].filter(Boolean).join(' ').toLocaleLowerCase().includes(term);
+        return statusMatch && searchMatch;
+      });
+      if (!visibleProjects.length) {
+        projectList.innerHTML = '<div class="empty">No projects match this search or filter.</div>';
+        renderActivityFeed();
+        return;
+      }
+      visibleProjects.forEach((item) => {
         const row = document.createElement('article'); row.className = 'project-row';
         const thumb = document.createElement('div'); thumb.className = 'project-thumb';
-        const cover = item.thumbnailUrl || item.coverUrl || item.coverFile || (item.kind === 'image' ? (item.mediaUrl || item.file) : null);
-        if (cover) { const img = document.createElement('img'); img.loading = 'lazy'; img.src = typeof cover === 'string' ? cover : urlFor(`${item.id}:thumb`, cover); img.alt = ''; thumb.appendChild(img); }
-        else thumb.textContent = item.kind === 'audio' ? '♫' : item.kind === 'image' ? '▧' : '▶';
+        const cover = item.coverUrl || item.coverFile || (item.kind === 'image' ? (item.mediaUrl || item.file) : null);
+        if (cover) { const img = document.createElement('img'); img.src = typeof cover === 'string' ? cover : urlFor(`${item.id}:thumb`, cover); img.alt = ''; thumb.appendChild(img); }
+        else thumb.textContent = item.kind === 'audio' ? '♫' : '▶';
         const name = document.createElement('div'); name.className = 'project-name';
-        const title = document.createElement('strong'); title.textContent = projectTitle(item);
-        const description = document.createElement('small'); description.textContent = `${item.category || item.kind || 'Media'} · ${item.published ? 'Published' : 'Draft'}${item.featured ? ' · Featured' : ''}`;
+        const title = document.createElement('strong'); title.textContent = item.title || item.fileName || 'Untitled project';
+        const description = document.createElement('small'); description.textContent = `${item.fileName || 'Media file'} · ${prettySize(item.file?.size || item.size || 0)}`;
         name.append(title, description);
-        const tag = document.createElement('span'); tag.className = 'tag'; tag.textContent = item.kind || 'media';
-        const date = document.createElement('time'); date.className = 'project-date'; date.textContent = safeDate(projectDate(item.createdAt));
+        const tag = document.createElement('span'); tag.className = 'tag'; tag.textContent = item.published ? 'Published' : 'Draft';
+        const date = document.createElement('time'); date.className = 'project-date'; date.textContent = safeDate(item.createdAt);
         const actions = document.createElement('div'); actions.className = 'project-actions';
-        addRowButton(actions, 'Preview', `Preview ${projectTitle(item)}`, () => previewProject(item));
-        if (!item.localOnly) {
-          addRowButton(actions, 'Edit', `Edit ${projectTitle(item)}`, () => editProject(item), { disabled: item.pendingAck });
-          addRowButton(actions, item.published ? 'Unpublish' : 'Publish', `${item.published ? 'Unpublish' : 'Publish'} ${projectTitle(item)}`, () => toggleProject(item, 'published', !item.published), { pressed: item.published, disabled: item.pendingAck });
-          addRowButton(actions, item.featured ? 'Featured' : 'Feature', `${item.featured ? 'Remove featured status from' : 'Feature'} ${projectTitle(item)}`, () => toggleProject(item, 'featured', !item.featured), { pressed: item.featured, disabled: item.pendingAck });
-          const ordered = cloudProjects.slice().sort((a, b) => Number(a.order ?? Number.MAX_SAFE_INTEGER) - Number(b.order ?? Number.MAX_SAFE_INTEGER) || projectDate(a.createdAt) - projectDate(b.createdAt));
-          const cloudIndex = ordered.findIndex((project) => project.id === item.id);
-          addRowButton(actions, '↑', `Move ${projectTitle(item)} up`, () => moveProject(item, -1), { disabled: item.pendingAck || cloudIndex <= 0 });
-          addRowButton(actions, '↓', `Move ${projectTitle(item)} down`, () => moveProject(item, 1), { disabled: item.pendingAck || cloudIndex === ordered.length - 1 });
-        } else {
-          addRowButton(actions, 'Publish', `Publish ${projectTitle(item)} to shared portfolio`, (event) => publishProject(item, event.currentTarget));
+        if (!item.published && item.file) {
+          const publish = document.createElement('button'); publish.className = 'publish-project'; publish.type = 'button'; publish.textContent = 'Publish'; publish.setAttribute('aria-label', `Publish ${item.title || item.fileName} to the public gallery`);
+          publish.addEventListener('click', () => publishProject(item, publish)); actions.appendChild(publish);
         }
-        addRowButton(actions, 'Delete', `Delete ${projectTitle(item)}`, () => removeProject(item.id), { danger: true });
+        if (item.published || !item.file) {
+          const edit = document.createElement('button'); edit.className = 'publish-project'; edit.type = 'button'; edit.textContent = 'Edit';
+          edit.setAttribute('aria-label', `Edit metadata for ${item.title || item.fileName}`);
+          edit.addEventListener('click', () => editProject(item)); actions.appendChild(edit);
+        }
+        if (item.published || !item.file) {
+          const visibility = document.createElement('button'); visibility.className = 'publish-project'; visibility.type = 'button'; visibility.textContent = item.published ? 'Unpublish' : 'Publish';
+          visibility.addEventListener('click', () => setProjectPublished(item, !item.published)); actions.appendChild(visibility);
+        }
+        const remove = document.createElement('button'); remove.className = 'delete-project'; remove.type = 'button'; remove.title = `Remove ${item.title || item.fileName}`; remove.setAttribute('aria-label', remove.title); remove.textContent = '×';
+        remove.addEventListener('click', () => removeProject(item.id));
+        actions.appendChild(remove);
         row.append(thumb, name, tag, date, actions); projectList.appendChild(row);
       });
       renderActivityFeed();
     }
     function mergeProjects() {
-      const merged = new Map(localProjects.map((item) => [item.id, { ...item, localOnly: true, published: false }]));
-      cloudProjects.forEach((item) => merged.set(item.id, { ...merged.get(item.id), ...item, localOnly: false }));
-      currentProjects = [...merged.values()].sort((a, b) => Number(b.featured === true) - Number(a.featured === true) || (Number(a.order ?? Number.MAX_SAFE_INTEGER) - Number(b.order ?? Number.MAX_SAFE_INTEGER)) || projectDate(b.createdAt) - projectDate(a.createdAt));
+      const merged = new Map(localProjects.map((item) => [item.id, item]));
+      cloudProjects.forEach((item) => merged.set(item.id, { ...merged.get(item.id), ...item }));
+      currentProjects = [...merged.values()].sort((a, b) => {
+        const aOrder = Number.isFinite(a.sortOrder) ? a.sortOrder : Number.POSITIVE_INFINITY;
+        const bOrder = Number.isFinite(b.sortOrder) ? b.sortOrder : Number.POSITIVE_INFINITY;
+        return aOrder - bOrder || (b.createdAt || 0) - (a.createdAt || 0);
+      });
       renderProjects();
     }
     function listenForProjects() {
       stopProjectListener = onSnapshot(collection(db, 'projects'), (snapshot) => {
         cloudProjects = snapshot.docs.map((entry) => {
           const data = entry.data();
-          return { ...data, id: entry.id, caption: data.description || data.caption || '', published: data.published === true, featured: data.featured === true, createdAtValue: data.createdAt, createdAt: projectDate(data.createdAt) || Date.now(), pendingAck: false };
+          return { ...data, id: entry.id, kind: data.mediaType || data.kind || 'audio', fileName: data.fileName || data.title || 'Portfolio media', mediaUrl: data.fileUrl || data.mediaUrl || data.externalUrl || '', caption: data.description || data.caption || '', coverUrl: data.thumbnailUrl || data.coverUrl || '', sortOrder: Number.isFinite(data.sortOrder) ? data.sortOrder : (Number.isFinite(data.order) ? data.order : undefined), published: data.published === true, createdAt: data.createdAt?.toMillis?.() || Date.now() };
         });
         mergeProjects();
       }, () => showProjectError('Could not load cloud projects. Check Firestore setup and access rules.'));
@@ -408,306 +676,282 @@
       document.getElementById('booking-list').prepend(alert);
     }
     async function refreshDashboard() {
-      try { localProjects = await readAll(); }
-      catch (error) { console.warn('Older browser-only projects could not be read:', error); localProjects = []; }
+      localProjects = await readAll();
       mergeProjects();
     }
     function showProjectError(message) {
-      const alert = document.createElement('div'); alert.className = 'empty project-error'; alert.textContent = message; projectList.prepend(alert);
+      const alert = document.createElement('div'); alert.className = 'empty project-error'; alert.textContent = message;
+      projectList.prepend(alert);
     }
     function makeProjectId() { return crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`; }
-    function cleanFileName(name) { return String(name || 'media').normalize('NFKD').replace(/[^a-zA-Z0-9._-]+/g, '_').slice(-90) || 'media'; }
-    const mediaExtensions = {
-      audio: new Set(['mp3','wav','m4a','aac','ogg','flac']), video: new Set(['mp4','mov','webm','m4v','ogv']), image: new Set(['jpg','jpeg','png','webp','gif','avif'])
-    };
-    const mimeByExtension = { mp3:'audio/mpeg',wav:'audio/wav',m4a:'audio/mp4',aac:'audio/aac',ogg:'audio/ogg',flac:'audio/flac',mp4:'video/mp4',mov:'video/quicktime',webm:'video/webm',m4v:'video/mp4',ogv:'video/ogg',jpg:'image/jpeg',jpeg:'image/jpeg',png:'image/png',webp:'image/webp',gif:'image/gif',avif:'image/avif' };
-    function extensionOf(name) { return String(name || '').split('.').pop().toLowerCase(); }
-    function identify(file) {
-      if (!file) return '';
-      const ext = extensionOf(file.name);
-      for (const kind of ['audio', 'video', 'image']) if (mediaExtensions[kind].has(ext)) return kind;
-      const type = String(file.type || '').toLowerCase();
-      if (Object.values(mimeByExtension).includes(type)) return type.split('/')[0];
-      return '';
-    }
+    function cleanFileName(name) { return name.normalize('NFKD').replace(/[^a-zA-Z0-9._-]+/g, '_').slice(-90) || 'media'; }
     function contentTypeFor(file, kind) {
-      const ext = extensionOf(file?.name);
-      const known = mimeByExtension[ext];
-      return known && known.startsWith(`${kind}/`) ? known : (String(file?.type || '').toLowerCase().startsWith(`${kind}/`) ? file.type : `${kind}/octet-stream`);
-    }
-    function safeExternalUrl(value) {
-      if (!value.trim()) return '';
-      let url; try { url = new URL(value.trim()); } catch { throw new Error('Enter a complete external URL beginning with https://.'); }
-      if (url.protocol !== 'https:' || url.username || url.password) throw new Error('External media links must use a public HTTPS URL.');
-      if (url.href.length > 2048) throw new Error('External media links must be 2,048 characters or shorter.');
-      return url.href;
+      const ext = file.name.split('.').pop().toLowerCase();
+      const known = { mp3:'audio/mpeg', wav:'audio/wav', m4a:'audio/mp4', aac:'audio/aac', ogg:'audio/ogg', flac:'audio/flac', opus:'audio/opus', mp4:'video/mp4', webm:kind === 'audio' ? 'audio/webm' : 'video/webm', m4v:'video/mp4', ogv:'video/ogg', jpg:'image/jpeg', jpeg:'image/jpeg', png:'image/png', webp:'image/webp', gif:'image/gif', avif:'image/avif' };
+      return known[ext] || (file.type && file.type.toLowerCase().startsWith(`${kind}/`) ? file.type : `${kind}/octet-stream`);
     }
     function uploadFile(path, file, kind, onProgress) {
-      return new Promise((resolve, reject) => {
-        if (!storage || !storageRef || !uploadBytesResumable || !getDownloadURL) { reject(new Error('Firebase Cloud Storage is not configured. Check the storage bucket and enable billing.')); return; }
-        const task = uploadBytesResumable(storageRef(storage, path), file, { contentType: contentTypeFor(file, kind) });
-        task.on('state_changed', (snapshot) => onProgress?.(Math.round(snapshot.bytesTransferred / Math.max(1, snapshot.totalBytes) * 100)), reject, () => resolve(task.snapshot.ref));
-      });
+      if (!storageProvider) return Promise.reject(new Error('Firebase Storage is not initialized in this app. Check firebase-config.js and reload the dashboard.'));
+      return storageProvider.upload(path, file, kind, onProgress);
     }
-    async function makeImageThumbnail(file) {
-      if (!window.createImageBitmap) return null;
+    async function publishToCloud(item, onProgress = () => {}) {
+      if (!auth.currentUser) throw new Error('Sign in again before publishing.');
+      if (!item.file) throw new Error('This local project file is unavailable.');
+      if (item.file.size > 250 * 1024 * 1024) throw new Error('Each media file must be 250 MB or smaller.');
+      if (item.coverFile && item.coverFile.size > 20 * 1024 * 1024) throw new Error('Cover images must be 20 MB or smaller.');
+      const id = item.id || makeProjectId();
+      const basePath = `portfolio/${auth.currentUser.uid}/${id}`;
+      const mediaPath = `${basePath}/media-${cleanFileName(item.fileName || item.file.name)}`;
+      const coverPath = item.coverFile ? `${basePath}/cover-${cleanFileName(item.coverFile.name)}` : '';
+      let uploadedMedia = false;
+      let uploadedCover = false;
       try {
-        const bitmap = await createImageBitmap(file); const scale = Math.min(1, 1200 / bitmap.width, 900 / bitmap.height);
-        const canvas = document.createElement('canvas'); canvas.width = Math.max(1, Math.round(bitmap.width * scale)); canvas.height = Math.max(1, Math.round(bitmap.height * scale));
-        canvas.getContext('2d').drawImage(bitmap, 0, 0, canvas.width, canvas.height); bitmap.close();
-        const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', .82));
-        return blob ? new File([blob], `thumbnail-${cleanFileName(file.name)}.jpg`, { type: 'image/jpeg' }) : null;
-      } catch { return null; }
-    }
-    async function makeVideoThumbnail(file) {
-      const video = document.createElement('video'); const objectUrl = URL.createObjectURL(file);
-      video.muted = true; video.playsInline = true; video.preload = 'metadata';
-      return new Promise((resolve) => {
-        let finished = false; const done = (value) => { if (finished) return; finished = true; clearTimeout(timer); video.removeAttribute('src'); video.load(); URL.revokeObjectURL(objectUrl); resolve(value); };
-        const timer = setTimeout(() => done(null), 7000);
-        video.addEventListener('loadeddata', () => { try { video.currentTime = Math.min(.15, Math.max(0, video.duration / 20)); } catch { done(null); } }, { once: true });
-        video.addEventListener('seeked', () => {
-          try {
-            const scale = Math.min(1, 1200 / video.videoWidth, 900 / video.videoHeight); const canvas = document.createElement('canvas');
-            canvas.width = Math.max(1, Math.round(video.videoWidth * scale)); canvas.height = Math.max(1, Math.round(video.videoHeight * scale));
-            canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-            canvas.toBlob((blob) => done(blob ? new File([blob], `thumbnail-${cleanFileName(file.name)}.jpg`, { type: 'image/jpeg' }) : null), 'image/jpeg', .8);
-          } catch { done(null); }
-        }, { once: true });
-        video.addEventListener('error', () => done(null), { once: true }); video.src = objectUrl; video.load();
-      });
-    }
-    async function makeThumbnail(file, kind) { return kind === 'image' ? makeImageThumbnail(file) : kind === 'video' ? makeVideoThumbnail(file) : null; }
-    async function deleteStoragePath(path) {
-      if (!path) return;
-      if (!storage || !storageRef || !deleteObject) throw new Error('Firebase Cloud Storage is not available for cleanup.');
-      try { await deleteObject(storageRef(storage, path)); } catch (error) { if (error.code !== 'storage/object-not-found') throw error; }
-    }
-    function tagsFromText(value) {
-      const tags = [...new Set(value.split(',').map((tag) => tag.trim()).filter(Boolean))];
-      if (tags.length > 12 || tags.some((tag) => tag.length > 40)) throw new Error('Use no more than 12 tags, with up to 40 characters each.');
-      return tags;
-    }
-    async function saveProjectData(values, existing, onProgress = () => {}) {
-      if (!auth.currentUser) throw new Error('Your sign-in expired. Sign in again and retry.');
-      if (values.file && values.file.size > 250 * 1024 * 1024) throw new Error('Media files must be 250 MB or smaller.');
-      if (values.coverFile && (identify(values.coverFile) !== 'image' || values.coverFile.size > 20 * 1024 * 1024)) throw new Error('Choose a supported cover image up to 20 MB.');
-      if (!values.file && !existing?.mediaUrl && !values.externalUrl) throw new Error('Choose a media file or enter an external media URL.');
-      const id = existing?.id || values.id || makeProjectId(); const uid = auth.currentUser.uid; const basePath = `portfolio/${uid}/${id}`; const version = makeProjectId();
-      const newPaths = []; let mediaPath = existing?.mediaPath || ''; let mediaUrl = existing?.mediaUrl || ''; let thumbnailPath = existing?.thumbnailPath || ''; let thumbnailUrl = existing?.thumbnailUrl || '';
-      let coverPath = existing?.coverPath || ''; let coverUrl = existing?.coverUrl || ''; let sourceType = existing?.sourceType || (mediaPath ? 'upload' : 'external');
-      let fileName = existing?.fileName || ''; let size = existing?.size || 0; let contentType = existing?.contentType || `${values.kind}/octet-stream`;
-      try {
-        if (values.file) {
-          fileName = values.file.name.slice(0, 240); size = values.file.size; contentType = contentTypeFor(values.file, values.kind); sourceType = 'upload';
-          mediaPath = `${basePath}/media-${version}-${cleanFileName(fileName)}`; onProgress(`Uploading media · 0%`);
-          const mediaRef = await uploadFile(mediaPath, values.file, values.kind, (percent) => onProgress(`Uploading media · ${percent}%`)); newPaths.push(mediaPath); mediaUrl = await getDownloadURL(mediaRef);
-          const thumbFile = values.coverFile ? null : await makeThumbnail(values.file, values.kind);
-          if (thumbFile) {
-            thumbnailPath = `${basePath}/thumbnail-${version}.jpg`; onProgress('Uploading thumbnail · 0%');
-            const thumbRef = await uploadFile(thumbnailPath, thumbFile, 'image', (percent) => onProgress(`Uploading thumbnail · ${percent}%`)); newPaths.push(thumbnailPath); thumbnailUrl = await getDownloadURL(thumbRef);
-          } else { thumbnailPath = ''; thumbnailUrl = ''; }
-        } else if (!existing?.mediaUrl) {
-          sourceType = 'external'; mediaUrl = values.externalUrl; fileName = (new URL(values.externalUrl).pathname.split('/').filter(Boolean).pop() || 'external-media').slice(0, 240); contentType = `${values.kind}/octet-stream`; size = 0; mediaPath = ''; thumbnailPath = ''; thumbnailUrl = '';
-        } else if (sourceType === 'external') {
-          if (!values.externalUrl) throw new Error('This project uses an external media URL. Keep the URL or upload a media file before saving.');
-          mediaUrl = values.externalUrl; fileName = (new URL(values.externalUrl).pathname.split('/').filter(Boolean).pop() || fileName || 'external-media').slice(0, 240);
+        onProgress('Uploading media…');
+        const mediaUrl = await uploadFile(mediaPath, item.file, item.kind, (percent) => onProgress(`Uploading media ${percent}%…`));
+        uploadedMedia = true;
+        let coverUrl = '';
+        if (item.coverFile && coverPath) {
+          onProgress('Uploading cover art…');
+          coverUrl = await uploadFile(coverPath, item.coverFile, 'image', (percent) => onProgress(`Uploading cover ${percent}%…`));
+          uploadedCover = true;
         }
-        if (values.coverFile) {
-          coverPath = `${basePath}/cover-${version}-${cleanFileName(values.coverFile.name)}`; onProgress('Uploading cover image · 0%');
-          const coverRef = await uploadFile(coverPath, values.coverFile, 'image', (percent) => onProgress(`Uploading cover image · ${percent}%`)); newPaths.push(coverPath); coverUrl = await getDownloadURL(coverRef);
-          thumbnailPath = coverPath; thumbnailUrl = coverUrl;
-        }
-        const order = existing?.order ?? (Math.max(-100, ...cloudProjects.map((project) => Number(project.order ?? -100))) + 100);
-        const createdAt = existing?.createdAtValue || serverTimestamp();
-        const record = {
-          ownerUid: uid, kind: values.kind, fileName, title: values.title, description: values.description, caption: values.description,
-          category: values.category, tags: values.tags, client: values.client, credits: values.credits, externalUrl: values.externalUrl,
-          sourceType, mediaPath, mediaUrl, thumbnailPath, thumbnailUrl, coverPath, coverUrl, size, contentType,
-          featured: values.featured, published: values.published, order, createdAt, updatedAt: serverTimestamp()
+        const cloudRecord = {
+          kind: item.kind, fileName: item.fileName || item.file.name,
+          title: item.title || (item.fileName || item.file.name).replace(/\.[^/.]+$/, ''),
+          caption: item.caption || '', description: item.caption || '', category: item.category || '',
+          mediaType: item.kind, fileUrl: mediaUrl, filePath: mediaPath,
+          size: item.file.size, contentType: contentTypeFor(item.file, item.kind),
+          mediaPath, mediaUrl, coverPath, coverUrl: coverUrl || item.coverUrl || '',
+          thumbnailUrl: coverUrl || item.coverUrl || '', artist: item.artist || '', credits: item.credits || '',
+          sortOrder: Number.isInteger(item.sortOrder) ? item.sortOrder : 100,
+          ownerUid: auth.currentUser.uid, published: item.published === true,
+          featured: Boolean(item.featured), createdAt: serverTimestamp(), updatedAt: serverTimestamp()
         };
-        await setDoc(doc(db, 'projects', id), record);
-        let createdAtValue = existing?.createdAtValue?.toMillis ? existing.createdAtValue : null;
-        if (!createdAtValue) {
-          try { const savedSnapshot = await getDoc(doc(db, 'projects', id)); if (savedSnapshot.exists()) createdAtValue = savedSnapshot.data().createdAt || null; }
-          catch (readError) { console.warn('Saved project, but could not read back its server timestamp yet:', readError); }
-        }
-        const saved = { ...record, id, createdAt: existing?.createdAt || Date.now(), createdAtValue, localOnly: false, pendingAck: !createdAtValue };
-        const oldPaths = [existing?.mediaPath, existing?.coverPath, existing?.thumbnailPath].filter((path) => path && ![mediaPath, coverPath, thumbnailPath].includes(path));
-        await Promise.allSettled(oldPaths.map(deleteStoragePath));
-        return saved;
+        await setDoc(doc(db, 'projects', id), cloudRecord);
+        return { ...item, ...cloudRecord, id, createdAt: Date.now() };
       } catch (error) {
-        await Promise.allSettled(newPaths.map(deleteStoragePath));
+        if (uploadedCover) await deleteStoragePath(coverPath).catch(() => {});
+        if (uploadedMedia) await deleteStoragePath(mediaPath).catch(() => {});
         throw error;
       }
     }
+    async function saveLocalProject(item) {
+      const db = await openDatabase();
+      await new Promise((resolve, reject) => {
+        const transaction = db.transaction('media', 'readwrite'); transaction.objectStore('media').put(item);
+        transaction.oncomplete = resolve; transaction.onerror = () => reject(transaction.error);
+      });
+    }
     async function deleteLocalProject(id) {
       const db = await openDatabase();
-      await new Promise((resolve, reject) => { const transaction = db.transaction('media', 'readwrite'); transaction.objectStore('media').delete(id); transaction.oncomplete = resolve; transaction.onerror = () => reject(transaction.error); });
+      await new Promise((resolve, reject) => {
+        const transaction = db.transaction('media', 'readwrite'); transaction.objectStore('media').delete(id);
+        transaction.oncomplete = resolve; transaction.onerror = () => reject(transaction.error);
+      });
       [`${id}:thumb`, id, `${id}:cover`].forEach((key) => { const url = localUrls.get(key); if (url) URL.revokeObjectURL(url); localUrls.delete(key); });
     }
+    async function deleteStoragePath(path) {
+      if (!path) return;
+      if (!storageProvider) throw new Error('Firebase Storage is not initialized in this app. Check firebase-config.js and reload the dashboard.');
+      await storageProvider.delete(path);
+    }
     async function publishProject(item, button) {
-      if (button) { button.disabled = true; button.textContent = 'Publishing…'; }
+      button.disabled = true; button.textContent = 'Publishing…';
       try {
-        const published = await saveProjectData({ id: item.id, kind: item.kind, file: item.file, coverFile: item.coverFile || null, title: projectTitle(item), description: item.description || item.caption || '', category: item.category || '', tags: Array.isArray(item.tags) ? item.tags : [], client: item.client || '', credits: item.credits || '', externalUrl: item.externalUrl || '', featured: item.featured === true, published: true }, null, (progress) => { if (button) button.textContent = progress; });
-        await deleteLocalProject(item.id).catch((error) => console.warn('Published project but could not clear its local copy:', error));
-        localProjects = localProjects.filter((project) => project.id !== item.id);
-        cloudProjects = [published, ...cloudProjects.filter((project) => project.id !== item.id)]; mergeProjects();
+        const published = await publishToCloud({ ...item, published: true }, (progress) => { button.textContent = progress; });
+        cloudProjects = [published, ...cloudProjects.filter((project) => project.id !== item.id)];
+        mergeProjects();
       } catch (error) {
-        console.error('YJ Studios legacy project migration failed:', error);
-        showProjectError(error.message || 'Could not publish this older project. Check Firebase Storage, billing, and deployed storage.rules. It remains saved in this browser.');
-      } finally { if (button) { button.disabled = false; button.textContent = 'Publish'; } }
+        console.error('YJ Studios project upload failed:', error);
+        button.disabled = false; button.textContent = 'Publish';
+        const sizeError = /must be \d+ MB or smaller/.test(error.message || '');
+        showProjectError(sizeError ? error.message : 'Could not publish this project. Confirm the Storage bucket is initialized, Storage Rules are deployed, and your account has the owner claim.');
+      }
     }
-    async function toggleProject(item, field, value) {
-      try { await updateDoc(doc(db, 'projects', item.id), { [field]: value, updatedAt: serverTimestamp() }); }
-      catch (error) { console.error('YJ Studios project update failed:', error); showProjectError('Could not update that project. Check Firestore access and retry.'); }
-    }
-    async function moveProject(item, direction) {
-      const ordered = cloudProjects.slice().sort((a, b) => Number(a.order ?? Number.MAX_SAFE_INTEGER) - Number(b.order ?? Number.MAX_SAFE_INTEGER) || projectDate(a.createdAt) - projectDate(b.createdAt));
-      const index = ordered.findIndex((project) => project.id === item.id); const next = index + direction;
-      if (index < 0 || next < 0 || next >= ordered.length) return;
+    async function setProjectPublished(project, published) {
       try {
-        const batch = writeBatch(db); const moved = ordered.splice(index, 1)[0]; ordered.splice(next, 0, moved);
-        ordered.forEach((project, position) => batch.update(doc(db, 'projects', project.id), { order: position * 100, updatedAt: serverTimestamp() }));
-        await batch.commit();
-      } catch (error) { console.error('YJ Studios project ordering failed:', error); showProjectError('Could not change project order. Check Firestore access and retry.'); }
+        await updateDoc(doc(db, 'projects', project.id), { published, updatedAt: serverTimestamp() });
+      } catch (error) {
+        console.error('YJ Studios publication update failed:', error);
+        showProjectError('Could not change publication status. Check Firestore rules and sign in again if needed.');
+      }
+    }
+    async function saveExternalProject(fields) {
+      if (!auth.currentUser) throw new Error('Sign in again before saving a project.');
+      const id = makeProjectId();
+      const record = {
+        kind: fields.kind, mediaType: fields.kind, sourceType: 'external', fileName: fields.title,
+        title: fields.title, artist: fields.artist, description: fields.description,
+        caption: fields.description.slice(0, 180), credits: fields.credits,
+        category: fields.category, externalUrl: fields.url, fileUrl: fields.url,
+        filePath: '', mediaUrl: fields.url, thumbnailUrl: fields.thumbnailUrl,
+        coverUrl: fields.thumbnailUrl, published: fields.published,
+        sortOrder: fields.sortOrder, ownerUid: auth.currentUser.uid,
+        createdAt: serverTimestamp(), updatedAt: serverTimestamp()
+      };
+      await setDoc(doc(db, 'projects', id), record);
+      return { ...record, id, createdAt: Date.now() };
     }
     async function removeProject(id) {
       const project = currentProjects.find((item) => item.id === id);
-      if (!project || !window.confirm(`Delete “${projectTitle(project)}” from the studio portfolio? This cannot be undone.`)) return;
+      if (!project || !window.confirm(`Remove “${project.title || project.fileName || 'this project'}” from the studio library?`)) return;
       try {
-        if (project.localOnly) { await deleteLocalProject(id); localProjects = localProjects.filter((item) => item.id !== id); }
-        else {
-          await deleteDoc(doc(db, 'projects', id)); cloudProjects = cloudProjects.filter((item) => item.id !== id);
-          const results = await Promise.allSettled([project.mediaPath, project.coverPath, project.thumbnailPath].filter(Boolean).map(deleteStoragePath));
-          if (results.some((result) => result.status === 'rejected')) showProjectError('Project deleted. A media file could not be removed from Cloud Storage; check storage rules and clean it up from Firebase Console.');
-        }
+        // Delete the metadata first so a failed file cleanup cannot leave a broken public card.
+        if (cloudProjects.some((item) => item.id === id)) await deleteDoc(doc(db, 'projects', id));
+        if (project.mediaPath || project.filePath) await deleteStoragePath(project.mediaPath || project.filePath);
+        if (project.coverPath) await deleteStoragePath(project.coverPath);
+        await deleteLocalProject(id);
+        localProjects = localProjects.filter((item) => item.id !== id);
+        cloudProjects = cloudProjects.filter((item) => item.id !== id);
         mergeProjects();
-      } catch (error) { console.error('YJ Studios project removal failed:', error); showProjectError('Could not delete this project. Check Firestore and Storage rules, then retry.'); }
-    }
-    const projectForm = document.getElementById('project-form'); const projectMessage = document.getElementById('project-message');
-    const projectFiles = document.getElementById('project-files'); const projectCover = document.getElementById('project-cover');
-    const projectType = document.getElementById('project-type'); const selectedPreview = document.getElementById('selected-preview');
-    const progressBar = document.getElementById('upload-progress'); const saveButton = document.getElementById('save-project'); const previewButton = document.getElementById('preview-project');
-    const previewDialog = document.getElementById('project-preview-dialog'); const previewMedia = document.getElementById('admin-preview-media');
-    let editingProject = null; let savingProject = false; let selectedPreviewUrl = '';
-    function showProjectProgress(message) { progressBar.hidden = false; progressBar.value = 0; projectMessage.classList.remove('error'); projectMessage.textContent = message; }
-    function hideProjectProgress() { progressBar.hidden = true; progressBar.value = 0; }
-    function setFormMessage(message, isError = false) { projectMessage.textContent = message; projectMessage.classList.toggle('error', isError); }
-    function projectSource(item, file = null) {
-      if (file) return URL.createObjectURL(file);
-      if (item?.file) return urlFor(item.id, item.file);
-      return item?.mediaUrl || item?.externalUrl || '';
-    }
-    function mountPreview(container, item, source, selected = false) {
-      container.replaceChildren();
-      if (!source) { container.textContent = selected ? 'Choose a supported media file or add an external media URL.' : 'No media available to preview.'; return; }
-      const kind = item.kind || item.mediaType || 'audio'; let element;
-      if (kind === 'image') { element = document.createElement('img'); element.alt = item.title || 'Project preview'; element.loading = 'lazy'; element.src = source; }
-      else if (kind === 'video') { element = document.createElement('video'); element.controls = true; element.playsInline = true; element.preload = 'none'; element.src = source; element.poster = item.coverUrl || item.thumbnailUrl || ''; }
-      else { element = document.createElement('audio'); element.controls = true; element.preload = 'none'; element.src = source; }
-      container.appendChild(element);
-    }
-    function updateSelectedPreview() {
-      if (selectedPreviewUrl) { URL.revokeObjectURL(selectedPreviewUrl); selectedPreviewUrl = ''; }
-      const file = projectFiles.files[0] || null;
-      projectType.disabled = Boolean(editingProject?.mediaPath && !file);
-      if (file) {
-        const kind = identify(file); if (kind) projectType.value = kind;
-        selectedPreviewUrl = URL.createObjectURL(file); selectedPreview.textContent = `${file.name} · ${prettySize(file.size)}`;
-        const holder = document.createElement('div'); selectedPreview.appendChild(holder); mountPreview(holder, { kind: kind || projectType.value, title: file.name }, selectedPreviewUrl, true);
-      } else if (editingProject?.mediaUrl || editingProject?.file) {
-        selectedPreview.textContent = `Current media · ${editingProject.fileName || 'Project media'}`;
-        const holder = document.createElement('div'); selectedPreview.appendChild(holder); mountPreview(holder, editingProject, projectSource(editingProject), true);
-      } else selectedPreview.textContent = 'Choose a file to preview it before saving.';
-    }
-    function openProjectEditor(item = null) {
-      editingProject = item && !item.localOnly ? item : null; projectForm.reset(); projectMessage.textContent = ''; projectMessage.classList.remove('error'); hideProjectProgress();
-      projectFiles.value = ''; projectCover.value = ''; document.getElementById('modal-title').textContent = editingProject ? 'Edit project' : 'Add a project';
-      document.getElementById('project-title').value = editingProject ? projectTitle(editingProject) : '';
-      document.getElementById('project-caption').value = editingProject?.description || editingProject?.caption || '';
-      document.getElementById('project-category').value = editingProject?.category || '';
-      document.getElementById('project-tags').value = Array.isArray(editingProject?.tags) ? editingProject.tags.join(', ') : '';
-      document.getElementById('project-client').value = editingProject?.client || '';
-      document.getElementById('project-credits').value = editingProject?.credits || '';
-      document.getElementById('project-external-url').value = editingProject?.externalUrl || (editingProject?.sourceType === 'external' ? editingProject.mediaUrl || '' : '');
-      document.getElementById('project-featured').checked = editingProject?.featured === true;
-      document.getElementById('project-published').checked = editingProject ? editingProject.published === true : true;
-      projectType.value = editingProject?.kind || 'audio'; updateSelectedPreview();
-      saveButton.textContent = editingProject ? 'Save changes' : 'Save project'; modal.showModal();
-    }
-    function editProject(item) { openProjectEditor(item); }
-    function previewProject(item, sourceOverride = '') {
-      const source = sourceOverride || projectSource(item);
-      document.getElementById('project-preview-title').textContent = item.title || item.fileName || 'Project preview';
-      document.getElementById('admin-preview-heading').textContent = item.title || item.fileName || 'Project preview';
-      const details = [item.description || item.caption || '', item.category ? `Category: ${item.category}` : '', Array.isArray(item.tags) && item.tags.length ? `Tags: ${item.tags.join(', ')}` : '', item.client ? `Client: ${item.client}` : '', item.credits ? `Credits: ${item.credits}` : '', item.published ? 'Published' : 'Draft'].filter(Boolean).join(' · ');
-      document.getElementById('admin-preview-caption').textContent = details; mountPreview(previewMedia, item, source); previewDialog.showModal();
-    }
-    document.getElementById('open-project-modal').addEventListener('click', () => openProjectEditor());
-    document.getElementById('close-project-modal').addEventListener('click', () => { if (!savingProject) modal.close(); });
-    document.getElementById('close-project-preview').addEventListener('click', () => previewDialog.close());
-    modal.addEventListener('click', (event) => { if (event.target === modal && !savingProject) modal.close(); });
-    modal.addEventListener('cancel', (event) => { if (savingProject) event.preventDefault(); });
-    projectFiles.addEventListener('change', updateSelectedPreview);
-    projectType.addEventListener('change', updateSelectedPreview);
-    const dropbox = document.getElementById('project-dropbox');
-    for (const eventName of ['dragenter', 'dragover']) dropbox.addEventListener(eventName, (event) => { event.preventDefault(); dropbox.classList.add('dragging'); });
-    for (const eventName of ['dragleave', 'drop']) dropbox.addEventListener(eventName, (event) => { event.preventDefault(); dropbox.classList.remove('dragging'); });
-    dropbox.addEventListener('drop', (event) => { const file = event.dataTransfer?.files?.[0]; if (!file) return; const transfer = new DataTransfer(); transfer.items.add(file); projectFiles.files = transfer.files; updateSelectedPreview(); });
-    previewButton.addEventListener('click', () => {
-      const file = projectFiles.files[0] || null; const kind = file ? identify(file) : projectType.value;
-      const title = document.getElementById('project-title').value.trim() || file?.name || projectTitle(editingProject || {});
-      const source = file ? selectedPreviewUrl : (editingProject?.mediaUrl || document.getElementById('project-external-url').value.trim());
-      previewProject({ ...editingProject, kind, title, fileName: file?.name || editingProject?.fileName, description: document.getElementById('project-caption').value.trim(), coverUrl: editingProject?.coverUrl, thumbnailUrl: editingProject?.thumbnailUrl, published: document.getElementById('project-published').checked }, source);
-    });
-    projectForm.addEventListener('submit', async (event) => {
-      event.preventDefault(); if (savingProject) return;
-      const file = projectFiles.files[0] || null; const coverFile = projectCover.files[0] || null; const externalUrlField = document.getElementById('project-external-url');
-      const message = (text) => setFormMessage(text, true); const kind = file ? identify(file) : projectType.value;
-      if (file && !kind) { message('That file type is not supported. Choose a supported audio, video, or image file.'); return; }
-      if (file && file.size > 250 * 1024 * 1024) { message('Media files must be 250 MB or smaller.'); return; }
-      if (coverFile && (identify(coverFile) !== 'image' || coverFile.size > 20 * 1024 * 1024)) { message('Cover images must be a supported image up to 20 MB.'); return; }
-      let externalUrl = ''; try { externalUrl = safeExternalUrl(externalUrlField.value); } catch (error) { message(error.message); return; }
-      if (!file && !editingProject?.mediaUrl && !externalUrl) { message('Choose a media file or enter an external media URL.'); return; }
-      if (!file && editingProject?.sourceType === 'external' && !externalUrl) { message('This project uses an external media URL. Keep the URL or upload a media file.'); return; }
-      const title = document.getElementById('project-title').value.trim() || (file?.name.replace(/\.[^/.]+$/, '') || projectTitle(editingProject || {}));
-      if (!title) { message('Add a project title.'); return; }
-      let tags; try { tags = tagsFromText(document.getElementById('project-tags').value); } catch (error) { message(error.message); return; }
-      if (!auth.currentUser) { message('Your sign-in expired. Sign in again and retry.'); return; }
-      savingProject = true; saveButton.disabled = true; previewButton.disabled = true; document.getElementById('close-project-modal').disabled = true; modal.classList.add('is-saving');
-      progressBar.hidden = true; progressBar.value = 0; setFormMessage('Saving project…');
-      const values = {
-        kind, file, coverFile, title, description: document.getElementById('project-caption').value.trim(),
-        category: document.getElementById('project-category').value.trim(), tags,
-        client: document.getElementById('project-client').value.trim(), credits: document.getElementById('project-credits').value.trim(),
-        externalUrl, featured: document.getElementById('project-featured').checked, published: document.getElementById('project-published').checked
-      };
-      try {
-        const saved = await saveProjectData(values, editingProject, (status) => { progressBar.hidden = false; const match = status.match(/(\d+)%/); if (match) progressBar.value = Number(match[1]); projectMessage.textContent = status; });
-        cloudProjects = [saved, ...cloudProjects.filter((project) => project.id !== saved.id)]; mergeProjects();
-        setFormMessage(saved.published ? 'Project saved and published to the shared portfolio.' : 'Project saved as a draft.');
-        setTimeout(() => { if (modal.open) modal.close(); }, 900);
       } catch (error) {
-        console.error('YJ Studios project save failed:', error);
-        const text = error.code === 'storage/unauthorized' ? 'Firebase Storage rejected this upload. Deploy storage.rules and sign in with the owner account.' : error.code === 'storage/quota-exceeded' ? 'Storage quota was exceeded. Check the Firebase billing plan and available quota.' : error.code === 'unavailable' || error.code === 'storage/retry-limit-exceeded' ? 'The upload was interrupted. Check your connection and retry; incomplete files were removed.' : error.message || 'Could not save the project. Check Firebase configuration and try again.';
-        setFormMessage(text, true);
-      } finally {
-        savingProject = false; saveButton.disabled = false; previewButton.disabled = false; document.getElementById('close-project-modal').disabled = false; modal.classList.remove('is-saving');
-        if (progressBar.value >= 100) hideProjectProgress();
+        console.error('YJ Studios project removal failed:', error);
+        showProjectError('The project record was removed, but its media cleanup failed. Check the Storage provider and rules to remove any remaining file.');
       }
-    });
-    modal.addEventListener('close', () => { if (selectedPreviewUrl) URL.revokeObjectURL(selectedPreviewUrl); selectedPreviewUrl = ''; editingProject = null; });
-    previewDialog.addEventListener('close', () => { previewMedia.replaceChildren(); });
-    document.getElementById('refresh-data').addEventListener('click', () => refreshDashboard().catch(() => {}));
-
-    for (const id of ['sidebar-logout', 'top-logout', 'mobile-logout']) {
-      document.getElementById(id).addEventListener('click', async () => {
-        if (!auth) return;
-        try { await signOut(auth); location.replace('./auth.html?mode=signin'); }
-        catch (error) { accessMessage.textContent = authFlow.googleAuthErrorMessage(error, { hostname: location.hostname }); }
-      });
     }
+    async function editProject(project) {
+      const title = window.prompt('Project title', project.title || '');
+      if (title === null) return;
+      const description = window.prompt('Project description', project.description || project.caption || '');
+      if (description === null) return;
+      const artist = window.prompt('Artist or performer', project.artist || '');
+      if (artist === null) return;
+      const credits = window.prompt('Credits', project.credits || '');
+      if (credits === null) return;
+      const category = window.prompt('Category', project.category || 'Other');
+      if (category === null) return;
+      const thumbnailUrl = window.prompt('Thumbnail URL (https:// or blank)', project.thumbnailUrl || project.coverUrl || '');
+      if (thumbnailUrl === null) return;
+      if (thumbnailUrl && !isSafeHttpsUrl(thumbnailUrl)) { showProjectError('Thumbnail must be a valid HTTPS URL.'); return; }
+      const currentOrder = Number.isFinite(project.sortOrder) ? project.sortOrder : 100;
+      const sortOrderText = window.prompt('Display order (lower numbers appear first)', String(currentOrder));
+      if (sortOrderText === null) return;
+      const sortOrder = Number(sortOrderText);
+      if (!Number.isInteger(sortOrder) || sortOrder < 0 || sortOrder > 9999) { showProjectError('Display order must be a whole number from 0 to 9999.'); return; }
+      try {
+        await updateDoc(doc(db, 'projects', project.id), {
+          title: title.trim().slice(0, 100), description: description.trim().slice(0, 1000),
+          caption: description.trim().slice(0, 180), category: category.trim().slice(0, 60),
+          artist: artist.trim().slice(0, 100), credits: credits.trim().slice(0, 240),
+          thumbnailUrl: thumbnailUrl.trim(), coverUrl: thumbnailUrl.trim(), sortOrder,
+          fileUrl: project.fileUrl || project.mediaUrl || project.externalUrl,
+          description: description.trim().slice(0, 1000),
+          updatedAt: serverTimestamp()
+        });
+      } catch (error) {
+        console.error('YJ Studios project update failed:', error);
+        showProjectError('Could not update project details. Check Firestore rules and try again.');
+      }
+    }
+    function isSafeHttpsUrl(value) {
+      try { const url = new URL(value); return url.protocol === 'https:' && !/example\.com|placeholder/i.test(url.href); }
+      catch { return false; }
+    }
+    document.getElementById('refresh-data').addEventListener('click', () => refreshDashboard().catch(() => {}));
+    document.getElementById('project-search').addEventListener('input', renderProjects);
+    document.getElementById('project-filter').addEventListener('change', renderProjects);
+    document.getElementById('open-project-modal').addEventListener('click', () => { document.getElementById('project-message').textContent = ''; modal.showModal(); });
+    document.getElementById('close-project-modal').addEventListener('click', () => modal.close());
+    modal.addEventListener('click', (event) => { if (event.target === modal) modal.close(); });
+    let selectedPreviewUrls = [];
+    document.getElementById('project-files').addEventListener('change', (event) => {
+      const preview = document.getElementById('media-preview');
+      selectedPreviewUrls.forEach((url) => URL.revokeObjectURL(url));
+      selectedPreviewUrls = [];
+      const files = [...(event.target.files || [])];
+      preview.replaceChildren();
+      if (!files.length) { preview.textContent = 'Choose audio, video, or image files to preview them here.'; return; }
+      const list = document.createElement('div');
+      files.forEach((file) => {
+        const kind = identify(file);
+        if (!kind) { const error = document.createElement('p'); error.textContent = `${file.name}: unsupported file type.`; list.appendChild(error); return; }
+        const url = URL.createObjectURL(file);
+        selectedPreviewUrls.push(url);
+        const row = document.createElement('div'); row.style.marginTop = '10px';
+        const label = document.createElement('div'); label.textContent = `${kind.toUpperCase()} · ${file.name} · ${(file.size / (1024 * 1024)).toFixed(1)} MB`;
+        let element;
+        if (kind === 'image') { element = document.createElement('img'); element.alt = `Preview of ${file.name}`; element.style.cssText = 'display:block;max-width:100%;max-height:220px;margin-top:8px;object-fit:contain'; }
+        else if (kind === 'video') { element = document.createElement('video'); element.controls = true; element.playsInline = true; element.preload = 'metadata'; element.style.cssText = 'display:block;max-width:100%;max-height:220px;margin-top:8px'; }
+        else { element = document.createElement('audio'); element.controls = true; element.preload = 'metadata'; element.style.cssText = 'display:block;width:100%;margin-top:8px'; }
+        element.src = url; row.append(label, element); list.appendChild(row);
+      });
+      preview.appendChild(list);
+    });
+    document.getElementById('project-form').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const files = [...document.getElementById('project-files').files];
+      const coverFile = document.getElementById('project-cover').files[0] || null;
+      const message = document.getElementById('project-message');
+      const valid = files.filter((file) => identify(file));
+      const externalUrl = document.getElementById('project-external-url').value.trim();
+      if ((!valid.length && !externalUrl) || valid.length !== files.length) { message.textContent = 'Choose media files or provide a public HTTPS media URL.'; return; }
+      if (externalUrl && !isSafeHttpsUrl(externalUrl)) { message.textContent = 'Use a valid HTTPS media URL without placeholder domains.'; return; }
+      if (externalUrl && valid.length) { message.textContent = 'Choose either files or an external media URL for one project at a time.'; return; }
+      if (coverFile && (!identify(coverFile).startsWith('image') || !valid.some((file) => ['audio', 'video'].includes(identify(file))))) { message.textContent = 'Attach a cover image only when at least one audio or video file is selected.'; return; }
+      if (valid.some((file) => file.size > 250 * 1024 * 1024)) { message.textContent = 'Each media file must be 250 MB or smaller.'; return; }
+      if (coverFile && coverFile.size > 20 * 1024 * 1024) { message.textContent = 'Cover images must be 20 MB or smaller.'; return; }
+      const titleBase = document.getElementById('project-title').value.trim();
+      const caption = document.getElementById('project-caption').value.trim();
+      const category = document.getElementById('project-category').value.trim();
+      const artist = document.getElementById('project-artist').value.trim();
+      const credits = document.getElementById('project-credits').value.trim();
+      const thumbnailUrl = document.getElementById('project-thumbnail-url').value.trim();
+      const sortOrder = Number(document.getElementById('project-order').value || 100);
+      const published = document.getElementById('project-published').checked;
+      if (thumbnailUrl && !isSafeHttpsUrl(thumbnailUrl)) { message.textContent = 'Thumbnail URL must be valid HTTPS.'; return; }
+      if (!Number.isInteger(sortOrder) || sortOrder < 0 || sortOrder > 9999) { message.textContent = 'Display order must be from 0 to 9999.'; return; }
+      const button = event.currentTarget.querySelector('[type="submit"]'); button.disabled = true;
+      let publishedCount = 0, localOnlyCount = 0, localFailedCount = 0;
+      let firstCloudError = null;
+      try {
+        if (externalUrl) {
+          const kind = document.getElementById('project-type').value;
+          if (!titleBase) { message.textContent = 'Enter a title for this project.'; return; }
+          const result = await saveExternalProject({ kind, title: titleBase, artist, description: caption, credits, category, url: externalUrl, thumbnailUrl, sortOrder, published });
+          cloudProjects = [result, ...cloudProjects.filter((project) => project.id !== result.id)];
+          mergeProjects(); event.currentTarget.reset();
+          message.textContent = published ? 'Project published to the public gallery.' : 'Project saved as a private draft.';
+          setTimeout(() => modal.close(), 1100); return;
+        }
+        for (let index = 0; index < valid.length; index++) {
+          const file = valid[index];
+          const kind = identify(file);
+          const name = file.name.replace(/\.[^/.]+$/, '');
+          const item = {
+            id: makeProjectId(), kind, file, fileName: file.name,
+            coverFile: coverFile && ['audio', 'video'].includes(kind) ? coverFile : null,
+            title: titleBase ? (valid.length > 1 ? `${titleBase} ${index + 1}` : titleBase) : name,
+            caption, category, artist, credits, coverUrl: thumbnailUrl, sortOrder: sortOrder + index,
+            published, createdAt: Date.now() + index
+          };
+          try {
+            const published = await publishToCloud(item, (progress) => { message.textContent = `${index + 1} of ${valid.length} · ${progress}`; });
+            cloudProjects = [published, ...cloudProjects.filter((project) => project.id !== item.id)];
+            publishedCount++;
+          } catch (error) {
+            firstCloudError ||= error;
+            console.error('YJ Studios cloud upload failed; saving this project locally:', error);
+            try { const localDraft = { ...item, published: false }; await saveLocalProject(localDraft); localProjects = [localDraft, ...localProjects.filter((project) => project.id !== item.id)]; localOnlyCount++; }
+            catch (localError) { console.error('YJ Studios local fallback also failed:', localError); localFailedCount++; }
+          }
+          mergeProjects();
+        }
+        event.currentTarget.reset();
+        if (localOnlyCount || localFailedCount) {
+          const parts = [];
+          if (publishedCount) parts.push(`${publishedCount} published to the shared gallery`);
+          if (localOnlyCount) parts.push(`${localOnlyCount} saved only in this browser`);
+          if (localFailedCount) parts.push(`${localFailedCount} could not be saved`);
+          message.textContent = `${parts.join(' · ')}. Check that the Storage bucket is initialized and its rules are deployed. Local copies remain drafts in this browser.`;
+        } else {
+          message.textContent = `${publishedCount} project${publishedCount === 1 ? '' : 's'} saved.`;
+          setTimeout(() => modal.close(), 1100);
+        }
+      } catch (error) { message.textContent = error.message || 'Could not save these files.'; }
+      finally { button.disabled = false; }
+    });
+
+    for (const id of ['sidebar-logout', 'top-logout', 'mobile-logout']) document.getElementById(id).addEventListener('click', () => { if (auth) signOut(auth); });
   </script>
 </body>
 </html>

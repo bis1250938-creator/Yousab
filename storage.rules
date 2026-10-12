@@ -4,24 +4,29 @@ service firebase.storage {
     function isOwner() {
       return request.auth != null
         && request.auth.token.owner == true
-        && request.auth.token.firebase.sign_in_provider == 'google.com'
+        && request.auth.token.firebase.sign_in_provider in ['google.com', 'password']
         && request.auth.token.email_verified == true;
     }
 
-    function validUpload(fileName) {
-      return (fileName.matches('media-.*')
-          && request.resource.size <= 250 * 1024 * 1024
-          && request.resource.contentType.matches('(audio|video|image)/.*'))
-        || (fileName.matches('(cover|thumbnail)-.*')
-          && request.resource.size <= 20 * 1024 * 1024
-          && request.resource.contentType.matches('image/.*'));
+    function publishedProjectOwnsObject(ownerUid, projectId, fileName) {
+      let project = firestore.get(/databases/(default)/documents/projects/$(projectId));
+      let objectPath = 'portfolio/' + ownerUid + '/' + projectId + '/' + fileName;
+      return project.data.published == true
+        && ((fileName.matches('media-.*') && (project.data.filePath == objectPath || project.data.mediaPath == objectPath))
+          || (fileName.matches('cover-.*') && (project.data.coverPath == objectPath || project.data.thumbnailPath == objectPath)));
     }
 
     match /portfolio/{ownerUid}/{projectId}/{fileName} {
-      allow read: if true;
+      allow read: if (isOwner() && ownerUid == request.auth.uid)
+        || publishedProjectOwnsObject(ownerUid, projectId, fileName);
       allow create, update: if isOwner()
         && ownerUid == request.auth.uid
-        && validUpload(fileName);
+        && ((fileName.matches('media-.*')
+              && request.resource.size <= 250 * 1024 * 1024
+              && request.resource.contentType.matches('(audio/(mpeg|wav|mp4|aac|ogg|flac|webm|opus)|video/(mp4|webm|ogg)|image/(jpeg|png|webp|avif|gif))'))
+          || (fileName.matches('cover-.*')
+              && request.resource.size <= 20 * 1024 * 1024
+              && request.resource.contentType.matches('image/(jpeg|png|webp|avif|gif)')));
       allow delete: if isOwner() && ownerUid == request.auth.uid;
     }
   }

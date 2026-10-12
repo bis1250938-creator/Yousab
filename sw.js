@@ -4,12 +4,11 @@ const APP_URL = new URL('index.html', BASE_URL).href;
 const SHELL_FILES = [
   './',
   './index.html',
-  './auth.html',
-  './account.html',
   './dashboard.html',
   './auth-flow.mjs',
   './firebase-config.js',
   './firebase-client.js',
+  './media-storage.js',
   './site-cloud.js',
   './site.webmanifest',
   './dashboard.webmanifest',
