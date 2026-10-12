@@ -8,12 +8,20 @@ service firebase.storage {
         && request.auth.token.email_verified == true;
     }
 
+    function validUpload(fileName) {
+      return (fileName.matches('media-.*')
+          && request.resource.size <= 250 * 1024 * 1024
+          && request.resource.contentType.matches('(audio|video|image)/.*'))
+        || (fileName.matches('(cover|thumbnail)-.*')
+          && request.resource.size <= 20 * 1024 * 1024
+          && request.resource.contentType.matches('image/.*'));
+    }
+
     match /portfolio/{ownerUid}/{projectId}/{fileName} {
       allow read: if true;
       allow create, update: if isOwner()
         && ownerUid == request.auth.uid
-        && request.resource.size <= 250 * 1024 * 1024
-        && request.resource.contentType.matches('(audio|video|image)/.*');
+        && validUpload(fileName);
       allow delete: if isOwner() && ownerUid == request.auth.uid;
     }
   }

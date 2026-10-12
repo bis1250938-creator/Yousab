@@ -31,7 +31,11 @@ async function startCloudFeatures() {
         return {
           ...data,
           id: entry.id,
-          createdAt: data.createdAt?.toMillis?.() || Date.now()
+          description: data.description || data.caption || '',
+          tags: Array.isArray(data.tags) ? data.tags : [],
+          featured: data.featured === true,
+          published: data.published === true,
+          createdAt: data.createdAt?.toMillis?.() || 0
         };
       });
       if (window.YJPortfolio?.renderRemoteProjects) {

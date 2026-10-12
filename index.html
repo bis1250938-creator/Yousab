@@ -128,11 +128,23 @@
     .portfolio-filters { display: flex; align-items: center; gap: 7px; }
     .portfolio-filter { padding: 8px 11px; border: 1px solid rgba(255,255,255,.1); border-radius: 2px; color: #9aa5ab; background: transparent; font-size: 10px; cursor: pointer; transition: color .2s, border-color .2s, background .2s; }
     .portfolio-filter:hover, .portfolio-filter[aria-pressed="true"] { color: var(--cyan-2); border-color: rgba(97,230,246,.48); background: rgba(97,230,246,.06); }
-    .portfolio-controls { display: flex; align-items: center; gap: 13px; }
+    .portfolio-controls { display: flex; align-items: center; gap: 13px; flex-wrap: wrap; }
     .portfolio-add { min-height: 34px; padding: 0 11px; color: var(--cyan-2); background: rgba(97,230,246,.07); border: 1px solid rgba(97,230,246,.38); border-radius: 2px; font-size: 10px; cursor: pointer; white-space: nowrap; }
     .portfolio-add:hover { background: rgba(97,230,246,.14); border-color: var(--cyan); }
     .portfolio-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .visually-hidden { position: absolute !important; width: 1px !important; height: 1px !important; padding: 0 !important; margin: -1px !important; overflow: hidden !important; clip: rect(0,0,0,0) !important; white-space: nowrap !important; border: 0 !important; }
+    .portfolio-search, .portfolio-category { min-height: 38px; padding: 0 11px; border: 1px solid rgba(255,255,255,.12); border-radius: 3px; color: #d7e1e4; background: #0b1014; font: 10px var(--sans); }
+    .portfolio-search { width: min(220px, 42vw); }
+    .portfolio-category { min-width: 140px; }
+    .portfolio-search:focus, .portfolio-category:focus { outline: 2px solid rgba(97,230,246,.45); outline-offset: 2px; }
+    .portfolio-project-category { display: inline-flex; margin-top: 10px; padding: 4px 7px; border: 1px solid rgba(97,230,246,.2); color: #9adce2; font-size: 8px; letter-spacing: .08em; text-transform: uppercase; }
+    .portfolio-featured { position: absolute; z-index: 3; top: 11px; right: 11px; padding: 5px 7px; border: 1px solid rgba(255,212,147,.46); color: #ffdda8; background: rgba(13,17,21,.83); font-size: 8px; letter-spacing: .1em; text-transform: uppercase; }
+    .portfolio-details-button { margin-top: 12px; padding: 8px 10px; border: 1px solid rgba(97,230,246,.25); color: var(--cyan-2); background: rgba(97,230,246,.04); font-size: 9px; cursor: pointer; }
+    .portfolio-details-button:hover { border-color: rgba(97,230,246,.6); background: rgba(97,230,246,.09); }
+    .portfolio-no-results { grid-column: 1/-1; padding: 35px 18px; border: 1px solid var(--line); color: #9aa5ab; text-align: center; font-size: 11px; }
     .portfolio-card { position: relative; z-index: 0; min-width: 0; border: 1px solid var(--line); background: #0d1115; transform: scale(1); transform-origin: center; transition: transform .28s cubic-bezier(.2,.8,.2,1), border-color .22s, box-shadow .22s; }
+    .portfolio-card[data-upload-id] { cursor: pointer; }
+    .portfolio-card[data-upload-id] audio, .portfolio-card[data-upload-id] video, .portfolio-card[data-upload-id] button { cursor: auto; }
     @media (hover: hover) and (pointer: fine) {
       .portfolio-card:hover { z-index: 3; transform: translateY(-4px) scale(1.045); border-color: rgba(97,230,246,.48); box-shadow: 0 18px 42px rgba(0,0,0,.38), 0 0 24px rgba(97,230,246,.07); }
     }
@@ -210,6 +222,13 @@
     .lightbox-caption { margin: 12px 0 0; color: #b7c2c7; font-size: 11px; text-align: center; }
     .lightbox-close { position: absolute; z-index: 1; top: 9px; right: 9px; width: 31px; height: 31px; color: var(--white); border: 1px solid rgba(255,255,255,.2); background: rgba(10,14,17,.86); font-size: 20px; cursor: pointer; }
     .lightbox-close:hover { color: var(--cyan); border-color: rgba(97,230,246,.6); }
+    .portfolio-preview-media { display: grid; place-items: center; max-height: 66vh; min-height: 150px; overflow: auto; background: #06090c; }
+    .portfolio-preview-media img, .portfolio-preview-media video { display: block; max-width: 100%; max-height: 66vh; object-fit: contain; }
+    .portfolio-preview-media audio { width: min(100%, 800px); padding: 14px; }
+    .portfolio-preview-copy { max-width: 900px; margin: 0 auto; padding: 16px 10px 8px; text-align: center; }
+    .portfolio-preview-copy h3 { margin: 0 0 8px; font: 600 20px var(--display); }
+    .portfolio-preview-copy p { margin: 5px 0; color: #a5b1b6; font-size: 10px; line-height: 1.7; }
+    .portfolio-preview-copy a { display: inline-block; margin-top: 8px; color: var(--cyan-2); font-size: 10px; }
     .portfolio-meta span:first-child { width: 6px; height: 6px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 9px rgba(97,230,246,.45); }
 
     .services-section { background: #0d1115; border-block: 1px solid rgba(255,255,255,.055); }
@@ -504,11 +523,13 @@
           <p class="portfolio-note">Choose a format to explore the portfolio.</p>
           <div class="portfolio-controls">
             <div class="portfolio-filters" role="group" aria-label="Filter portfolio by media type">
-              <button class="portfolio-filter" type="button" data-filter="all" aria-pressed="true">All work</button>
+              <button class="portfolio-filter" type="button" data-filter="all" aria-pressed="true">All projects</button>
               <button class="portfolio-filter" type="button" data-filter="audio" aria-pressed="false">Audio</button>
               <button class="portfolio-filter" type="button" data-filter="video" aria-pressed="false">Video</button>
               <button class="portfolio-filter" type="button" data-filter="image" aria-pressed="false">Images</button>
             </div>
+            <label class="visually-hidden" for="portfolio-category">Filter by category</label><select class="portfolio-category" id="portfolio-category"><option value="all">All categories</option></select>
+            <label class="visually-hidden" for="portfolio-search">Search projects</label><input class="portfolio-search" id="portfolio-search" type="search" placeholder="Search projects" autocomplete="off">
           </div>
         </div>
         <div class="portfolio-grid" id="portfolio-grid" aria-live="polite">
@@ -543,10 +564,10 @@
       </div>
     </section>
 
-    <dialog class="media-lightbox" id="media-lightbox" aria-label="Expanded portfolio image">
-      <button class="lightbox-close" id="lightbox-close" type="button" aria-label="Close enlarged image">×</button>
-      <img class="lightbox-image" id="lightbox-image" alt="">
-      <p class="lightbox-caption" id="lightbox-caption"></p>
+    <dialog class="media-lightbox" id="media-lightbox" aria-label="Portfolio project preview">
+      <button class="lightbox-close" id="lightbox-close" type="button" aria-label="Close project preview">×</button>
+      <div class="portfolio-preview-media" id="portfolio-preview-media"></div>
+      <div class="portfolio-preview-copy"><h3 id="lightbox-title"></h3><p id="lightbox-caption"></p><p id="lightbox-details"></p><a id="lightbox-external-link" href="#" target="_blank" rel="noopener noreferrer" hidden>Open external media ↗</a></div>
     </dialog>
 
     <section class="work-section" id="craft">
@@ -714,44 +735,13 @@
     }
 
     const portfolioGrid = document.getElementById('portfolio-grid');
-    const previewUrls = new Map();
     let activePortfolioFilter = 'all';
-
-    const mediaDatabase = new Promise((resolve, reject) => {
-      if (!('indexedDB' in window)) { reject(new Error('Browser storage is unavailable.')); return; }
-      const request = indexedDB.open('yj-studios-portfolio', 2);
-      request.onupgradeneeded = () => {
-        if (!request.result.objectStoreNames.contains('media')) request.result.createObjectStore('media', { keyPath: 'id' });
-      };
-      request.onsuccess = () => resolve(request.result);
-      request.onerror = () => reject(request.error || new Error('Could not open browser storage.'));
-    });
-    async function readSavedUploads() {
-      try {
-        const db = await mediaDatabase;
-        const saved = await new Promise((resolve, reject) => {
-          const request = db.transaction('media', 'readonly').objectStore('media').getAll();
-          request.onsuccess = () => resolve(request.result);
-          request.onerror = () => reject(request.error);
-        });
-        return saved;
-      } catch { return []; }
-    }
-    function identifyMedia(file) {
-      const mime = (file.type || '').toLowerCase();
-      if (mime.startsWith('audio/')) return 'audio';
-      if (mime.startsWith('video/')) return 'video';
-      if (mime.startsWith('image/')) return 'image';
-      const extension = file.name.split('.').pop().toLowerCase();
-      if (['mp3','wav','m4a','aac','ogg','flac'].includes(extension)) return 'audio';
-      if (['mp4','mov','webm','m4v','ogv'].includes(extension)) return 'video';
-      if (['jpg','jpeg','png','webp','gif','avif'].includes(extension)) return 'image';
-      return '';
-    }
-    function formatFileSize(bytes) {
-      if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
-      return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-    }
+    let activeCategory = 'all';
+    let activeSearch = '';
+    let remotePortfolioRecords = [];
+    let activePreviewObjectUrl = '';
+    const portfolioCategory = document.getElementById('portfolio-category');
+    const portfolioSearch = document.getElementById('portfolio-search');
     let audioContext = null;
     function setupAudioVisualizer(audio, canvas, artwork) {
       const context = canvas.getContext('2d');
@@ -821,105 +811,88 @@
       audio.addEventListener('seeked', draw);
       draw();
     }
+    function safePublicUrl(value) {
+      try { const url = new URL(String(value || ''), location.href); return url.protocol === 'https:' ? url.href : ''; }
+      catch { return ''; }
+    }
+    function projectPreviewUrl(record) { return safePublicUrl(record.mediaUrl) || safePublicUrl(record.externalUrl); }
     function createUploadedCard(record) {
-      const url = record.mediaUrl || URL.createObjectURL(record.file);
-      if (record.file) previewUrls.set(record.id, url);
-      const coverUrl = record.coverUrl || (record.coverFile ? URL.createObjectURL(record.coverFile) : '');
-      if (record.coverFile) previewUrls.set(`${record.id}:cover`, coverUrl);
-      const card = document.createElement('article');
-      card.className = 'portfolio-card reveal in';
-      card.dataset.kind = record.kind;
-      card.dataset.uploadId = record.id;
-      card.dataset.fileName = record.fileName;
-
-      const art = document.createElement('div');
-      art.className = 'portfolio-art';
-      const media = document.createElement('div');
-      media.className = 'uploaded-media';
+      const url = projectPreviewUrl(record); if (!url) return;
+      const coverUrl = safePublicUrl(record.coverUrl) || safePublicUrl(record.thumbnailUrl);
+      const card = document.createElement('article'); card.className = 'portfolio-card reveal in';
+      card.dataset.kind = record.kind || 'audio'; card.dataset.uploadId = record.id; card.dataset.remoteProject = 'true';
+      card.dataset.category = String(record.category || '').trim().toLowerCase();
+      card.dataset.search = [record.title, record.description, record.caption, record.category, ...(record.tags || []), record.client, record.credits, record.fileName].filter(Boolean).join(' ').toLowerCase();
+      const art = document.createElement('div'); art.className = 'portfolio-art';
+      const media = document.createElement('div'); media.className = 'uploaded-media';
       let audioVisualConfig = null;
       if (record.kind === 'image') {
-        const image = document.createElement('img');
-        image.className = 'uploaded-image'; image.src = url; image.alt = record.title;
-        image.tabIndex = 0; image.setAttribute('role', 'button'); image.setAttribute('aria-label', `Enlarge ${record.title}`);
-        media.appendChild(image);
+        const image = document.createElement('img'); image.className = 'uploaded-image'; image.src = safePublicUrl(record.thumbnailUrl) || url; image.alt = record.title || 'Portfolio image';
+        image.loading = 'lazy'; image.decoding = 'async'; image.setAttribute('aria-label', `Preview ${record.title || 'image project'}`); media.appendChild(image);
       } else if (record.kind === 'video') {
-        const video = document.createElement('video');
-        video.className = 'uploaded-video'; video.src = url; video.controls = true; video.playsInline = true; video.preload = 'metadata';
-        if (coverUrl) video.poster = coverUrl;
-        video.setAttribute('aria-label', `${record.title} video preview`);
-        media.appendChild(video);
+        const video = document.createElement('video'); video.className = 'uploaded-video'; video.src = url; video.controls = true; video.playsInline = true; video.preload = 'none';
+        if (coverUrl) video.poster = coverUrl; video.setAttribute('aria-label', `${record.title || 'Project'} video preview`); media.appendChild(video);
       } else {
-        const audioArtwork = document.createElement('div');
-        audioArtwork.className = 'uploaded-audio-art';
-        if (coverUrl) {
-          const cover = document.createElement('img');
-          cover.className = 'uploaded-cover uploaded-image'; cover.src = coverUrl; cover.alt = `Cover art for ${record.title}`;
-          cover.tabIndex = 0; cover.setAttribute('role', 'button'); cover.setAttribute('aria-label', `Enlarge cover art for ${record.title}`);
-          audioArtwork.appendChild(cover);
-        }
-        const spectrum = document.createElement('canvas');
-        spectrum.className = 'audio-spectrum'; spectrum.setAttribute('aria-hidden', 'true');
-        const audio = document.createElement('audio');
-        audio.className = 'uploaded-audio'; audio.controls = true; audio.preload = 'metadata';
-        if (record.mediaUrl) audio.crossOrigin = 'anonymous';
-        audio.src = url;
-        audio.setAttribute('aria-label', `${record.title} audio preview`);
-        audioArtwork.appendChild(spectrum);
-        media.append(audioArtwork, audio);
-        audioVisualConfig = { audio, canvas: spectrum, artwork: audioArtwork };
+        const audioArtwork = document.createElement('div'); audioArtwork.className = 'uploaded-audio-art';
+        if (coverUrl) { const cover = document.createElement('img'); cover.className = 'uploaded-cover'; cover.src = coverUrl; cover.alt = ''; cover.loading = 'lazy'; cover.decoding = 'async'; audioArtwork.appendChild(cover); }
+        const spectrum = document.createElement('canvas'); spectrum.className = 'audio-spectrum'; spectrum.setAttribute('aria-hidden', 'true');
+        const audio = document.createElement('audio'); audio.className = 'uploaded-audio'; audio.controls = true; audio.preload = 'none'; audio.src = url; audio.setAttribute('aria-label', `${record.title || 'Project'} audio preview`);
+        audioArtwork.appendChild(spectrum); media.append(audioArtwork, audio); audioVisualConfig = { audio, canvas: spectrum, artwork: audioArtwork };
       }
-      const topLine = document.createElement('div');
-      topLine.className = 'portfolio-topline';
-      const kindLabel = document.createElement('span');
-      kindLabel.textContent = `${record.kind} · PREVIEW`;
-      const fileLabel = document.createElement('span');
-      fileLabel.textContent = record.fileName.split('.').pop().toUpperCase();
-      topLine.append(kindLabel, fileLabel);
+      const topLine = document.createElement('div'); topLine.className = 'portfolio-topline';
+      const kindLabel = document.createElement('span'); kindLabel.textContent = `${record.kind || 'media'}${record.featured ? ' · FEATURED' : ''}`;
+      const fileLabel = document.createElement('span'); fileLabel.textContent = (record.fileName || '').split('.').pop().toUpperCase(); topLine.append(kindLabel, fileLabel);
       art.append(media, topLine);
-
-      const info = document.createElement('div');
-      info.className = 'portfolio-info';
-      const type = document.createElement('span');
-      type.textContent = record.kind === 'image' ? 'Image · Studio / Release' : `${record.kind} · Studio work`;
-      const title = document.createElement('h3'); title.textContent = record.title;
-      const caption = document.createElement('p'); caption.textContent = record.caption || record.fileName;
-      const meta = document.createElement('div'); meta.className = 'portfolio-meta';
-      const dot = document.createElement('span');
-      const details = document.createElement('span'); details.textContent = `${formatFileSize(record.size || record.file?.size || 0)} · ${record.mediaUrl ? 'Cloud portfolio' : 'Saved in this browser'}${coverUrl ? ' · Cover art attached' : ''}`;
-      meta.append(dot, details);
-      info.append(type, title, caption, meta);
-      card.append(art, info);
-      portfolioGrid.insertBefore(card, portfolioGrid.firstChild);
+      if (record.featured) { const badge = document.createElement('span'); badge.className = 'portfolio-featured'; badge.textContent = 'Featured'; art.appendChild(badge); }
+      const info = document.createElement('div'); info.className = 'portfolio-info';
+      const type = document.createElement('span'); type.textContent = record.kind === 'image' ? 'Image project' : `${record.kind || 'Media'} project`;
+      const title = document.createElement('h3'); title.textContent = record.title || record.fileName || 'Untitled project';
+      const caption = document.createElement('p'); caption.textContent = record.description || record.caption || record.fileName || '';
+      const meta = document.createElement('div'); meta.className = 'portfolio-meta'; const dot = document.createElement('span');
+      const metaText = document.createElement('span'); const date = record.createdAt ? new Intl.DateTimeFormat('en', { month: 'short', year: 'numeric' }).format(new Date(record.createdAt)) : '';
+      metaText.textContent = [record.category || record.kind, date].filter(Boolean).join(' · '); meta.append(dot, metaText);
+      info.append(type, title, caption);
+      if (record.category) { const category = document.createElement('span'); category.className = 'portfolio-project-category'; category.textContent = record.category; info.appendChild(category); }
+      if (Array.isArray(record.tags) && record.tags.length) { const tags = document.createElement('p'); tags.className = 'portfolio-tags'; tags.textContent = record.tags.map((tag) => `#${tag}`).join('  '); info.appendChild(tags); }
+      info.append(meta);
+      const detailsButton = document.createElement('button'); detailsButton.type = 'button'; detailsButton.className = 'portfolio-details-button'; detailsButton.textContent = 'Project details'; detailsButton.setAttribute('aria-label', `View details for ${record.title || record.fileName || 'project'}`); info.appendChild(detailsButton);
+      card.append(art, info); portfolioGrid.appendChild(card);
       if (audioVisualConfig) setupAudioVisualizer(audioVisualConfig.audio, audioVisualConfig.canvas, audioVisualConfig.artwork);
     }
+    function refreshCategoryOptions() {
+      const current = activeCategory; const categories = [...new Set(remotePortfolioRecords.map((record) => String(record.category || '').trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+      portfolioCategory.replaceChildren(new Option('All categories', 'all'));
+      categories.forEach((category) => portfolioCategory.add(new Option(category, category.toLowerCase())));
+      if (current !== 'all' && categories.some((category) => category.toLowerCase() === current)) portfolioCategory.value = current;
+      else { activeCategory = 'all'; portfolioCategory.value = 'all'; }
+    }
     function refreshPortfolioVisibility() {
-      const uploadedKinds = new Set([...portfolioGrid.querySelectorAll('[data-upload-id]')].map((card) => card.dataset.kind));
+      const uploadedKinds = new Set(remotePortfolioRecords.map((record) => record.kind));
+      const normalizedSearch = activeSearch.trim().toLowerCase(); let visibleCount = 0;
       portfolioGrid.querySelectorAll('.portfolio-card').forEach((card) => {
-        const hidePlaceholder = card.dataset.placeholder === 'true' && uploadedKinds.has(card.dataset.kind);
+        const isPlaceholder = card.dataset.placeholder === 'true';
+        const hidePlaceholder = isPlaceholder && uploadedKinds.has(card.dataset.kind);
         const hideByFilter = activePortfolioFilter !== 'all' && card.dataset.kind !== activePortfolioFilter;
-        card.hidden = hidePlaceholder || hideByFilter;
+        const hideByCategory = activeCategory !== 'all' && (isPlaceholder || card.dataset.category !== activeCategory);
+        const hideBySearch = Boolean(normalizedSearch) && (isPlaceholder || !card.dataset.search.includes(normalizedSearch));
+        card.hidden = hidePlaceholder || hideByFilter || hideByCategory || hideBySearch;
+        if (!card.hidden && !isPlaceholder) visibleCount++;
       });
+      let empty = portfolioGrid.querySelector('.portfolio-no-results');
+      if (!visibleCount && (remotePortfolioRecords.length || normalizedSearch || activeCategory !== 'all')) {
+        if (!empty) { empty = document.createElement('p'); empty.className = 'portfolio-no-results'; empty.textContent = 'No projects match these filters.'; portfolioGrid.appendChild(empty); }
+        empty.hidden = false;
+      } else if (empty) empty.hidden = true;
     }
-    async function restoreUploads() {
-      const saved = await readSavedUploads();
-      saved.sort((a, b) => a.createdAt - b.createdAt).forEach(createUploadedCard);
-      refreshPortfolioVisibility();
+    function renderRemotePortfolio() {
+      portfolioGrid.querySelectorAll('[data-remote-project="true"]').forEach((card) => card.remove());
+      remotePortfolioRecords.slice().sort((a, b) => Number(b.featured === true) - Number(a.featured === true) || Number(a.order ?? Number.MAX_SAFE_INTEGER) - Number(b.order ?? Number.MAX_SAFE_INTEGER) || Number(b.createdAt || 0) - Number(a.createdAt || 0)).forEach(createUploadedCard);
+      refreshCategoryOptions(); refreshPortfolioVisibility();
     }
-    restoreUploads();
     window.YJPortfolio = {
       async renderRemoteProjects(records) {
-        const remoteIds = new Set(records.map((record) => record.id));
-        portfolioGrid.querySelectorAll('[data-upload-id]').forEach((card) => {
-          if (remoteIds.has(card.dataset.uploadId)) card.remove();
-        });
-        portfolioGrid.querySelectorAll('[data-remote-project="true"]').forEach((card) => card.remove());
-        records.slice().reverse().forEach((record) => {
-          if (!record.mediaUrl) return;
-          createUploadedCard(record);
-          const card = portfolioGrid.querySelector(`[data-upload-id="${CSS.escape(record.id)}"]`);
-          if (card) card.dataset.remoteProject = 'true';
-        });
-        refreshPortfolioVisibility();
+        remotePortfolioRecords = records.filter((record) => record.published === true && projectPreviewUrl(record));
+        renderRemotePortfolio();
       }
     };
 
@@ -930,25 +903,35 @@
         refreshPortfolioVisibility();
       });
     });
-
+    portfolioCategory.addEventListener('change', () => { activeCategory = portfolioCategory.value; refreshPortfolioVisibility(); });
+    portfolioSearch.addEventListener('input', () => { activeSearch = portfolioSearch.value; refreshPortfolioVisibility(); });
     const mediaLightbox = document.getElementById('media-lightbox');
-    const lightboxImage = document.getElementById('lightbox-image');
+    const portfolioPreviewMedia = document.getElementById('portfolio-preview-media');
+    function openPortfolioPreview(record) {
+      const source = projectPreviewUrl(record); if (!source) return;
+      const title = record.title || record.fileName || 'Portfolio project';
+      document.getElementById('lightbox-title').textContent = title;
+      document.getElementById('lightbox-caption').textContent = record.description || record.caption || '';
+      const details = [record.category ? `Category: ${record.category}` : '', Array.isArray(record.tags) && record.tags.length ? `Tags: ${record.tags.join(', ')}` : '', record.client ? `Client: ${record.client}` : '', record.credits ? `Credits: ${record.credits}` : '', record.createdAt ? `Uploaded ${new Intl.DateTimeFormat('en', { dateStyle: 'long' }).format(new Date(record.createdAt))}` : ''].filter(Boolean);
+      document.getElementById('lightbox-details').textContent = details.join(' · ');
+      const externalLink = document.getElementById('lightbox-external-link');
+      const safeExternal = safePublicUrl(record.externalUrl);
+      if (safeExternal) { externalLink.href = safeExternal; externalLink.hidden = false; } else { externalLink.removeAttribute('href'); externalLink.hidden = true; }
+      portfolioPreviewMedia.replaceChildren();
+      let element;
+      if (record.kind === 'image') { element = document.createElement('img'); element.src = safePublicUrl(source); element.alt = title; element.decoding = 'async'; }
+      else if (record.kind === 'video') { element = document.createElement('video'); element.src = source; element.controls = true; element.playsInline = true; element.preload = 'metadata'; element.poster = record.coverUrl || record.thumbnailUrl || ''; element.setAttribute('aria-label', `${title} video`); }
+      else { element = document.createElement('audio'); element.src = source; element.controls = true; element.preload = 'metadata'; element.setAttribute('aria-label', `${title} audio`); }
+      portfolioPreviewMedia.appendChild(element); mediaLightbox.showModal();
+    }
     portfolioGrid.addEventListener('click', (event) => {
-      const image = event.target.closest('img.uploaded-image');
-      if (!image) return;
-      lightboxImage.src = image.src;
-      lightboxImage.alt = image.alt;
-      document.getElementById('lightbox-caption').textContent = image.alt;
-      mediaLightbox.showModal();
-    });
-    portfolioGrid.addEventListener('keydown', (event) => {
-      if ((event.key === 'Enter' || event.key === ' ') && event.target.matches('img.uploaded-image')) {
-        event.preventDefault(); event.target.click();
-      }
+      const card = event.target.closest('[data-upload-id]'); if (!card) return;
+      if (event.target.closest('audio,video,a')) return;
+      const record = remotePortfolioRecords.find((project) => project.id === card.dataset.uploadId); if (record) openPortfolioPreview(record);
     });
     document.getElementById('lightbox-close').addEventListener('click', () => mediaLightbox.close());
     mediaLightbox.addEventListener('click', (event) => { if (event.target === mediaLightbox) mediaLightbox.close(); });
-    mediaLightbox.addEventListener('close', () => lightboxImage.removeAttribute('src'));
+    mediaLightbox.addEventListener('close', () => { const media = portfolioPreviewMedia.querySelector('audio,video'); if (media) { media.pause(); media.removeAttribute('src'); media.load(); } portfolioPreviewMedia.replaceChildren(); });
 
     const menu = document.querySelector('.menu-toggle');
     const navLinks = document.querySelector('.nav-links');

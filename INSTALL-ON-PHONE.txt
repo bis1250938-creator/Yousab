@@ -6,7 +6,7 @@ YJ STUDIOS — INSTALL ON YOUR PHONE
 4. Android: accept the install prompt, or choose Install app / Add to Home screen from the browser menu.
 5. iPhone: open the dashboard in Safari, tap Share, choose Add to Home Screen, then tap Add.
 
-The home-screen app caches the site shell for offline use after the first online visit. New projects uploaded from the owner dashboard are stored in Firebase Cloud Storage and appear in the public gallery across devices once Firebase Storage is set up. Older projects previously saved in this browser remain local until you choose Publish beside each one in the dashboard. Cloud media needs an internet connection to play on other devices.
+The home-screen app caches the site shell for offline use after the first online visit. New projects save metadata in Firestore and media in Firebase Cloud Storage, then appear in the public gallery across devices. Older projects from previous browser-only versions remain available in the owner dashboard until you choose Publish beside each one. Cloud media needs an internet connection to play on other devices.
 
 When Firebase Firestore is enabled and its security rules are deployed, website booking requests appear in the owner dashboard. Requests are inquiries only; YJ Studios still confirms each session. If sending fails, visitors can copy and share their request.
 

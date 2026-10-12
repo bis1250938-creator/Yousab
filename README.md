@@ -4,10 +4,10 @@ Editable static website source. There is no build step. Visitors and the owner u
 
 ## Files
 
-- `index.html` — responsive studio site, portfolio upload gallery, audio visualizer, and session request form.
+- `index.html` — responsive studio site, searchable multimedia portfolio, audio visualizer, and session request form.
 - `auth.html` — shared Google sign-in and sign-up page for studio visitors and the owner.
 - `account.html` — signed-in visitor account page, session status, booking link, and sign-out.
-- `dashboard.html` — private owner workspace for portfolio management, project counts, service rates, activity, and booking inbox. It redirects through the shared account flow.
+- `dashboard.html` — private owner workspace for adding, editing, previewing, ordering, publishing, and deleting portfolio projects, plus service rates, activity, and booking inbox.
 - `auth-flow.mjs` — validated Google sign-in/sign-up intent, role routing, and owner-session helpers.
 - `firebase-config.js` — Firebase Web app configuration used for Google sign-in.
 - `firebase-client.js` / `site-cloud.js` — Firebase initialization, public portfolio reads, and booking request writes.
@@ -24,8 +24,7 @@ Editable static website source. There is no build step. Visitors and the owner u
 
 ## Edit and preview in VS Code
 
-1. Extract `yj-studios-pwa.zip`.
-2. In VS Code, choose **File → Open Folder…** and open the extracted folder.
+1. Open this project folder in VS Code with **File → Open Folder…**.
 3. Edit `index.html` for the page, styling, and interactive behavior. Edit `site.webmanifest` for the app name and colors.
 4. For local PWA and offline behavior, serve the folder from `localhost` with a static server such as VS Code Live Server. Opening `index.html` as a `file://` URL does not enable the service worker.
 
@@ -33,9 +32,13 @@ To keep the site or owner dashboard on a phone, publish the website files at an 
 
 ## Portfolio and booking data
 
-Sign in through `auth.html` with the Google account that has been assigned the owner role to add, publish, review, or remove portfolio projects. New uploads are sent to Firebase Cloud Storage and published in the gallery across devices. Older projects saved in this browser remain there until you choose **Publish** beside them. If cloud upload is unavailable, new files are saved locally and the dashboard explains how to publish them later.
+Sign in through `auth.html` with the Google account assigned the owner role. New projects save their metadata in Firestore and their media in Firebase Cloud Storage. The dashboard supports audio, video, and image projects, descriptions, categories, tags, client and credit details, external links, featured status, drafts, previews, replacing media, and manual ordering. Uploads show progress and are retried from the form if a connection fails; new projects are never saved to browser storage as a fallback.
 
-Published media is public so visitors can play or view it; only the owner account can upload or delete files. Cloud Storage requires the Firebase Blaze billing plan. Downloads and stored files may incur charges, so set a budget alert and publish media intended for the public site only.
+Projects that were saved in IndexedDB by an older version of this site are still available in the owner dashboard. Use **Publish** beside each older project to upload it to Cloud Storage and copy its metadata to Firestore. Once published, that local copy is removed. The public website reads only published Firestore projects, so projects appear consistently across browsers and devices.
+
+The public portfolio has media-type and category filters, search, featured projects, responsive players, image thumbnails, and project previews. Audio and video use native player controls and do not preload the full file before a visitor presses play. Uploaded image and video thumbnails are generated in the browser when its decoder supports them; otherwise the cover image or media itself is used.
+
+Published media is public so visitors can play or view it; only a verified owner account can create, edit, publish, unpublish, order, or delete project records and media. Firestore Rules validate project metadata; Storage Rules validate the owner claim, file paths, types, and size limits. Cloud Storage requires the Firebase Blaze billing plan. Downloads and stored files may incur charges, so set a budget alert and publish media intended for the public site only.
 
 When Firestore is enabled and `firestore.rules` are published, the public booking form sends inquiries to a private owner-only inbox. The dashboard shows new requests live and lets the owner update their status or delete them. A request is not a confirmed session. If Firestore is not configured or sending fails, the visitor can still copy and share the request.
 
@@ -57,11 +60,11 @@ The dashboard refreshes and verifies the Firebase ID token's owner claim before 
 
 1. In Firebase Console, enable Google under **Authentication → Sign-in method** and add `yjstudio.com` under **Authentication → Settings → Authorized domains**. The Firebase Web app is `yj-studio-50df5` with `authDomain` `yj-studio-50df5.firebaseapp.com`; the OAuth handler is `https://yj-studio-50df5.firebaseapp.com/__/auth/handler`. For local Live Server, use `http://localhost:5500` and authorize `localhost`. Never use `file://` for sign-in.
 2. In **Authentication → Users**, find the existing owner account linked to Google and copy its Firebase UID. If that Auth account does not exist yet, publish the site, choose **Create an account** at `auth.html`, and sign up with the intended Google account. This creates only an unprivileged account. Verify the UID corresponds to the intended owner before granting a role.
-3. Install and sign in to the Firebase CLI (`npm install -g firebase-tools`, then `firebase login`). From `outputs/`, deploy the rules with `firebase deploy --only firestore,storage --project yj-studio-50df5`. This removes the old email-based authorization check; the dashboard remains blocked until the next step assigns the owner claim.
+3. Install and sign in to the Firebase CLI (`npm install -g firebase-tools`, then `firebase login`). From this website project folder, deploy the Firestore indexes and Firestore/Storage rules with `firebase deploy --only firestore,storage --project yj-studio-50df5`. The dashboard remains blocked until the next step assigns the owner claim.
 4. In a trusted admin terminal, install the isolated tool dependency and authenticate with Google Cloud Application Default Credentials using an account permitted to administer this Firebase project:
 
    ```powershell
-   cd outputs/admin-tools
+   cd admin-tools
    npm install
    gcloud auth application-default login
    node set-owner-role.mjs grant FIREBASE_UID FIREBASE_UID

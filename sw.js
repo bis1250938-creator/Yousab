@@ -1,4 +1,4 @@
-const CACHE_NAME = 'yj-studios-shell-v26';
+const CACHE_NAME = 'yj-studios-shell-v27';
 const BASE_URL = new URL('./', self.registration.scope);
 const APP_URL = new URL('index.html', BASE_URL).href;
 const SHELL_FILES = [

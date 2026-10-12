@@ -42,7 +42,42 @@ service cloud.firestore {
 
     match /projects/{projectId} {
       allow get, list: if isOwner() || resource.data.published == true;
-      allow create, update, delete: if isOwner();
+      function validProject(data) {
+        let prefix = 'portfolio/' + request.auth.uid + '/' + projectId + '/';
+        return data.keys().hasAll([
+            'kind', 'fileName', 'title', 'caption', 'size', 'contentType',
+            'mediaPath', 'mediaUrl', 'coverPath', 'coverUrl', 'published', 'createdAt'
+          ])
+          && data.kind in ['audio', 'video', 'image']
+          && data.fileName is string && data.fileName.size() > 0 && data.fileName.size() <= 240
+          && data.title is string && data.title.size() > 0 && data.title.size() <= 100
+          && data.caption is string && data.caption.size() <= 1000
+          && data.size is int && data.size >= 0 && data.size <= 262144000
+          && data.contentType is string && data.contentType.matches('(audio|video|image)/.*')
+          && data.mediaPath is string && data.mediaUrl is string && data.mediaUrl.matches('https://.*')
+          && (data.mediaPath == '' || data.mediaPath.matches(prefix + 'media-.*'))
+          && data.coverPath is string && data.coverUrl is string
+          && (data.coverPath == '' || data.coverPath.matches(prefix + '(cover|thumbnail)-.*'))
+          && data.published is bool
+          && data.createdAt is timestamp
+          && (!data.keys().hasAny(['ownerUid']) || data.ownerUid == request.auth.uid)
+          && (!data.keys().hasAny(['description']) || (data.description is string && data.description.size() <= 1000))
+          && (!data.keys().hasAny(['category']) || (data.category is string && data.category.size() <= 60))
+          && (!data.keys().hasAny(['tags']) || (data.tags is list && data.tags.size() <= 12))
+          && (!data.keys().hasAny(['client']) || (data.client is string && data.client.size() <= 100))
+          && (!data.keys().hasAny(['credits']) || (data.credits is string && data.credits.size() <= 240))
+          && (!data.keys().hasAny(['externalUrl']) || (data.externalUrl is string && data.externalUrl.size() <= 2048 && (data.externalUrl == '' || data.externalUrl.matches('https://.*'))))
+          && (!data.keys().hasAny(['sourceType']) || data.sourceType in ['upload', 'external'])
+          && (!data.keys().hasAny(['sourceType']) || (data.sourceType == 'upload' && data.mediaPath != '') || (data.sourceType == 'external' && data.mediaPath == '' && data.externalUrl == data.mediaUrl))
+          && (!data.keys().hasAny(['featured']) || data.featured is bool)
+          && (!data.keys().hasAny(['order']) || data.order is int)
+          && (!data.keys().hasAny(['thumbnailPath']) || (data.thumbnailPath is string && (data.thumbnailPath == '' || data.thumbnailPath.matches(prefix + '(cover|thumbnail)-.*'))))
+          && (!data.keys().hasAny(['thumbnailUrl']) || (data.thumbnailUrl is string && (data.thumbnailUrl == '' || data.thumbnailUrl.matches('https://.*'))))
+          && data.updatedAt == request.time;
+      }
+      allow create: if isOwner() && validProject(request.resource.data) && request.resource.data.createdAt == request.time;
+      allow update: if isOwner() && validProject(request.resource.data) && request.resource.data.createdAt == resource.data.createdAt;
+      allow delete: if isOwner();
     }
   }
 }

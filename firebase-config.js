@@ -1,5 +1,5 @@
 // Web app configuration is public client-side data. Keep Firebase security rules
-// and the owner-email check in place; never put private service-account keys here.
+// and owner custom-claim checks in place; never put service-account keys here.
 export const firebaseConfig = {
   apiKey: "AIzaSyAMDW3JJZ-nNnXLQveUd3gcwiBLX4F0nB4",
   authDomain: "yj-studio-50df5.firebaseapp.com",
