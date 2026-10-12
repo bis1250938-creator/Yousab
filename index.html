@@ -775,6 +775,7 @@
     const portfolioEmpty = document.getElementById('portfolio-empty');
     const previewUrls = new Map();
     let activePortfolioFilter = 'all';
+    let portfolioDataStatus = 'Loading published studio work…';
 
     const mediaDatabase = new Promise((resolve, reject) => {
       if (!('indexedDB' in window)) { reject(new Error('Browser storage is unavailable.')); return; }
@@ -933,7 +934,7 @@
       card.dataset.uploadId = record.id;
       card.dataset.fileName = record.fileName;
       card.dataset.category = record.category || '';
-      card.dataset.search = [record.title, record.artist, record.category, record.caption, record.credits].filter(Boolean).join(' ').toLocaleLowerCase();
+      card.dataset.search = [record.title, record.artist, record.category, record.caption, record.credits, ...(record.tags || [])].filter(Boolean).join(' ').toLocaleLowerCase();
 
       const art = document.createElement('div');
       art.className = 'portfolio-art';
@@ -995,7 +996,7 @@
       const caption = document.createElement('p'); caption.textContent = record.caption || record.fileName || ''; caption.dir = 'auto';
       const meta = document.createElement('div'); meta.className = 'portfolio-meta';
       const dot = document.createElement('span');
-      const details = document.createElement('span'); details.textContent = `${formatFileSize(record.size || record.file?.size || 0)} · ${record.mediaUrl ? 'Cloud portfolio' : 'Saved in this browser'}${coverUrl ? ' · Cover art attached' : ''}`;
+      const details = document.createElement('span'); details.textContent = `${record.projectDate ? `${record.projectDate} · ` : ''}${formatFileSize(record.size || record.file?.size || 0)} · ${record.mediaUrl ? 'Cloud portfolio' : 'Saved in this browser'}${coverUrl ? ' · Cover art attached' : ''}`;
       meta.append(dot, details);
       info.append(type, title, caption, meta);
       card.append(art, info);
@@ -1016,7 +1017,7 @@
         if (!card.hidden) visible++;
       });
       portfolioEmpty.classList.toggle('hidden', visible > 0);
-      if (!visible) portfolioEmpty.textContent = searchTerm || activePortfolioFilter !== 'all' ? 'No published projects match this search or filter.' : 'No published studio work yet.';
+      if (!visible) portfolioEmpty.textContent = searchTerm || activePortfolioFilter !== 'all' ? 'No published projects match this search or filter.' : portfolioDataStatus;
     }
     async function restoreUploads() {
       const saved = await readSavedUploads();
@@ -1027,10 +1028,16 @@
     restoreUploads();
     window.YJPortfolio = {
       showError(message) {
+        portfolioDataStatus = message;
         portfolioGrid.querySelectorAll('[data-placeholder="true"]').forEach((card) => card.remove());
-        if (!portfolioGrid.querySelector('.portfolio-card')) { portfolioEmpty.textContent = message; portfolioEmpty.classList.remove('hidden'); }
+        refreshPortfolioVisibility();
+      },
+      showStatus(message) {
+        portfolioDataStatus = message;
+        refreshPortfolioVisibility();
       },
       async renderRemoteProjects(records) {
+        portfolioDataStatus = 'No published studio work yet.';
         portfolioGrid.querySelectorAll('[data-placeholder="true"]').forEach((card) => card.remove());
         const remoteIds = new Set(records.map((record) => record.id));
         portfolioGrid.querySelectorAll('[data-upload-id]').forEach((card) => {

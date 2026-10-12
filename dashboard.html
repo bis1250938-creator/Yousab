@@ -118,12 +118,14 @@
 
   <dialog class="modal" id="project-modal" aria-labelledby="modal-title"><div class="modal-inner"><div class="modal-head"><div><div class="eyebrow">Portfolio management</div><h2 id="modal-title">Add a project</h2></div><button class="close-button" id="close-project-modal" type="button" aria-label="Close">×</button></div>
     <form id="project-form"><div class="field"><label for="project-type">Media type</label><select id="project-type"><option value="audio">Audio</option><option value="video">Video</option><option value="image">Image</option></select></div><div class="field"><label for="project-files">Media files (optional when using an external URL)</label><div class="dropbox"><input id="project-files" type="file" accept="audio/*,video/*,image/*" multiple></div><div id="media-preview" class="form-note" aria-live="polite">Choose media to preview it here.</div></div>
-      <div class="field"><label for="project-cover">Optional cover image for audio or video</label><input id="project-cover" type="file" accept="image/*"></div>
+      <div class="field"><label for="project-cover">Optional cover image for audio or video</label><input id="project-cover" type="file" accept="image/*"><div id="cover-preview" class="form-note" aria-live="polite">Cover preview appears here when selected.</div></div>
       <div class="field"><label for="project-title">Project title</label><input id="project-title" type="text" maxlength="100" placeholder="Title" required></div>
       <div class="field"><label for="project-artist">Artist or performer</label><input id="project-artist" type="text" maxlength="100" placeholder="Artist or performer"></div>
       <div class="field"><label for="project-caption">Description</label><textarea id="project-caption" maxlength="1000" placeholder="Project details" dir="auto"></textarea></div>
       <div class="field"><label for="project-credits">Credits</label><input id="project-credits" type="text" maxlength="240" placeholder="Recording, mix, mastering credits" dir="auto"></div>
-      <div class="field"><label for="project-category">Category</label><select id="project-category"><option>Recording</option><option>Mixing</option><option>Mastering</option><option>Coptic Hymns</option><option>Taraneem</option><option>Other</option></select></div>
+      <div class="field"><label for="project-category">Category</label><select id="project-category"><option>Audio</option><option>Video</option><option>Images</option><option>Recording</option><option>Mixing</option><option>Mastering</option><option>Coptic Hymns</option><option>Taraneem</option><option>Other</option></select></div>
+      <div class="field"><label for="project-tags">Tags (comma separated)</label><input id="project-tags" type="text" maxlength="480" placeholder="Live, vocals, mastering"></div>
+      <div class="field"><label for="project-date">Project date (optional)</label><input id="project-date" type="date"></div>
       <div class="field"><label for="project-external-url">External media URL (optional)</label><input id="project-external-url" type="url" maxlength="2048" placeholder="https://…" inputmode="url"></div>
       <div class="field"><label for="project-thumbnail-url">Thumbnail URL (optional)</label><input id="project-thumbnail-url" type="url" maxlength="2048" placeholder="https://…" inputmode="url"></div>
       <div class="field"><label for="project-order">Display order</label><input id="project-order" type="number" min="0" max="9999" step="1" value="100"></div>
@@ -540,7 +542,7 @@
       const filter = document.getElementById('project-filter').value;
       const visibleProjects = currentProjects.filter((item) => {
         const statusMatch = filter === 'all' || (filter === 'published' ? item.published : filter === 'draft' ? !item.published : item.kind === filter);
-        const searchMatch = !term || [item.title, item.fileName, item.artist, item.description, item.caption, item.category, item.credits].filter(Boolean).join(' ').toLocaleLowerCase().includes(term);
+        const searchMatch = !term || [item.title, item.fileName, item.artist, item.description, item.caption, item.category, item.credits, ...(item.tags || [])].filter(Boolean).join(' ').toLocaleLowerCase().includes(term);
         return statusMatch && searchMatch;
       });
       if (!visibleProjects.length) {
@@ -686,13 +688,21 @@
     function makeProjectId() { return crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`; }
     function cleanFileName(name) { return name.normalize('NFKD').replace(/[^a-zA-Z0-9._-]+/g, '_').slice(-90) || 'media'; }
     function contentTypeFor(file, kind) {
-      const ext = file.name.split('.').pop().toLowerCase();
-      const known = { mp3:'audio/mpeg', wav:'audio/wav', m4a:'audio/mp4', aac:'audio/aac', ogg:'audio/ogg', flac:'audio/flac', opus:'audio/opus', mp4:'video/mp4', webm:kind === 'audio' ? 'audio/webm' : 'video/webm', m4v:'video/mp4', ogv:'video/ogg', jpg:'image/jpeg', jpeg:'image/jpeg', png:'image/png', webp:'image/webp', gif:'image/gif', avif:'image/avif' };
-      return known[ext] || (file.type && file.type.toLowerCase().startsWith(`${kind}/`) ? file.type : `${kind}/octet-stream`);
+      return mediaStorageApi.contentTypeForMedia(file, kind);
     }
     function uploadFile(path, file, kind, onProgress) {
       if (!storageProvider) return Promise.reject(new Error('Firebase Storage is not initialized in this app. Check firebase-config.js and reload the dashboard.'));
       return storageProvider.upload(path, file, kind, onProgress);
+    }
+    function cloudSetupHint(error) {
+      const code = String(error?.code || 'unknown');
+      const detail = String(error?.message || '').toLowerCase();
+      if (detail.includes('storage is not initialized') || detail.includes('storage is not configured')) return 'The Storage SDK or provider is not ready. Check that the Storage SDK loaded and firebase-config.js selects Firebase Storage.';
+      if (code === 'storage/bucket-not-found') return 'The Firebase Storage bucket has not been initialized or the bucket name is incorrect.';
+      if (code === 'storage/unauthorized' || code === 'permission-denied') return 'Firebase rejected this write. Confirm Storage/Firestore rules are deployed and this account has the owner claim.';
+      if (code === 'storage/retry-limit-exceeded' || code === 'storage/canceled') return 'The upload was interrupted. Check the connection and try again.';
+      if (code === 'auth/network-request-failed' || code === 'unavailable') return 'Firebase could not be reached. Check the internet connection and retry.';
+      return `Firebase reported ${code}. Check the browser console for the detailed error.`;
     }
     async function publishToCloud(item, onProgress = () => {}) {
       if (!auth.currentUser) throw new Error('Sign in again before publishing.');
@@ -723,6 +733,7 @@
           size: item.file.size, contentType: contentTypeFor(item.file, item.kind),
           mediaPath, mediaUrl, coverPath, coverUrl: coverUrl || item.coverUrl || '',
           thumbnailUrl: coverUrl || item.coverUrl || '', artist: item.artist || '', credits: item.credits || '',
+          tags: Array.isArray(item.tags) ? item.tags : [], projectDate: item.projectDate || '',
           sortOrder: Number.isInteger(item.sortOrder) ? item.sortOrder : 100,
           ownerUid: auth.currentUser.uid, published: item.published === true,
           featured: Boolean(item.featured), createdAt: serverTimestamp(), updatedAt: serverTimestamp()
@@ -765,7 +776,7 @@
         console.error('YJ Studios project upload failed:', error);
         button.disabled = false; button.textContent = 'Publish';
         const sizeError = /must be \d+ MB or smaller/.test(error.message || '');
-        showProjectError(sizeError ? error.message : 'Could not publish this project. Confirm the Storage bucket is initialized, Storage Rules are deployed, and your account has the owner claim.');
+        showProjectError(sizeError ? error.message : `Could not publish this project. ${cloudSetupHint(error)}`);
       }
     }
     async function setProjectPublished(project, published) {
@@ -786,6 +797,7 @@
         category: fields.category, externalUrl: fields.url, fileUrl: fields.url,
         filePath: '', mediaUrl: fields.url, thumbnailUrl: fields.thumbnailUrl,
         coverUrl: fields.thumbnailUrl, published: fields.published,
+        tags: fields.tags, projectDate: fields.projectDate,
         sortOrder: fields.sortOrder, ownerUid: auth.currentUser.uid,
         createdAt: serverTimestamp(), updatedAt: serverTimestamp()
       };
@@ -820,6 +832,14 @@
       if (credits === null) return;
       const category = window.prompt('Category', project.category || 'Other');
       if (category === null) return;
+      const existingTags = Array.isArray(project.tags) ? project.tags : (typeof project.tags === 'string' ? project.tags.split(',') : []);
+      const tagsText = window.prompt('Tags (comma separated)', existingTags.join(', '));
+      if (tagsText === null) return;
+      const tags = [...new Set(tagsText.split(',').map((tag) => tag.trim()).filter(Boolean))];
+      if (tags.length > 12 || tags.some((tag) => tag.length > 40)) { showProjectError('Use up to 12 tags, with no tag longer than 40 characters.'); return; }
+      const projectDate = window.prompt('Project date (YYYY-MM-DD or blank)', project.projectDate || '');
+      if (projectDate === null) return;
+      if (projectDate && !/^\d{4}-\d{2}-\d{2}$/.test(projectDate)) { showProjectError('Use YYYY-MM-DD for the project date.'); return; }
       const thumbnailUrl = window.prompt('Thumbnail URL (https:// or blank)', project.thumbnailUrl || project.coverUrl || '');
       if (thumbnailUrl === null) return;
       if (thumbnailUrl && !isSafeHttpsUrl(thumbnailUrl)) { showProjectError('Thumbnail must be a valid HTTPS URL.'); return; }
@@ -833,6 +853,7 @@
           title: title.trim().slice(0, 100), description: description.trim().slice(0, 1000),
           caption: description.trim().slice(0, 180), category: category.trim().slice(0, 60),
           artist: artist.trim().slice(0, 100), credits: credits.trim().slice(0, 240),
+          tags, projectDate,
           thumbnailUrl: thumbnailUrl.trim(), coverUrl: thumbnailUrl.trim(), sortOrder,
           fileUrl: project.fileUrl || project.mediaUrl || project.externalUrl,
           description: description.trim().slice(0, 1000),
@@ -877,6 +898,20 @@
       });
       preview.appendChild(list);
     });
+    let coverPreviewUrl = '';
+    document.getElementById('project-cover').addEventListener('change', (event) => {
+      if (coverPreviewUrl) URL.revokeObjectURL(coverPreviewUrl);
+      coverPreviewUrl = '';
+      const preview = document.getElementById('cover-preview');
+      preview.replaceChildren();
+      const file = event.target.files?.[0];
+      if (!file) { preview.textContent = 'Cover preview appears here when selected.'; return; }
+      if (!identify(file)?.startsWith('image')) { preview.textContent = 'Choose a supported image for the cover.'; return; }
+      coverPreviewUrl = URL.createObjectURL(file);
+      const image = document.createElement('img'); image.src = coverPreviewUrl; image.alt = 'Selected cover preview';
+      image.style.cssText = 'display:block;max-width:180px;max-height:150px;margin-top:8px;object-fit:contain';
+      preview.appendChild(image);
+    });
     document.getElementById('project-form').addEventListener('submit', async (event) => {
       event.preventDefault();
       const files = [...document.getElementById('project-files').files];
@@ -895,6 +930,9 @@
       const category = document.getElementById('project-category').value.trim();
       const artist = document.getElementById('project-artist').value.trim();
       const credits = document.getElementById('project-credits').value.trim();
+      const tags = [...new Set(document.getElementById('project-tags').value.split(',').map((tag) => tag.trim()).filter(Boolean))];
+      const projectDate = document.getElementById('project-date').value;
+      if (tags.length > 12 || tags.some((tag) => tag.length > 40)) { message.textContent = 'Use up to 12 tags, with no tag longer than 40 characters.'; return; }
       const thumbnailUrl = document.getElementById('project-thumbnail-url').value.trim();
       const sortOrder = Number(document.getElementById('project-order').value || 100);
       const published = document.getElementById('project-published').checked;
@@ -907,7 +945,7 @@
         if (externalUrl) {
           const kind = document.getElementById('project-type').value;
           if (!titleBase) { message.textContent = 'Enter a title for this project.'; return; }
-          const result = await saveExternalProject({ kind, title: titleBase, artist, description: caption, credits, category, url: externalUrl, thumbnailUrl, sortOrder, published });
+          const result = await saveExternalProject({ kind, title: titleBase, artist, description: caption, credits, category, tags, projectDate, url: externalUrl, thumbnailUrl, sortOrder, published });
           cloudProjects = [result, ...cloudProjects.filter((project) => project.id !== result.id)];
           mergeProjects(); event.currentTarget.reset();
           message.textContent = published ? 'Project published to the public gallery.' : 'Project saved as a private draft.';
@@ -922,6 +960,7 @@
             coverFile: coverFile && ['audio', 'video'].includes(kind) ? coverFile : null,
             title: titleBase ? (valid.length > 1 ? `${titleBase} ${index + 1}` : titleBase) : name,
             caption, category, artist, credits, coverUrl: thumbnailUrl, sortOrder: sortOrder + index,
+            tags, projectDate,
             published, createdAt: Date.now() + index
           };
           try {
@@ -942,7 +981,7 @@
           if (publishedCount) parts.push(`${publishedCount} published to the shared gallery`);
           if (localOnlyCount) parts.push(`${localOnlyCount} saved only in this browser`);
           if (localFailedCount) parts.push(`${localFailedCount} could not be saved`);
-          message.textContent = `${parts.join(' · ')}. Check that the Storage bucket is initialized and its rules are deployed. Local copies remain drafts in this browser.`;
+          message.textContent = `${parts.join(' · ')}. ${cloudSetupHint(firstCloudError)} Local copies remain drafts in this browser.`;
         } else {
           message.textContent = `${publishedCount} project${publishedCount === 1 ? '' : 's'} saved.`;
           setTimeout(() => modal.close(), 1100);

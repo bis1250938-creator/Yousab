@@ -4,14 +4,14 @@
 
 - `firebase-config.js` now uses the Firebase Web app configuration supplied for project `yj-studio-50df5`.
 - `firebase-client.js` reuses the default Firebase app and exports reusable `app`, `auth`, `db`, and bucket configuration. Analytics is omitted because this site does not need it.
-- `site-cloud.js` listens in real time to published Firestore projects, accepts both the current portfolio fields and the existing `kind`/`mediaUrl` schema, and ignores missing, non-HTTPS, example, and placeholder media URLs.
+- `site-cloud.js` listens in real time to published Firestore projects, accepts current and legacy media URL fields, sorts on the client so missing `createdAt` values do not disappear from results, and reports published documents with invalid media data separately from a truly empty gallery.
 - `index.html` keeps the existing portfolio design and media cards; Studio Work adds search, media/category filters, a custom audio player, responsive video/embeds, and an accessible image lightbox.
 - The booking form continues saving requests to the private Firestore inbox and opens a prefilled WhatsApp chat to `+20 120 867 8717` on submit. The customer must tap **Send** in WhatsApp; websites cannot silently send WhatsApp messages.
 - `dashboard.html` keeps the owner-only sign-in and supports project metadata, draft/published status, order, search/filter, editing, confirmed deletion, and uploads of audio, video, and images to Firebase Storage.
-- `media-storage.js` isolates storage operations behind a provider interface. Its 250 MB media and 20 MB cover limits are application limits, not Firebase quotas. MOV is rejected because browser playback varies; MP4 and WebM are supported.
+- `media-storage.js` isolates storage operations behind a provider interface and normalizes browser MIME aliases to types accepted by Storage Rules. Its 250 MB media and 20 MB cover limits are application limits, not Firebase quotas. MOV is rejected because browser playback varies; MP4 and WebM are supported.
 - `firebase-config.js` selects Firebase Storage as the media provider. Uploads work after the Firebase project is on Blaze, its Storage bucket is initialized, and the included Storage Rules are deployed.
 - `auth-flow.mjs`, `admin-tools/`, `firestore.rules`, and `storage.rules` authorize only verified accounts with the trusted `owner: true` custom claim. The claim is never granted by frontend code.
-- `firestore.indexes.json` supports the published-project date sort.
+- `firestore.indexes.json` is retained for deployments that use the composite ordering elsewhere; the public gallery no longer requires that composite index.
 
 ## Billing and media storage status
 

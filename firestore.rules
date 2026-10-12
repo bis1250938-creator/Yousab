@@ -56,6 +56,8 @@ service cloud.firestore {
           && (!data.keys().hasAny(['sortOrder']) || (data.sortOrder is int && data.sortOrder >= 0 && data.sortOrder <= 9999))
           && (!data.keys().hasAny(['artist']) || (data.artist is string && data.artist.size() <= 100))
           && (!data.keys().hasAny(['credits']) || (data.credits is string && data.credits.size() <= 240))
+          && (!data.keys().hasAny(['tags']) || (data.tags is list && data.tags.size() <= 12))
+          && (!data.keys().hasAny(['projectDate']) || (data.projectDate is string && (data.projectDate == '' || data.projectDate.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$'))))
           && (!data.keys().hasAny(['thumbnailUrl']) || (data.thumbnailUrl is string && data.thumbnailUrl.size() <= 2048))
           && (!data.keys().hasAny(['featured']) || data.featured is bool)
           && (!data.keys().hasAny(['kind']) || data.kind == data.mediaType)
@@ -65,13 +67,15 @@ service cloud.firestore {
       }
       allow create: if isOwner() && validProject(request.resource.data) && request.resource.data.createdAt == request.time;
       allow update: if isOwner()
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['title', 'description', 'caption', 'category', 'featured', 'updatedAt', 'published', 'sortOrder', 'artist', 'credits', 'thumbnailUrl', 'coverUrl'])
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['title', 'description', 'caption', 'category', 'featured', 'updatedAt', 'published', 'sortOrder', 'artist', 'credits', 'thumbnailUrl', 'coverUrl', 'tags', 'projectDate'])
         && request.resource.data.title is string && request.resource.data.title.size() > 0 && request.resource.data.title.size() <= 100
         && (!request.resource.data.keys().hasAny(['description']) || (request.resource.data.description is string && request.resource.data.description.size() <= 1000))
         && request.resource.data.category is string && request.resource.data.category.size() <= 60
         && (!request.resource.data.keys().hasAny(['sortOrder']) || (request.resource.data.sortOrder is int && request.resource.data.sortOrder >= 0 && request.resource.data.sortOrder <= 9999))
         && (!request.resource.data.keys().hasAny(['artist']) || (request.resource.data.artist is string && request.resource.data.artist.size() <= 100))
         && (!request.resource.data.keys().hasAny(['credits']) || (request.resource.data.credits is string && request.resource.data.credits.size() <= 240))
+        && (!request.resource.data.keys().hasAny(['tags']) || (request.resource.data.tags is list && request.resource.data.tags.size() <= 12))
+        && (!request.resource.data.keys().hasAny(['projectDate']) || (request.resource.data.projectDate is string && (request.resource.data.projectDate == '' || request.resource.data.projectDate.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$'))))
         && (!request.resource.data.keys().hasAny(['thumbnailUrl']) || (request.resource.data.thumbnailUrl is string && request.resource.data.thumbnailUrl.size() <= 2048))
         && (!request.resource.data.keys().hasAny(['published']) || request.resource.data.published is bool)
         && request.resource.data.updatedAt == request.time;
