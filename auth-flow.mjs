@@ -27,21 +27,36 @@ export function consumeAuthIntent(storage) {
   }
 }
 
-export function hasStudioProjectAccess(user, tokenResult) {
+export function studioProjectAccessFailure(user, tokenResult, projectId) {
+  if (!user) return 'No Firebase account is signed in.';
   const claims = tokenResult?.claims;
+  if (!claims) return 'Firebase did not return an ID token. Sign out, sign in again, and retry.';
+  if (projectId && (claims.aud !== projectId || claims.iss !== `https://securetoken.google.com/${projectId}`)) {
+    return 'This account is signed into a different Firebase project than this website. Check firebase-config.js and the deployed site configuration.';
+  }
+  if (user.emailVerified !== true || claims.email_verified !== true) {
+    return 'The signed-in Firebase account does not have a verified email. Verify that account in Firebase Authentication, then sign out and back in.';
+  }
+  if (claims.owner !== true) {
+    return `Firebase signed in UID ${user.uid}, but that UID has no trusted owner claim. From a trusted machine, run in admin-tools: node set-owner-role.mjs grant ${user.uid} ${user.uid} — then sign out and back in.`;
+  }
   const provider = claims?.firebase?.sign_in_provider;
-  const verifiedProvider = ['google.com', 'password'].includes(provider)
-    && user?.providerData?.some((profile) => profile.providerId === provider && typeof profile.uid === 'string' && profile.uid.length > 0);
-  return Boolean(user
-    && claims?.owner === true
-    && claims.email_verified === true
-    && user.emailVerified === true
-    && verifiedProvider);
+  if (!['google.com', 'password'].includes(provider)) {
+    return 'This Firebase account used an unsupported sign-in provider. Use the owner account’s Google or Email/Password sign-in method.';
+  }
+  if (!user.providerData?.some((profile) => profile.providerId === provider && typeof profile.uid === 'string' && profile.uid.length > 0)) {
+    return `The Firebase token says ${provider} sign-in, but that provider is not linked to this Firebase UID. Check Authentication → Users and use the existing owner account.`;
+  }
+  return '';
 }
 
-export async function verifyStudioProjectSession(user, getIdTokenResult) {
+export function hasStudioProjectAccess(user, tokenResult, projectId) {
+  return studioProjectAccessFailure(user, tokenResult, projectId) === '';
+}
+
+export async function verifyStudioProjectSession(user, getIdTokenResult, projectId) {
   const tokenResult = await getIdTokenResult(user, true);
-  return { authorized: hasStudioProjectAccess(user, tokenResult), tokenResult };
+  return { authorized: hasStudioProjectAccess(user, tokenResult, projectId), tokenResult, failure: studioProjectAccessFailure(user, tokenResult, projectId) };
 }
 
 export function googleAuthErrorMessage(error, { hostname }) {

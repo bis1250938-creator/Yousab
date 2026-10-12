@@ -1,4 +1,6 @@
 import { app, auth, db } from './firebase-client.js';
+import { firebaseConfig } from './firebase-config.js';
+import { studioProjectAccessFailure, verifyStudioProjectSession } from './auth-flow.mjs';
 import { contentTypeForMedia, MAX_COVER_BYTES, MAX_MEDIA_BYTES, validateMediaFile } from './media-storage.js';
 import { uploadR2, deleteR2Objects, setR2Visibility, getResumeProjectId, forgetR2Session } from './r2-uploader.js';
 
@@ -74,14 +76,20 @@ function authMessage(error) {
   const code = error?.code || '';
   if (code === 'auth/invalid-credential' || code === 'auth/wrong-password' || code === 'auth/user-not-found') return 'That email and password did not match an account.';
   if (code === 'auth/unauthorized-domain') return 'Add this website hostname to Firebase Authentication → Settings → Authorized domains.';
+  if (code === 'auth/operation-not-allowed') return 'Enable this sign-in method in Firebase Authentication → Sign-in method.';
+  if (code === 'auth/invalid-api-key') return 'Firebase rejected this website configuration. Check the Web API key and project ID in firebase-config.js.';
   if (code === 'auth/popup-blocked') return 'Allow sign-in popups for this site and try Google sign-in again.';
+  if (code === 'auth/user-disabled') return 'This Firebase account is disabled. Re-enable the existing owner account in Authentication → Users.';
+  if (code === 'auth/user-token-expired' || code === 'auth/invalid-user-token') return 'Your Firebase session expired. Sign out and sign in again.';
+  if (code === 'auth/network-request-failed') return 'Firebase could not be reached. Check the connection and try again.';
   return error?.message || 'Sign-in failed. Check the Firebase Authentication settings and connection.';
 }
 
 function projectError(error) {
   const code = error?.code || '';
+  if (code === 'permission-denied') return 'Firestore denied this action. Confirm the signed-in Firebase UID has the trusted owner claim and that Firestore rules are deployed to the configured project, then sign out and back in.';
   if (code === 'storage/bucket-not-found') return 'The configured media storage bucket is unavailable.';
-  if (code === 'storage/unauthorized' || code === 'permission-denied') return 'Firebase denied this action. Check the account permissions and deployed Firestore and Storage rules.';
+  if (code === 'storage/unauthorized') return 'Firebase denied a legacy Storage action. Check the account permissions and deployed Storage rules.';
   if (code === 'storage/canceled') return 'Upload canceled. No project was published.';
   if (code === 'storage/retry-limit-exceeded' || code === 'unavailable') return 'The upload was interrupted. Check the connection and retry.';
   if (String(error?.message || '').includes('Firebase Storage is not configured')) return 'Firebase Storage is not available. Initialize the bucket in Firebase Console and check firebase-config.js.';
@@ -89,11 +97,7 @@ function projectError(error) {
 }
 
 function verifyOwner(user) {
-  if (!user?.emailVerified) return Promise.resolve(false);
-  return getIdTokenResult(user, true).then((token) => {
-    const provider = token.claims.firebase?.sign_in_provider;
-    return token.claims.owner === true && ['google.com', 'password'].includes(provider);
-  });
+  return verifyStudioProjectSession(user, getIdTokenResult, firebaseConfig.projectId);
 }
 
 function normalizeProject(snapshot) {
@@ -144,15 +148,18 @@ async function acceptUser(user) {
     return;
   }
   try {
-    if (!(await verifyOwner(user))) {
+    const access = await verifyOwner(user);
+    if (!access.authorized) {
       if (stopOwnerProjects) stopOwnerProjects();
       stopOwnerProjects = null;
-      setOwnerAccess(false, 'This account is signed in but is not authorized to manage Studio Work.');
+      setOwnerAccess(false, studioProjectAccessFailure(user, access.tokenResult, firebaseConfig.projectId));
       return;
     }
     setOwnerAccess(true, `Signed in as ${user.email || 'YJ Studios account'}.`);
     listenToOwnerProjects();
   } catch (error) {
+    if (stopOwnerProjects) stopOwnerProjects();
+    stopOwnerProjects = null;
     setOwnerAccess(false, `Could not verify owner access: ${authMessage(error)}`);
   }
 }
@@ -512,7 +519,8 @@ byId('portfolio-sign-in-form').addEventListener('submit', async (event) => {
   status(signInMessage, 'Checking Firebase account…');
   try {
     await signInWithEmailAndPassword(auth, byId('portfolio-owner-email').value.trim(), byId('portfolio-owner-password').value);
-    if (!(await verifyOwner(auth.currentUser))) throw new Error('This account is not authorized to manage Studio Work.');
+    const access = await verifyOwner(auth.currentUser);
+    if (!access.authorized) throw new Error(studioProjectAccessFailure(auth.currentUser, access.tokenResult, firebaseConfig.projectId));
     signInDialog.close();
     byId('portfolio-sign-in-form').reset();
     resetProjectForm(); projectDialog.showModal();
@@ -524,7 +532,8 @@ byId('portfolio-google-sign-in').addEventListener('click', async () => {
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: 'select_account' });
     const result = await signInWithPopup(auth, provider);
-    if (!(await verifyOwner(result.user))) throw new Error('This Google account is not authorized to manage Studio Work.');
+    const access = await verifyOwner(result.user);
+    if (!access.authorized) throw new Error(studioProjectAccessFailure(result.user, access.tokenResult, firebaseConfig.projectId));
     signInDialog.close();
     resetProjectForm(); projectDialog.showModal();
   } catch (error) { status(signInMessage, authMessage(error), true); }
