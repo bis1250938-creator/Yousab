@@ -88,5 +88,17 @@ service cloud.firestore {
         && request.resource.data.updatedAt == request.time;
       allow delete: if isOwner();
     }
+
+    // Device tokens are private server-managed records. Callable Functions
+    // scope all registration and sending operations to request.auth.uid.
+    match /notificationDevices/{userId}/devices/{deviceId} {
+      allow read, write: if false;
+    }
+    match /notificationRateLimits/{userId} {
+      allow read, write: if false;
+    }
+    match /notificationDeviceCounts/{userId} {
+      allow read, write: if false;
+    }
   }
 }

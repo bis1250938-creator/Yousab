@@ -2,6 +2,39 @@
 
 Firebase Authentication and Firestore continue to power owner sign-in, trusted administrator authorization, booking requests, and portfolio metadata. New audio, image, and video files use the authenticated Cloudflare R2 Worker documented in [R2_SETUP.md](./R2_SETUP.md); Firebase Storage is not used for new uploads.
 
+## Cross-device Web Push notifications
+
+The main-site **Notifications** control uses Firebase Cloud Messaging (FCM) on supported HTTPS browsers. It requests browser permission only after the user selects **Enable Notifications**. Each browser installation receives its own Firebase Installation ID (FID), stored under `notificationDevices/{firebaseUid}/devices/{browserDeviceId}` by a callable Function. On this version of Firebase, the Web SDK's FID registration callbacks update the saved record when an installation changes; dead FIDs are removed when a test send reports them invalid.
+
+The client cannot read or write device records directly. `registerNotificationDevice`, `removeNotificationDevice`, and `sendTestNotification` verify a signed-in, email-verified Google or Email/Password Firebase identity. Registration and removal are scoped to `request.auth.uid`, with a transactional limit of 10 browser devices per account. The test endpoint takes no target UID, FID, or custom message, and sends only to the caller's registered devices. It is rate-limited to one test every 30 seconds. This avoids opening a general-purpose send API; it does not send portfolio announcements to other users.
+
+### Required Firebase setup
+
+1. In Firebase Console, select project `yj-studio-50df5` → **Project settings → Cloud Messaging**. Under **Web Push certificates**, generate a key pair. Copy only the displayed **public** key into `globalThis.YJ_FCM_VAPID_KEY` in `firebase-public-config.js`. Do not paste the private key anywhere in this website.
+2. In the Cloud Messaging settings, confirm the Firebase Cloud Messaging API and FCM Registration API are enabled for this project. The web SDK registration requires HTTPS, a service worker, a Web Push key, and browser Push API support. The existing root-scoped `sw.js` was extended so the offline shell and FCM background handler share one registration.
+3. The Firebase project must be on **Blaze** to deploy Cloud Functions. This implementation does not switch billing plans or deploy services automatically. Functions have no-cost usage quotas, but deployment artifacts and usage beyond quotas can cost money. Configure a Google Cloud budget alert and a Cloud Run Functions spend cap before deployment; budgets are notifications, not a hard cap by themselves.
+4. From this website's project directory run:
+
+   ```sh
+   npm --prefix functions install
+   npm --prefix functions test
+   firebase deploy --only functions,firestore:rules --project yj-studio-50df5
+   ```
+
+   The Functions runtime uses the project's attached service identity and Firebase Admin SDK. No service-account JSON or server secret belongs in this repository. Static website files (including `sw.js` and `firebase-public-config.js`) still deploy through Vercel; the `functions/` source is excluded from the Vercel static deployment.
+
+### Use and platform notes
+
+1. Sign in with an existing verified Google or Email/Password Firebase account. Project edits still require the existing `owner: true` claim; notification subscriptions are per verified account and cannot target another account.
+2. Open **Notifications** → **Enable Notifications** on each browser/device and accept the browser prompt. A permission grant on one device does not subscribe another. **Send Test Notification** targets all of that account's registered devices. **Disable on This Device** removes this browser's record and FCM installation; repeat on other devices if desired. Owner sign-out also unregisters the current browser.
+3. Foreground delivery appears as an in-page toast to avoid duplicate OS notifications. Background messages are displayed by the service worker; clicking opens the Studio Work section. Browser/OS focus modes, revoked site permissions, connectivity, and push-provider delivery policies can delay or suppress delivery.
+4. iPhone/iPad web push requires iOS/iPadOS 16.4 or later and installing the website to the Home Screen; a normal Safari tab is not sufficient. The Firebase SDK also checks whether the required messaging APIs are present and shows an unsupported-browser message if not. Firebase documents FCM Web for browsers with Push API support; Apple documents the Home Screen requirement for iOS. [Firebase FCM Web setup](https://firebase.google.com/docs/cloud-messaging/web/get-started) · [Apple Web Push requirements](https://developer.apple.com/documentation/usernotifications/sending-web-push-notifications-in-web-apps-and-browsers).
+5. To test, use one desktop browser and a second browser/device signed into the same Firebase account. Enable each separately, send a test, verify foreground toast on an open page and a system notification with the page backgrounded, click the notification, then disable one device and verify the other remains registered. Also test permission states `default`, `granted`, and `denied` using browser site settings. A callable response means FCM accepted a send; it cannot guarantee OS display.
+
+### Current delivery boundary
+
+The source changes and local policy tests are implemented, but the VAPID public key is intentionally blank until generated in Firebase Console, and the Functions are not deployed from this workspace. Live cross-device delivery therefore remains unverified until the setup above is completed. Firebase's JavaScript SDK only attempts browsers where its runtime support check succeeds. Apple's iOS behavior is documented separately; the browser must be installed as a Home Screen app on a supported iOS/iPadOS release.
+
 ## Firebase Console configuration
 
 1. In **Project settings → General → Your apps**, confirm the Web app belongs to `yj-studio-50df5`. The web API key and app ID in `firebase-config.js` are public client configuration, not administrator secrets.
@@ -24,6 +57,7 @@ Firebase Authentication and Firestore continue to power owner sign-in, trusted a
 - `r2-worker/` validates Firebase ID tokens and claims, manages multipart uploads in R2, maintains active-object and operation quota inventory in D1, serves public media with byte-range support, and periodically cleans up stale upload reservations.
 - `firebase-config.js` contains the public Worker endpoint setting. It must be updated after deployment.
 - `firestore.rules` remains the authorization boundary for public published-project reads and owner-only metadata writes.
+- `firebase-public-config.js`, `notifications.js`, `notification-policy.mjs`, the extended `sw.js`, and `functions/` implement the FCM FID-based subscription, private device records, background handling, test sender, and local policy tests.
 - `storage.rules` is retained for legacy Firebase Storage objects only; it is not part of new R2 uploads.
 
 

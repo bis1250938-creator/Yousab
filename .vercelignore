@@ -1,3 +1,5 @@
 admin-tools/
 **/node_modules/
 r2-worker/
+functions/
+tests/

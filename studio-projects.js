@@ -39,6 +39,7 @@ let canManageProjects = false;
 let stopOwnerProjects = null;
 let activeUploadTask = null;
 let cancelRequested = false;
+let signInIntent = 'project';
 let projectPreviewUrl = '';
 let coverPreviewUrl = '';
 const comparisonPreviewUrls = new Map();
@@ -98,6 +99,22 @@ function projectError(error) {
 
 function verifyOwner(user) {
   return verifyStudioProjectSession(user, getIdTokenResult, firebaseConfig.projectId);
+}
+
+function completeOwnerSignIn() {
+  signInDialog.close();
+  byId('portfolio-sign-in-form').reset();
+  if (signInIntent === 'project') {
+    resetProjectForm();
+    projectDialog.showModal();
+  }
+  signInIntent = 'project';
+  byId('portfolio-sign-in-title').textContent = 'Sign in to add projects';
+  byId('portfolio-sign-in-description').textContent = 'Use the authorized YJ Studios account to manage portfolio projects.';
+}
+
+function requireVerifiedNotificationAccount(user) {
+  if (!user?.emailVerified) throw new Error('Verify this Firebase account email before registering notification devices.');
 }
 
 function normalizeProject(snapshot) {
@@ -444,7 +461,14 @@ async function deleteProject(project) {
 byId('portfolio-sign-in-close').addEventListener('click', () => signInDialog.close());
 byId('owner-add-project').addEventListener('click', () => {
   if (canManageProjects) { resetProjectForm(); projectDialog.showModal(); }
-  else { status(signInMessage, 'Sign in with the authorized Firebase account to manage Studio Work.'); signInDialog.showModal(); }
+  else { signInIntent = 'project'; byId('portfolio-sign-in-title').textContent = 'Sign in to add projects'; byId('portfolio-sign-in-description').textContent = 'Use the authorized YJ Studios account to manage portfolio projects.'; status(signInMessage, 'Sign in with the authorized Firebase account to manage Studio Work.'); signInDialog.showModal(); }
+});
+window.addEventListener('yj:open-owner-sign-in', () => {
+  signInIntent = 'notifications';
+  byId('portfolio-sign-in-title').textContent = 'Sign in for notifications';
+  byId('portfolio-sign-in-description').textContent = 'Use an existing verified Google or email/password Firebase account. It can manage only its own notification devices.';
+  status(signInMessage, 'Sign in with a verified Firebase account to register this browser.');
+  signInDialog.showModal();
 });
 projectTypeCards.forEach((card) => card.addEventListener('click', () => chooseProjectType(card.dataset.projectType)));
 byId('project-type-back').addEventListener('click', () => {
@@ -518,12 +542,15 @@ byId('portfolio-sign-in-form').addEventListener('submit', async (event) => {
   event.preventDefault();
   status(signInMessage, 'Checking Firebase account…');
   try {
-    await signInWithEmailAndPassword(auth, byId('portfolio-owner-email').value.trim(), byId('portfolio-owner-password').value);
+    const credential = await signInWithEmailAndPassword(auth, byId('portfolio-owner-email').value.trim(), byId('portfolio-owner-password').value);
+    if (signInIntent === 'notifications') {
+      requireVerifiedNotificationAccount(credential.user);
+      completeOwnerSignIn();
+      return;
+    }
     const access = await verifyOwner(auth.currentUser);
     if (!access.authorized) throw new Error(studioProjectAccessFailure(auth.currentUser, access.tokenResult, firebaseConfig.projectId));
-    signInDialog.close();
-    byId('portfolio-sign-in-form').reset();
-    resetProjectForm(); projectDialog.showModal();
+    completeOwnerSignIn();
   } catch (error) { status(signInMessage, authMessage(error), true); }
 });
 byId('portfolio-google-sign-in').addEventListener('click', async () => {
@@ -532,13 +559,20 @@ byId('portfolio-google-sign-in').addEventListener('click', async () => {
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: 'select_account' });
     const result = await signInWithPopup(auth, provider);
+    if (signInIntent === 'notifications') {
+      requireVerifiedNotificationAccount(result.user);
+      completeOwnerSignIn();
+      return;
+    }
     const access = await verifyOwner(result.user);
     if (!access.authorized) throw new Error(studioProjectAccessFailure(result.user, access.tokenResult, firebaseConfig.projectId));
-    signInDialog.close();
-    resetProjectForm(); projectDialog.showModal();
+    completeOwnerSignIn();
   } catch (error) { status(signInMessage, authMessage(error), true); }
 });
-byId('owner-sign-out').addEventListener('click', () => signOut(auth).catch((error) => status(byId('owner-portfolio-status'), authMessage(error), true)));
+byId('owner-sign-out').addEventListener('click', async () => {
+  await window.YJNotifications?.unregisterCurrentDevice?.();
+  signOut(auth).catch((error) => status(byId('owner-portfolio-status'), authMessage(error), true));
+});
 
 onAuthStateChanged(auth, (user) => { acceptUser(user).catch((error) => setOwnerAccess(false, authMessage(error))); });
 

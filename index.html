@@ -540,6 +540,27 @@
     :root[data-theme="light"] .choice-text small,:root[data-theme="light"] .portfolio-meta{color:#586a71}
     :root[data-theme="light"] .portfolio-topline{color:#e1eaec}
     @media(max-width:650px){:root[data-theme="light"] .nav-links{background:rgba(248,251,251,.98)}}
+    .notification-settings-dialog{width:min(470px,calc(100% - 24px));padding:25px;border:1px solid rgba(112,220,233,.32);background:#10181e;color:var(--white);box-shadow:0 25px 100px #000b}
+    .notification-settings-dialog::backdrop{background:rgba(2,5,7,.8);backdrop-filter:blur(5px)}
+    .notification-settings-dialog h2{margin:0 0 9px;font:600 24px var(--display);letter-spacing:-.04em}
+    .notification-settings-dialog p{color:var(--muted);font-size:12px;line-height:1.7}
+    .notification-status-card{margin:15px 0;padding:12px 14px;border:1px solid var(--line);background:rgba(255,255,255,.025);font-size:12px}
+    .notification-status-card strong{display:block;margin-bottom:4px;color:var(--cyan-2);font-size:10px;text-transform:uppercase;letter-spacing:.12em}
+    .notification-status-card span{display:block;overflow-wrap:anywhere;color:var(--muted)}
+    .notification-settings-actions{display:flex;flex-wrap:wrap;gap:9px;margin:17px 0}
+    .notification-settings-actions button{min-height:40px;padding:0 13px;border:1px solid rgba(112,220,233,.4);border-radius:3px;background:rgba(112,220,233,.08);color:var(--cyan-2);font:inherit;font-size:11px;cursor:pointer}
+    .notification-settings-actions button:disabled{opacity:.5;cursor:not-allowed}
+    .notification-settings-message{min-height:24px;margin:10px 0;color:var(--green);font-size:11px}
+    .notification-settings-message[data-error="true"]{color:#f2b8ad}
+    .notification-settings-close{float:right;border:0;background:transparent;color:var(--muted);font:inherit;font-size:24px;cursor:pointer}
+    #notification-toast{position:fixed;z-index:1000;right:18px;bottom:18px;max-width:min(420px,calc(100% - 36px));padding:13px 16px;border:1px solid rgba(112,220,233,.45);border-radius:4px;background:#10181e;color:#f4f7f8;box-shadow:0 12px 35px #0008;font-size:12px}
+    #notification-toast[hidden]{display:none}
+    .theme-select{min-height:35px;padding:0 8px;border:1px solid rgba(205,230,235,.2);border-radius:3px;background:rgba(255,255,255,.025);color:#dce4e7;font:inherit;font-size:10px;cursor:pointer}
+    :root[data-theme="light"] .notification-settings-dialog{background:#f8fbfb;color:#1b2a30;border-color:#b9cdd1}
+    :root[data-theme="light"] .notification-settings-dialog p,:root[data-theme="light"] .notification-status-card span{color:#455b63}
+    :root[data-theme="light"] .notification-status-card{background:#fff;border-color:#d4dfe1}
+    :root[data-theme="light"] #notification-toast{background:#f8fbfb;color:#1b2a30;border-color:#8bbdc3}
+    @media(max-width:650px){.notification-settings-dialog{padding:19px 16px}.notification-settings-actions{display:grid;grid-template-columns:1fr}.notification-settings-actions button{width:100%}}
   </style>
 </head>
 <body>
@@ -557,6 +578,7 @@
         <a href="#services">Services</a>
         <a href="#studio">The studio</a>
         <label class="sr-only" for="site-theme-mode">Color theme</label><select class="theme-select" id="site-theme-mode" aria-label="Color theme"><option value="system">Device theme</option><option value="dark">Dark theme</option><option value="light">Light theme</option></select>
+        <button class="theme-select" id="notification-settings-open" type="button" aria-haspopup="dialog">Notifications</button>
         <a class="nav-cta" href="#book">Book a session <span class="arrow">↗</span></a>
         <button class="nav-cta install-button" id="install-app" type="button" hidden>Save to phone ↗</button>
       </nav>
@@ -654,8 +676,27 @@
       <p class="lightbox-caption" id="lightbox-caption"></p>
     </dialog>
 
+    <dialog class="notification-settings-dialog" id="notification-settings-dialog" aria-labelledby="notification-settings-title">
+      <button class="notification-settings-close" id="notification-settings-close" type="button" aria-label="Close notification settings">×</button>
+      <div class="eyebrow">YJ Studios · Settings</div>
+      <h2 id="notification-settings-title">Web notifications</h2>
+      <p>Subscriptions belong to this signed-in account and this browser. Each phone or computer must be enabled separately.</p>
+      <div class="notification-status-card"><strong>Account</strong><span id="notification-auth-status">Checking Firebase sign-in…</span></div>
+      <div class="notification-status-card"><strong>Permission and device</strong><span id="notification-permission-status">Checking this browser…</span></div>
+      <div class="notification-settings-actions">
+        <button id="notification-enable" type="button">Enable Notifications</button>
+        <button id="notification-disable" type="button">Disable on This Device</button>
+        <button id="notification-test" type="button" disabled>Send Test Notification</button>
+        <button id="notification-sign-in" type="button" hidden>Sign in to continue</button>
+        <button id="notification-account-sign-out" type="button" hidden>Sign out</button>
+      </div>
+      <p class="notification-settings-message" id="notification-settings-status" role="status" aria-live="polite"></p>
+      <p>When permission is blocked, change this site’s notification access in browser or device settings. On iPhone/iPad, use an iOS 16.4+ Home Screen web app. Push delivery can be delayed or suppressed by device settings.</p>
+    </dialog>
+    <div id="notification-toast" role="status" aria-live="polite" hidden></div>
+
     <dialog class="studio-project-dialog" id="portfolio-sign-in-dialog" aria-labelledby="portfolio-sign-in-title">
-      <form id="portfolio-sign-in-form"><h2 id="portfolio-sign-in-title">Sign in to add projects</h2><p>Use the authorized YJ Studios account to manage portfolio projects.</p>
+      <form id="portfolio-sign-in-form"><h2 id="portfolio-sign-in-title">Sign in to add projects</h2><p id="portfolio-sign-in-description">Use the authorized YJ Studios account to manage portfolio projects.</p>
         <label>Email<input id="portfolio-owner-email" type="email" autocomplete="username" required></label>
         <label>Password<input id="portfolio-owner-password" type="password" autocomplete="current-password" required></label>
         <div class="owner-form-actions"><button class="owner-submit" type="submit">Sign in securely</button><button id="portfolio-google-sign-in" type="button">Sign in with Google</button><button id="portfolio-sign-in-close" type="button">Cancel</button></div>
@@ -1399,6 +1440,7 @@
   </script>
   <script type="module" src="./site-cloud.js"></script>
   <script type="module" src="./studio-projects.js"></script>
+  <script type="module" src="./notifications.js"></script>
 </body>
 </html>
 
