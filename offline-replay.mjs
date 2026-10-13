@@ -1,3 +1,5 @@
+import { unreferencedUploadedKeys } from './project-upload-policy.mjs';
+
 export const SERVER_TIMESTAMP_RECOVERY_MARKER = '__YJ_SERVER_TIMESTAMP__';
 
 function restoreServerTimestamp(value, serverTimestamp) {
@@ -15,7 +17,7 @@ function fieldsMatch(expected, current) {
 }
 
 function projectR2Paths(data, ownerUid) {
-  return [data.mediaPath || data.filePath, data.coverPath, data.beforePath, data.afterPath]
+  return [data.mediaPath || data.filePath || data.storagePath, data.coverPath || data.thumbnailPath, data.beforePath, data.afterPath, data.imagePath]
     .filter((path) => typeof path === 'string' && path.startsWith(`portfolio/${ownerUid}/`));
 }
 
@@ -25,7 +27,7 @@ function conflict(message) {
   return error;
 }
 
-export async function replayOfflineProjectChanges(operations, { ownerUid, firestore, remove }) {
+export async function replayOfflineProjectChanges(operations, { ownerUid, firestore, remove, cleanupMedia, onCreateRecovered }) {
   let completed = 0;
   const skippedIds = new Set();
   for (let index = 0; index < operations.length; index++) {
@@ -36,9 +38,24 @@ export async function replayOfflineProjectChanges(operations, { ownerUid, firest
     const exists = serverSnapshot.exists();
     const serverData = exists ? serverSnapshot.data() : null;
 
+    if (operation.type === 'orphan-media-cleanup') {
+      if (operation.ownerUid !== ownerUid) {
+        throw conflict(`Uploaded media cleanup ${operation.docId} belongs to a different owner. Its recovery record was retained.`);
+      }
+      if (typeof cleanupMedia !== 'function') {
+        throw conflict(`Uploaded media cleanup ${operation.docId} needs the authorized R2 connection. Its recovery record was retained.`);
+      }
+      const keys = unreferencedUploadedKeys(serverSnapshot, operation.keys, ownerUid);
+      if (keys.length) await cleanupMedia(keys);
+      await remove(operation.id);
+      completed++;
+      continue;
+    }
+
     if (operation.type === 'create') {
       if (exists) {
         if (serverData.ownerUid === ownerUid && fieldsMatch(operation.data, serverData)) {
+          await onCreateRecovered?.(operation);
           await remove(operation.id);
           completed++;
           continue;
@@ -47,6 +64,7 @@ export async function replayOfflineProjectChanges(operations, { ownerUid, firest
           && candidate.type === 'update' && candidate.data?.revision === serverData.revision
           && fieldsMatch(candidate.data, serverData));
         if (serverData.ownerUid === ownerUid && laterAppliedEdit) {
+          await onCreateRecovered?.(operation);
           await remove(operation.id);
           completed++;
           continue;
@@ -69,6 +87,7 @@ export async function replayOfflineProjectChanges(operations, { ownerUid, firest
         }
       }
       await firestore.setDoc(reference, restoreServerTimestamp(operation.data, firestore.serverTimestamp));
+      await onCreateRecovered?.(operation);
       await remove(operation.id);
       completed++;
       continue;

@@ -15,7 +15,7 @@ Cloudflare currently lists R2 Standard's free tier as 10 GB-month storage, 1 mil
 Safeguards configured in the Worker source:
 
 - `STORAGE_QUOTA_BYTES=8000000000` reserves a conservative 8,000,000,000-byte portfolio limit, leaving headroom under the 10 GB-month R2 allowance. It counts active multipart reservations and complete objects in this app's D1 inventory. Use a dedicated bucket/account and check other account usage because R2 free allowances are shared.
-- `MAX_OBJECT_BYTES=5368709120` caps any one file at 5 GiB. The browser's app-level cap is also 5 GiB; cover images are capped at 100 MiB.
+- `MAX_OBJECT_BYTES=5368709120` caps any one file at 5 GiB. The Worker clamps this to the provider limit and independently enforces `MAX_COVER_BYTES=104857600` (100 MiB) for image covers. The browser validates the same limits for usability.
 - `MAX_MONTHLY_R2_CLASS_A=900000` stops Worker-mediated multipart Class A operations before the listed 1 million allowance. This app counter does not observe other buckets or services in the account, so keep account usage below the free limits independently.
 - Worker Free plan requests have a 100,000 requests/day limit. Each public media read passes through the Worker, so this also limits portfolio media requests while keeping R2 Class B usage bounded. If the account uses paid Workers, configure it to stay on the Free plan; this Worker does not automatically upgrade services.
 - The Worker rejects uploads when configured limits are reached. Cloudflare D1 also has plan-based quotas; check its current limits before launch at [D1 pricing and limits](https://developers.cloudflare.com/d1/platform/pricing/). The Worker does not provide a Cloudflare account-wide hard spending cap. Configure Cloudflare usage/billing notifications in the dashboard and review R2 and Workers usage regularly. Treat alerts as monitoring, not a spending cap. Do not enable paid Workers or other paid products as a way around a reached limit.
@@ -40,7 +40,7 @@ R2 charges can still occur if the Cloudflare account uses other buckets/services
    ```sh
    npx wrangler d1 migrations apply yj-studios-media-control --remote
    ```
-4. Review `r2-worker/wrangler.toml`. Add your exact production origin to `ALLOWED_ORIGINS`. Keep localhost entries only for local development. The variables set a 5 GiB object cap, 8 GB app-level reserved storage cap, and 900,000 monthly app-tracked Class A-operation cap. Do not raise them without checking account usage and the current price sheet.
+4. Review `r2-worker/wrangler.toml`. Add your exact production origin to `ALLOWED_ORIGINS`. Keep localhost entries only for local development. The Worker enforces a 5 GiB object cap, 100 MiB cover cap, 8 GB app-level reserved-storage cap, and 900,000 monthly app-tracked Class A-operation cap. These limits are clamped in Worker code so a larger config value cannot raise them. Do not change the source safeguards without checking account usage and current pricing.
 5. Deploy from `r2-worker/`:
 
    ```sh
@@ -70,9 +70,9 @@ R2 multipart parts are 16 MiB from the browser. This stays below the Cloudflare 
 
 1. Sign into the owner account on the site. If Add Project opens the sign-in dialog, complete sign-in; only a verified account with the trusted claim can open the type wizard.
 2. Select one of the six project types, choose a local file, fill the required title, and use Draft or Publish. Preview and file size are shown before saving.
-3. The browser uploads 16 MiB parts to the authenticated Worker, which reserves quota in D1 and stores multipart objects in R2. Progress, retries, and cancel are handled in the modal. Once every object completes, the project document is written to the existing `projects` Firestore collection with Worker media URLs and R2 object keys.
+3. The browser uploads 16 MiB parts to the authenticated Worker, which checks the trusted owner token, file MIME, per-file size, and reserved quota in D1 before writing multipart objects to R2. Progress, retries, and cancel are handled in the modal. Once every object completes, the project document is written to the existing `projects` Firestore collection with Worker media URLs and R2 object keys. The modal reports separately when media is uploaded and when Firestore confirms project metadata.
 4. For published R2 media, the Worker marks only that project’s R2 objects public after the owner action; draft R2 objects return 404. Published projects appear through the existing real-time Firestore portfolio listener. Draft metadata remains hidden by Firestore rules. Edit/publish/unpublish/delete controls remain owner-only.
-5. If Firestore rejects metadata after media upload, the client asks the Worker to delete those uploaded R2 objects. If that cleanup request itself fails, remove the object through the owner workflow after retrying or use the Cloudflare dashboard; check the D1 inventory before manual deletion.
+5. If Firestore rejects metadata after media upload, the client first reads the project from the server. It deletes only uploaded keys that the confirmed record does not reference. If the read or deletion is unavailable, the app preserves the media paths in IndexedDB for owner retry; it never blindly deletes objects after an ambiguous Firestore acknowledgement. A saved create is replayed with its stable document ID, and an already-committed create is recognized without making a duplicate. Download recovery details before discarding records. A metadata-only external-URL project still uses Firestore without R2.
 
 ## What was checked and what remains
 

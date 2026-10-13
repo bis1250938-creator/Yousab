@@ -65,8 +65,8 @@ function renderStatus() {
     ? 'Persistent Firestore storage is enabled on this device.'
     : 'Persistent Firestore storage is off; offline changes may be lost if you close this page.'];
   if (pending) parts.push(`${pending} visible write${pending === 1 ? '' : 's'} waiting for confirmation. Firebase does not expose an exact restored queue count.`);
-  if (recoverableCount) parts.push(`${recoverableCount} rejected project change${recoverableCount === 1 ? ' is' : 's are'} saved locally for explicit retry or conflict review.`);
-  else if (recoverableCount === null && cacheMode === 'persistent') parts.push('Checking locally saved project recovery data…');
+  if (recoverableCount) parts.push(`${recoverableCount} project change or media-cleanup action${recoverableCount === 1 ? ' is' : 's are'} saved locally for owner retry or review.`);
+  else if (recoverableCount === null) parts.push('Checking locally saved project recovery data…');
   if (serverState === 'cached') parts.push('Showing previously synchronized data; it may be out of date.');
   if (lastServerSync) parts.push(`Last server-confirmed sync: ${new Date(lastServerSync).toLocaleString()}.`);
   if (latestFailure) parts.push(latestFailure);
@@ -81,7 +81,6 @@ function renderStatus() {
 }
 
 async function refreshRecoverableCount() {
-  if (cacheMode !== 'persistent') { recoverableCount = 0; renderStatus(); return; }
   try { recoverableCount = await countRejectedProjectWrites(); }
   catch { recoverableCount = null; }
   renderStatus();
@@ -225,6 +224,7 @@ window.YJOffline = {
   setRetryHandler: setOfflineRetryHandler,
   setRecoveryHandler: setOfflineRecoveryHandler,
   setRecoveryReviewHandlers: setOfflineRecoveryReviewHandlers,
+  refreshRecoveryCount: refreshRecoverableCount,
   async retrySavedProjectChanges() { if (recoveryHandler) await recoveryHandler(); await refreshRecoverableCount(); },
   confirmServerSync: reportServerConfirmed,
   setFailure(message) { latestFailure = String(message || ''); renderStatus(); },
@@ -280,8 +280,8 @@ closeButton?.addEventListener('click', () => settingsDialog.close());
 settingsDialog?.addEventListener('click', (event) => { if (event.target === settingsDialog) settingsDialog.close(); });
 recoveryDownloadButton?.addEventListener('click', async () => {
   if (!recoveryReviewHandler) { settingsMessage.textContent = 'Sign in with the authorized owner account to review saved project changes.'; return; }
-  try { await recoveryReviewHandler(); settingsMessage.textContent = 'A review copy of saved project changes was downloaded.'; }
-  catch (error) { settingsMessage.textContent = error?.message || 'Could not download saved changes.'; }
+  try { await recoveryReviewHandler(); settingsMessage.textContent = 'A review copy of saved project and media-cleanup details was downloaded.'; }
+  catch (error) { settingsMessage.textContent = error?.message || 'Could not download recovery details.'; }
 });
 recoveryDiscardButton?.addEventListener('click', async () => {
   if (!recoveryDiscardHandler) { settingsMessage.textContent = 'Sign in with the authorized owner account to manage saved project changes.'; return; }
@@ -289,7 +289,7 @@ recoveryDiscardButton?.addEventListener('click', async () => {
     const discarded = await recoveryDiscardHandler();
     if (discarded) {
       await refreshRecoverableCount();
-      settingsMessage.textContent = 'The selected saved project changes were discarded.';
+      settingsMessage.textContent = 'The selected saved recovery records were discarded.';
     }
   } catch (error) { settingsMessage.textContent = error?.message || 'Could not discard saved changes.'; }
 });

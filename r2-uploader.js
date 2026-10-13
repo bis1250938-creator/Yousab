@@ -11,11 +11,15 @@ function uploadError(message, code, status = 0, retryable = false) {
   return error;
 }
 
+export function normalizeR2WorkerUrl(value) {
+  const url = new URL(value);
+  if (url.protocol !== 'https:' || url.hostname.toLowerCase().includes('set-your')) throw new Error('Invalid R2 Worker URL.');
+  return url.href.replace(/\/$/, '');
+}
+
 function apiBase() {
   try {
-    const url = new URL(r2WorkerUrl);
-    if (url.protocol !== 'https:' || url.hostname.includes('SET-YOUR')) throw new Error();
-    return url.href.replace(/\/$/, '');
+    return normalizeR2WorkerUrl(r2WorkerUrl);
   } catch {
     throw uploadError(
       'Media uploads are not configured yet. Deploy the Cloudflare R2 Worker, then put its HTTPS URL in firebase-config.js.',
@@ -25,6 +29,10 @@ function apiBase() {
 }
 
 function sessionKey(file) {
+  return sessionKeyFromDescriptor(file);
+}
+
+function sessionKeyFromDescriptor(file) {
   return `yj-r2:${file.name}:${file.size}:${file.lastModified}`;
 }
 
@@ -46,6 +54,12 @@ export function getResumeProjectId(file) {
 export function forgetR2Session(file) {
   if (!file) return;
   try { localStorage.removeItem(sessionKey(file)); }
+  catch { /* Storage can be disabled by the browser. */ }
+}
+
+export function forgetR2SessionDescriptor(descriptor) {
+  if (!descriptor?.name || !Number.isFinite(descriptor.size) || !Number.isFinite(descriptor.lastModified)) return;
+  try { localStorage.removeItem(sessionKeyFromDescriptor(descriptor)); }
   catch { /* Storage can be disabled by the browser. */ }
 }
 

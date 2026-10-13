@@ -729,10 +729,10 @@
       </ul>
       <p class="offline-storage-message" id="offline-storage-message" role="status"></p>
       <div class="offline-recovery-actions" id="offline-recovery-actions" hidden>
-        <p>Saved project changes require the authorized owner account. Download a review copy before discarding any unresolved conflicts.</p>
+        <p>Saved project changes and R2 cleanup records require the authorized owner account. Media paths are checked against Firestore before files are removed. Download a review copy before discarding unresolved changes.</p>
         <div class="offline-storage-actions">
-          <button id="offline-recovery-download" type="button">Download saved changes</button>
-          <button id="offline-recovery-discard" type="button">Discard saved changes</button>
+          <button id="offline-recovery-download" type="button">Download recovery details</button>
+          <button id="offline-recovery-discard" type="button">Discard saved records</button>
         </div>
       </div>
       <div class="offline-storage-actions">

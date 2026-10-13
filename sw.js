@@ -1,4 +1,4 @@
-const CACHE_NAME = 'yj-studios-shell-v36';
+const CACHE_NAME = 'yj-studios-shell-v37';
 const BASE_URL = new URL('./', self.registration.scope);
 const APP_URL = new URL('index.html', BASE_URL).href;
 const OFFLINE_URL = new URL('offline.html', BASE_URL).href;
@@ -45,6 +45,7 @@ const SHELL_FILES = [
   './offline-policy.mjs',
   './offline-recovery.mjs',
   './offline-replay.mjs',
+  './project-upload-policy.mjs',
   './offline-sync.mjs',
   './firebase-config.js',
   './firebase-public-config.js',

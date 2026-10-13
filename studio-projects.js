@@ -2,11 +2,12 @@ import { app, auth, db } from './firebase-client.js';
 import { firebaseConfig } from './firebase-config.js';
 import { studioProjectAccessFailure, verifyStudioProjectSessionWithCachedToken } from './auth-flow.mjs';
 import { contentTypeForMedia, MAX_COVER_BYTES, MAX_MEDIA_BYTES, validateMediaFile } from './media-storage.js';
-import { uploadR2, deleteR2Objects, setR2Visibility, getResumeProjectId, forgetR2Session } from './r2-uploader.js';
-import { enqueueFirestoreWrite, isActuallyOfflineHint, observeFirestoreSnapshot, persistentOfflineStorageEnabled, trackFirestoreWrite } from './offline-sync.mjs';
+import { uploadR2, deleteR2Objects, setR2Visibility, getResumeProjectId, forgetR2Session, forgetR2SessionDescriptor } from './r2-uploader.js';
+import { enqueueFirestoreWrite, isActuallyOfflineHint, observeFirestoreSnapshot, persistentOfflineStorageEnabled } from './offline-sync.mjs';
 import { offlineProjectWriteFailure, projectRevisionAfterEdit } from './offline-policy.mjs';
-import { listRejectedProjectWrites, removeRejectedProjectWrite } from './offline-recovery.mjs';
+import { listRejectedProjectWrites, removeRejectedProjectWrite, saveRejectedProjectWrite } from './offline-recovery.mjs';
 import { replayOfflineProjectChanges, SERVER_TIMESTAMP_RECOVERY_MARKER } from './offline-replay.mjs';
+import { unreferencedUploadedKeys } from './project-upload-policy.mjs';
 
 const [authApi, firestoreApi] = await Promise.all([
   import('https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js'),
@@ -148,19 +149,61 @@ function normalizeProject(snapshot) {
 }
 
 function projectR2Paths(data) {
-  return [data.mediaPath || data.filePath, data.coverPath, data.beforePath, data.afterPath]
+  return [data.mediaPath || data.filePath || data.storagePath, data.coverPath || data.thumbnailPath, data.beforePath, data.afterPath, data.imagePath]
     .filter((path) => typeof path === 'string' && path.startsWith(`portfolio/${ownerUser?.uid || ''}/`));
 }
 
 async function retrySavedProjectWrites() {
-  if (!ownerUser || !canManageProjects) throw new Error('Sign in with the authorized owner account before retrying saved project changes.');
   const operations = await listRejectedProjectWrites();
+  if (!operations.length) return 0;
+  if (!ownerUser || !canManageProjects) throw new Error('Sign in with the authorized owner account before retrying saved project changes or media cleanup.');
   const completed = await replayOfflineProjectChanges(operations, {
     ownerUid: ownerUser.uid,
     remove: removeRejectedProjectWrite,
+    cleanupMedia: async (keys) => {
+      await setR2Visibility(keys, false, auth).catch(() => {});
+      await deleteR2Objects(keys, auth);
+    },
+    onCreateRecovered: (operation) => (operation.uploadSessions || []).forEach(forgetR2SessionDescriptor),
     firestore: { db, doc, getDocFromServer, setDoc, updateDoc, deleteDoc, serverTimestamp }
   });
-  if (completed) status(byId('owner-portfolio-status'), `${completed} saved offline project change${completed === 1 ? '' : 's'} synchronized.`);
+  if (completed) status(byId('owner-portfolio-status'), `${completed} saved project change or media cleanup action${completed === 1 ? '' : 's'} completed.`);
+}
+
+async function downloadProjectRecovery() {
+  const operations = await listRejectedProjectWrites();
+  if (!operations.length) throw new Error('There are no saved project recovery records.');
+  const blob = new Blob([JSON.stringify({ exportedAt: new Date().toISOString(), operations }, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `yj-studios-project-recovery-${new Date().toISOString().slice(0, 10)}.json`;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+async function discardProjectRecovery() {
+  const operations = await listRejectedProjectWrites();
+  if (!operations.length) return 0;
+  if (!confirm(`Permanently discard ${operations.length} saved project change or media cleanup record? This cannot be undone.`)) return 0;
+  for (const operation of operations) {
+    let keys = operation.type === 'orphan-media-cleanup' ? operation.keys : [];
+    if (operation.type === 'create') keys = projectR2Paths(operation.data || {});
+    if (keys.length) {
+      if (isActuallyOfflineHint()) throw new Error('Reconnect before discarding a recovery record that includes uploaded media. The files must be checked against Firestore first.');
+      const snapshot = await getDocFromServer(doc(db, 'projects', operation.docId));
+      const safeKeys = unreferencedUploadedKeys(snapshot, keys, ownerUser.uid);
+      if (safeKeys.length) {
+        await setR2Visibility(safeKeys, false, auth).catch(() => {});
+        await deleteR2Objects(safeKeys, auth);
+      }
+    }
+    (operation.uploadSessions || []).forEach(forgetR2SessionDescriptor);
+    await removeRejectedProjectWrite(operation.id);
+  }
+  return operations.length;
 }
 
 window.YJOffline?.setRecoveryHandler(retrySavedProjectWrites);
@@ -198,6 +241,9 @@ function setOwnerAccess(enabled, message = '') {
   addButton.hidden = false;
   signOutButton.hidden = !enabled;
   status(byId('owner-portfolio-status'), message, !enabled && Boolean(message));
+  window.YJOffline?.setRecoveryReviewHandlers(enabled
+    ? { download: downloadProjectRecovery, discard: discardProjectRecovery }
+    : {});
   window.YJPortfolio?.setOwnerTools(enabled, {
     onEdit: editProject,
     onDelete: deleteProject,
@@ -331,6 +377,39 @@ function upload(projectId, file, kind, label) {
   return uploadR2({ file, kind, projectId, prefix: label.startsWith('Before') ? 'before' : label.startsWith('After') ? 'after' : label.toLowerCase().replace(/[^a-z]/g, ''), auth, onProgress: (percent) => { progress.value = percent; status(projectMessage, `${label}: ${percent}% uploaded · ${(file.size / 1048576).toFixed(1)} MB`); }, onTask: (task) => { activeUploadTask = task; } });
 }
 
+async function cleanupFailedProjectUploads(projectId, keys, user) {
+  if (!keys.length) return { state: 'none' };
+  const recovery = {
+    type: 'orphan-media-cleanup', docId: projectId, ownerUid: user.uid,
+    keys: [...new Set(keys)], lastError: 'A project save did not receive confirmed success.'
+  };
+  try {
+    // A cached/missing document is not proof that Firestore rejected the save.
+    const snapshot = await getDocFromServer(doc(db, 'projects', projectId));
+    const safeKeys = unreferencedUploadedKeys(snapshot, recovery.keys, user.uid);
+    if (!safeKeys.length) return { state: 'referenced' };
+    await setR2Visibility(safeKeys, false, auth).catch(() => {});
+    await deleteR2Objects(safeKeys, auth);
+    return { state: 'deleted', count: safeKeys.length };
+  } catch (error) {
+    try {
+      await saveRejectedProjectWrite({ ...recovery, lastError: String(error?.message || error) });
+      await window.YJOffline?.refreshRecoveryCount?.();
+      return { state: 'queued', error };
+    } catch (recoveryError) {
+      return { state: 'preserved', error, recoveryError };
+    }
+  }
+}
+
+function uploadCleanupMessage(result) {
+  if (result.state === 'deleted') return ' Completed uploaded media was safely removed.';
+  if (result.state === 'referenced') return ' Firestore already references the uploaded media, so it was preserved.';
+  if (result.state === 'queued') return ' Uploaded media was preserved; its exact R2 paths are saved for safe owner cleanup after reconnecting.';
+  if (result.state === 'preserved') return ` Uploaded media was preserved because Firestore could not confirm whether it is referenced. Keep project ID ${result.projectId || 'shown in the upload details'} for support.`;
+  return '';
+}
+
 async function saveProject(published) {
   if (!ownerUser || !canManageProjects) {
     status(projectMessage, 'Sign in with the authorized account before adding a project.', true);
@@ -387,6 +466,7 @@ async function saveProject(published) {
   let beforeUploaded = false;
   let afterUploaded = false;
   let cancellationHandled = false;
+  let projectRecoveryId = '';
   submitButton.disabled = true;
   byId('owner-project-draft').disabled = true;
   byId('owner-project-cancel').disabled = true;
@@ -437,12 +517,25 @@ async function saveProject(published) {
       size: file?.size || 0, contentType: file ? contentTypeForMedia(file, kind) : '',
       published, sortOrder, ownerUid: ownerUser.uid, revision: 0, createdAt: serverTimestamp(), updatedAt: serverTimestamp()
     };
+    if (isActuallyOfflineHint() && !persistentOfflineStorageEnabled()) {
+      throw new Error('Connectivity was lost before Firestore could save the project. Offline Firestore storage is disabled; reconnect and retry.');
+    }
     await setR2Visibility(uploadedKeys, published, auth);
+    if (uploadedKeys.length) {
+      submitButton.textContent = 'Saving…';
+      status(projectMessage, 'Media uploaded. Saving project details to Firestore…');
+    }
     const recoveryRecord = { ...record, createdAt: SERVER_TIMESTAMP_RECOVERY_MARKER, updatedAt: SERVER_TIMESTAMP_RECOVERY_MARKER };
-    const { promise: write } = await enqueueFirestoreWrite(`project:${id}`, () => setDoc(doc(db, 'projects', id), record),
-      usesUploadedFiles ? null : { type: 'create', docId: id, data: recoveryRecord });
+    const uploadSessions = [file, cover, beforeFile, afterFile].filter(Boolean)
+      .map(({ name, size, lastModified }) => ({ name, size, lastModified }));
+    const queuedWrite = await enqueueFirestoreWrite(`project:${id}`, () => setDoc(doc(db, 'projects', id), record), {
+      type: 'create', docId: id, data: recoveryRecord, uploadSessions
+    });
+    const { promise: write } = queuedWrite;
+    projectRecoveryId = queuedWrite.recoveryId;
     if (isActuallyOfflineHint()) {
-      write.catch((error) => status(byId('owner-portfolio-status'), `Project ${id} was queued locally but Firebase rejected it: ${projectError(error)}`, true));
+      write.then(() => [file, cover, beforeFile, afterFile].forEach(forgetR2Session), () => {});
+      write.catch((error) => status(byId('owner-portfolio-status'), `Project ${id} is queued locally but Firebase rejected it: ${projectError(error)} The saved project details and media paths remain available under Offline data settings → Retry sync.`, true));
       cancellationHandled = true;
       progress.value = 100;
       status(projectMessage, 'Project saved in this device’s Firestore queue. It is not published on the server until connectivity returns and Firebase accepts the write.');
@@ -464,8 +557,12 @@ async function saveProject(published) {
     byId('owner-cover-preview').replaceChildren();
     setTimeout(() => { if (projectDialog.open) projectDialog.close(); resetProjectForm(); }, 1300);
   } catch (error) {
-    await deleteR2Objects(uploadedKeys, auth).catch(() => {});
-    status(projectMessage, projectError(error), true);
+    if (projectRecoveryId) {
+      status(projectMessage, `${projectError(error)} The project details and uploaded media paths are saved locally for an authorized retry; uploaded files were preserved.`, true);
+    } else {
+      const cleanup = await cleanupFailedProjectUploads(id, uploadedKeys, ownerUser);
+      status(projectMessage, `${projectError(error)}${uploadCleanupMessage({ ...cleanup, projectId: id })}`, true);
+    }
   } finally {
     activeUploadTask = null;
     if (!cancellationHandled) {
