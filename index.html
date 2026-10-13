@@ -1,15 +1,9 @@
 <!doctype html>
-<html lang="en" dir="ltr">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#090b0e">
-  <script>
-    (() => {
-      const mode = localStorage.getItem('yj-studios-theme-mode') || 'system';
-      document.documentElement.dataset.theme = mode === 'system' ? (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark') : mode;
-    })();
-  </script>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="YJ Studios">
@@ -23,6 +17,7 @@
   <title>YJ Studios | Recording, Mixing & Sound Engineering</title>
   <link rel="manifest" href="./site.webmanifest">
   <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+  <script>if (location.hash === '#dashboard') location.replace('./dashboard.html');</script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -133,82 +128,10 @@
     .portfolio-filters { display: flex; align-items: center; gap: 7px; }
     .portfolio-filter { padding: 8px 11px; border: 1px solid rgba(255,255,255,.1); border-radius: 2px; color: #9aa5ab; background: transparent; font-size: 10px; cursor: pointer; transition: color .2s, border-color .2s, background .2s; }
     .portfolio-filter:hover, .portfolio-filter[aria-pressed="true"] { color: var(--cyan-2); border-color: rgba(97,230,246,.48); background: rgba(97,230,246,.06); }
-    .portfolio-search { min-width: 210px; padding: 9px 11px; border: 1px solid rgba(255,255,255,.12); border-radius: 2px; color: var(--white); background: rgba(255,255,255,.025); font: inherit; font-size: 10px; }
-    .portfolio-search:focus { outline: 1px solid rgba(97,230,246,.7); }
-    .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
-    .portfolio-empty.hidden { display:none; }
-    .offline-sync-panel { display:flex; align-items:center; justify-content:space-between; gap:16px; margin:-7px 0 22px; padding:12px 14px; border:1px solid rgba(97,230,246,.16); background:rgba(16,24,29,.72); }
-    .offline-sync-copy { min-width:0; display:grid; gap:4px; }
-    .offline-sync-copy strong { color:var(--cyan-2); font-size:10px; font-weight:600; }
-    .offline-sync-copy span { color:var(--muted); font-size:9px; line-height:1.6; }
-    .offline-sync-actions { display:flex; align-items:center; gap:8px; flex-shrink:0; }
-    .offline-sync-actions button { min-height:31px; padding:0 10px; border:1px solid rgba(97,230,246,.3); color:var(--cyan-2); background:transparent; font-size:9px; cursor:pointer; }
-    .offline-sync-actions button:disabled { opacity:.55; cursor:wait; }
-    .offline-storage-dialog { width:min(480px,calc(100% - 24px)); padding:23px; border:1px solid #365660; background:#10181e; color:var(--white); box-shadow:0 25px 100px #000b; }
-    .offline-storage-dialog::backdrop { background:rgba(2,5,7,.8); backdrop-filter:blur(5px); }
-    .offline-storage-dialog h2 { margin:0 0 10px; font:600 21px var(--display); }
-    .offline-storage-dialog p,.offline-storage-dialog li { color:#aab7bd; font-size:11px; line-height:1.75; }
-    .offline-storage-dialog ul { padding-left:20px; }
-    .offline-storage-dialog .offline-storage-actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:18px; }
-    .offline-recovery-actions { display:grid; gap:8px; margin-top:14px; padding-top:13px; border-top:1px solid var(--line); }
-    .offline-recovery-actions[hidden] { display:none; }
-    .offline-recovery-actions p { margin:0; }
-    .offline-storage-dialog button { min-height:37px; padding:0 12px; border:1px solid #3e737c; color:var(--cyan-2); background:#101e23; font-size:10px; cursor:pointer; }
-    .offline-storage-dialog button.primary { color:#071115; background:var(--cyan); border-color:var(--cyan); font-weight:700; }
-    .offline-storage-dialog button:disabled { opacity:.55; cursor:wait; }
-    .offline-storage-message { min-height:18px; margin:8px 0 0!important; color:var(--cyan-2)!important; }
     .portfolio-controls { display: flex; align-items: center; gap: 13px; }
     .portfolio-add { min-height: 34px; padding: 0 11px; color: var(--cyan-2); background: rgba(97,230,246,.07); border: 1px solid rgba(97,230,246,.38); border-radius: 2px; font-size: 10px; cursor: pointer; white-space: nowrap; }
     .portfolio-add:hover { background: rgba(97,230,246,.14); border-color: var(--cyan); }
-    .owner-portfolio-controls { display:flex; align-items:center; gap:8px; }
-    .owner-portfolio-controls[hidden],.owner-card-actions[hidden] { display:none; }
-    .owner-inline-status { color:var(--muted); font-size:9px; }
-    .owner-card-actions { display:flex; flex-wrap:wrap; gap:6px; margin-top:12px; }
-    .owner-card-actions button { min-height:28px; padding:0 9px; border:1px solid rgba(97,230,246,.3); color:var(--cyan-2); background:transparent; font-size:9px; cursor:pointer; }
-    .owner-card-actions button:hover { background:rgba(97,230,246,.08); }
-    .owner-card-actions .owner-delete { border-color:rgba(239,128,112,.4); color:#f2a89d; }
-    .studio-project-dialog { width:min(550px,calc(100% - 24px)); max-height:90vh; overflow:auto; padding:24px; border:1px solid #365660; background:#10181e; color:var(--white); box-shadow:0 25px 100px #000b; }
-    .studio-project-dialog::backdrop { background:rgba(2,5,7,.8); backdrop-filter:blur(5px); }
-    .studio-project-dialog h2 { margin:0 0 8px; font:600 23px var(--display); }
-    .studio-project-dialog p { color:#9aaab0; font-size:11px; line-height:1.7; }
-    .studio-project-dialog label { display:grid; gap:6px; margin:12px 0; color:#bdcbd0; font-size:10px; }
-    .studio-project-dialog input,.studio-project-dialog select,.studio-project-dialog textarea { width:100%; min-height:39px; padding:10px; border:1px solid var(--line); background:#0b1217; color:var(--white); font:inherit; font-size:11px; }
-    .studio-project-dialog textarea { min-height:72px; resize:vertical; }
-    .owner-form-actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
-    .owner-form-actions button { min-height:38px; padding:0 13px; border:1px solid #3e737c; color:var(--cyan-2); background:#101e23; font-size:10px; }
-    .owner-form-actions .owner-submit { color:#071115; background:var(--cyan); border-color:var(--cyan); font-weight:700; }
-    .owner-form-message { min-height:18px; margin:10px 0 0!important; color:var(--cyan-2)!important; }
-    .owner-form-message[data-error="true"] { color:#f2a89d!important; }
-    .owner-preview { display:block; max-width:100%; max-height:220px; margin-top:9px; object-fit:contain; }
-    .project-type-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin:18px 0; }
-    .project-type-card { display:grid; grid-template-columns:38px 1fr; gap:9px; align-items:center; min-height:82px; padding:12px; text-align:left; color:var(--white); border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.025); cursor:pointer; transition:border-color .18s,background .18s,transform .18s; }
-    .project-type-card:hover { transform:translateY(-2px); border-color:rgba(97,230,246,.55); }
-    .project-type-card[aria-pressed="true"] { border-color:var(--cyan); background:rgba(97,230,246,.1); box-shadow:inset 0 0 0 1px rgba(97,230,246,.2); }
-    .project-type-icon { display:grid; place-items:center; width:36px; height:36px; color:var(--cyan-2); border:1px solid rgba(97,230,246,.25); border-radius:50%; font-size:19px; }
-    .project-type-card strong { display:block; margin-bottom:4px; font-size:11px; }
-    .project-type-card small { display:block; color:var(--muted); font-size:9px; line-height:1.45; }
-    .project-form-step[hidden],.project-type-step[hidden] { display:none; }
-    .project-step-header { display:flex; align-items:center; gap:11px; margin:12px 0 18px; }
-    .project-back { border:0; color:var(--cyan-2); background:transparent; cursor:pointer; font:inherit; }
-    .project-selected-type { color:var(--muted); font-size:10px; }
-    .project-dynamic-field[hidden] { display:none!important; }
-    .project-form-actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; }
-    .project-form-actions button { min-height:40px; padding:0 14px; border:1px solid #3e737c; color:var(--cyan-2); background:#101e23; font-size:10px; cursor:pointer; }
-    .project-form-actions .project-publish { color:#071115; background:var(--cyan); border-color:var(--cyan); font-weight:700; }
-    .project-form-actions button:disabled { opacity:.55; cursor:wait; }
-    .project-compare { display:grid; gap:6px; margin-top:10px; }
-    .project-compare audio { width:100%; }
-    .project-lyrics { margin-top:8px; color:var(--muted); font-size:10px; white-space:pre-wrap; }
     .portfolio-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-    .portfolio-card[data-placeholder="true"] { display: none; }
-    .portfolio-empty { grid-column: 1/-1; padding: 30px; border: 1px solid var(--line); color: var(--muted); text-align: center; font-size: 11px; line-height: 1.7; }
-    .uploaded-video, .uploaded-embed { display: block; width: 100%; height: 100%; object-fit: contain; border: 0; background: #050709; }
-    .audio-player-controls { position: absolute; z-index: 3; right: 5%; bottom: 12px; left: 5%; display: grid; grid-template-columns: 30px minmax(50px,1fr) 42px 42px 54px; align-items: center; gap: 7px; padding: 7px; border: 1px solid rgba(255,255,255,.12); background: rgba(5,9,12,.86); backdrop-filter: blur(12px); }
-    .audio-player-controls button { min-height: 29px; border: 1px solid rgba(97,230,246,.38); color: var(--cyan-2); background: #10191e; cursor: pointer; }
-    .audio-player-controls input[type="range"] { width: 100%; accent-color: var(--cyan); }
-    .audio-player-controls time { color: #d6e2e4; font-size: 9px; font-variant-numeric: tabular-nums; text-align: center; }
-    .audio-player-controls .volume-control { width: 54px; }
-    .uploaded-audio { position:absolute!important; width:1px!important; height:1px!important; overflow:hidden!important; clip-path:inset(50%); }
     .portfolio-card { position: relative; z-index: 0; min-width: 0; border: 1px solid var(--line); background: #0d1115; transform: scale(1); transform-origin: center; transition: transform .28s cubic-bezier(.2,.8,.2,1), border-color .22s, box-shadow .22s; }
     @media (hover: hover) and (pointer: fine) {
       .portfolio-card:hover { z-index: 3; transform: translateY(-4px) scale(1.045); border-color: rgba(97,230,246,.48); box-shadow: 0 18px 42px rgba(0,0,0,.38), 0 0 24px rgba(97,230,246,.07); }
@@ -286,8 +209,6 @@
     .lightbox-image { display: block; max-width: 100%; max-height: calc(94vh - 94px); width: auto; height: auto; margin: 0 auto; object-fit: contain; box-shadow: 0 22px 70px rgba(0,0,0,.55); }
     .lightbox-caption { margin: 12px 0 0; color: #b7c2c7; font-size: 11px; text-align: center; }
     .lightbox-close { position: absolute; z-index: 1; top: 9px; right: 9px; width: 31px; height: 31px; color: var(--white); border: 1px solid rgba(255,255,255,.2); background: rgba(10,14,17,.86); font-size: 20px; cursor: pointer; }
-    .lightbox-nav { position: absolute; top: 50%; z-index: 1; width: 40px; height: 48px; transform: translateY(-50%); border: 1px solid rgba(255,255,255,.2); color: var(--white); background: #0a0e11d9; font-size: 24px; cursor: pointer; }
-    .lightbox-prev { left: 8px; } .lightbox-next { right: 8px; }
     .lightbox-close:hover { color: var(--cyan); border-color: rgba(97,230,246,.6); }
     .portfolio-meta span:first-child { width: 6px; height: 6px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 9px rgba(97,230,246,.45); }
 
@@ -363,9 +284,6 @@
     .request-preview p { white-space: pre-line; margin: 0 0 13px; color: #c6d0d4; font-size: 10px; line-height: 1.7; }
     .copy-button { min-height: 35px; padding: 0 12px; background: transparent; border: 1px solid rgba(97,230,246,.55); color: var(--cyan-2); font-size: 10px; cursor: pointer; }
     .copy-button:hover { background: rgba(97,230,246,.09); }
-    .whatsapp-button { display: inline-flex; align-items: center; min-height: 35px; margin-left: 7px; padding: 0 12px; border: 1px solid #258b61; color: #91e2b6; font-size: 10px; text-decoration: none; }
-    .whatsapp-button[hidden] { display: none; }
-    .whatsapp-button:hover { background: rgba(37,139,97,.12); }
     .form-status { color: #f2b8ad; font-size: 10px; margin: 11px 0 0; min-height: 15px; }
 
     .footer { padding: 28px 0; border-top: 1px solid rgba(255,255,255,.07); }
@@ -389,10 +307,7 @@
       .work-art { height: 235px; }
       .portfolio-art { min-height: 220px; }
       .portfolio-toolbar { align-items: flex-start; flex-direction: column; }
-      .offline-sync-panel { align-items:flex-start; flex-direction:column; }
       .portfolio-controls { width: 100%; flex-wrap: wrap; gap: 9px; }
-      .owner-portfolio-controls { width:100%; flex-wrap:wrap; }
-      .project-type-grid { grid-template-columns:1fr; }
       .service-grid { grid-template-columns: repeat(2, 1fr); }
       .service-card { min-height: 235px; }
       .about-grid { gap: 44px; }
@@ -409,12 +324,6 @@
       .nav-links.open { display: flex; }
       .nav-links a { padding: 4px 0; }
       .nav-cta { text-align: center; padding: 12px; }
-      .portfolio-controls { align-items: stretch; }
-      .portfolio-search { min-width:0; }
-      .owner-inline-status { flex-basis:100%; }
-      .offline-sync-actions { width:100%; flex-wrap:wrap; }
-      .offline-sync-actions button { flex:1; }
-      .studio-project-dialog { padding:19px; }
       .hero { padding: 58px 0 40px; }
       .hero-grid { grid-template-columns: 1fr; gap: 20px; }
       .hero h1 { font-size: clamp(54px, 13vw, 76px); margin-top: 22px; }
@@ -434,7 +343,6 @@
       .portfolio-section { padding: 68px 0 58px; }
       .portfolio-toolbar { gap: 12px; margin: -6px 0 21px; }
       .portfolio-filters { width: 100%; flex-wrap: wrap; }
-      .portfolio-search { width: 100%; }
       .portfolio-filter { padding: 8px 10px; }
       .portfolio-controls { gap: 8px; }
       .upload-dialog-inner { padding: 19px 16px; }
@@ -535,68 +443,9 @@
       .about-points { grid-template-columns: 1fr; }
       .form-top { align-items: flex-start; flex-direction: column; gap: 5px; }
     }
-    :root[data-theme="light"]{color-scheme:light;--ink:#f5f8f8;--panel:#fff;--panel-2:#edf3f4;--line:rgba(31,57,65,.18);--muted:#52646b;--white:#1b2a30;--cyan:#087f91;--cyan-2:#086d7c;--green:#176b4d}
-    :root[data-theme="light"] body{background:#f5f8f8;color:var(--white)}
-    :root[data-theme="light"] .topbar{background:rgba(248,251,251,.94);border-bottom-color:#d8e1e3}
-    :root[data-theme="light"] .nav-links{color:#394d54}
-    :root[data-theme="light"] .theme-select{min-height:35px;padding:0 8px;border:1px solid #b9c9cd;border-radius:3px;background:#fff;color:#263b42;font:inherit;font-size:10px}
-    :root[data-theme="light"] .hero-copy,:root[data-theme="light"] .section-intro,:root[data-theme="light"] .meta-item span,:root[data-theme="light"] .portfolio-note,:root[data-theme="light"] .portfolio-info p,:root[data-theme="light"] .work-info p,:root[data-theme="light"] .service-card p,:root[data-theme="light"] .about-copy p,:root[data-theme="light"] .about-point span,:root[data-theme="light"] .footer p{color:#52646b}
-    :root[data-theme="light"] .float-tag{background:rgba(255,255,255,.94);color:#24383f;border-color:#ccdadd}
-    :root[data-theme="light"] .portfolio-section,:root[data-theme="light"] .services-section,:root[data-theme="light"] .booking-section{background:#edf3f4;border-color:#d9e2e4}
-    :root[data-theme="light"] .work-card,:root[data-theme="light"] .portfolio-card,:root[data-theme="light"] .service-card,:root[data-theme="light"] .booking-form{background:#fff;border-color:#d4dfe1;color:#1b2a30}
-    :root[data-theme="light"] .portfolio-filter{color:#52646b;border-color:#cbd7da}
-    :root[data-theme="light"] .portfolio-filter:hover,:root[data-theme="light"] .portfolio-filter[aria-pressed="true"]{color:#075e69;background:#e1f2f3;border-color:#8bbdc3}
-    :root[data-theme="light"] .portfolio-search,:root[data-theme="light"] .field input,:root[data-theme="light"] .field select,:root[data-theme="light"] .field textarea{background:#fff;color:#1b2a30;border-color:#bdcbd0}
-    :root[data-theme="light"] .field label,:root[data-theme="light"] .field-hint{color:#455b63}
-    :root[data-theme="light"] .request-preview,:root[data-theme="light"] .portfolio-empty{background:#f7fafa;color:#43575e;border-color:#d1dfe1}
-    :root[data-theme="light"] .studio-project-dialog{background:#f8fbfb;color:#1b2a30;border-color:#b9cdd1}
-    :root[data-theme="light"] .studio-project-dialog p,:root[data-theme="light"] .studio-project-dialog label{color:#455b63}
-    :root[data-theme="light"] .studio-project-dialog input,:root[data-theme="light"] .studio-project-dialog select,:root[data-theme="light"] .studio-project-dialog textarea{background:#fff;color:#1b2a30;border-color:#bdcbd0}
-    :root[data-theme="light"] .footer{background:#e8eff0;border-color:#d2dddf}
-    :root[data-theme="light"] .footer-brand,:root[data-theme="light"] .footer-links{color:#3f555c}
-    :root[data-theme="light"] .nav-links{background:transparent}
-    :root[data-theme="light"] .portfolio-dialog,:root[data-theme="light"] .media-lightbox{background:#f8fbfb;color:#1b2a30}
-    :root[data-theme="light"] .portfolio-dialog .upload-field input[type="text"],:root[data-theme="light"] .portfolio-dialog .upload-field textarea{background:#fff;color:#1b2a30;border-color:#bdcbd0}
-    :root[data-theme="light"] .about-point,:root[data-theme="light"] .choice-price{color:#334a52}
-    :root[data-theme="light"] .choice,:root[data-theme="light"] .about-point{border-color:#d2dddf}
-    :root[data-theme="light"] .choice:has(input:checked){background:#e6f4f4;border-color:#84bbc2}
-    :root[data-theme="light"] .choice-text small,:root[data-theme="light"] .portfolio-meta{color:#586a71}
-    :root[data-theme="light"] .portfolio-topline{color:#e1eaec}
-    @media(max-width:650px){:root[data-theme="light"] .nav-links{background:rgba(248,251,251,.98)}}
-    .notification-settings-dialog{width:min(470px,calc(100% - 24px));padding:25px;border:1px solid rgba(112,220,233,.32);background:#10181e;color:var(--white);box-shadow:0 25px 100px #000b}
-    .notification-settings-dialog::backdrop{background:rgba(2,5,7,.8);backdrop-filter:blur(5px)}
-    .notification-settings-dialog h2{margin:0 0 9px;font:600 24px var(--display);letter-spacing:-.04em}
-    .notification-settings-dialog p{color:var(--muted);font-size:12px;line-height:1.7}
-    .notification-status-card{margin:15px 0;padding:12px 14px;border:1px solid var(--line);background:rgba(255,255,255,.025);font-size:12px}
-    .notification-status-card strong{display:block;margin-bottom:4px;color:var(--cyan-2);font-size:10px;text-transform:uppercase;letter-spacing:.12em}
-    .notification-status-card span{display:block;overflow-wrap:anywhere;color:var(--muted)}
-    .notification-settings-actions{display:flex;flex-wrap:wrap;gap:9px;margin:17px 0}
-    .notification-settings-actions button{min-height:40px;padding:0 13px;border:1px solid rgba(112,220,233,.4);border-radius:3px;background:rgba(112,220,233,.08);color:var(--cyan-2);font:inherit;font-size:11px;cursor:pointer}
-    .notification-settings-actions button:disabled{opacity:.5;cursor:not-allowed}
-    .notification-settings-message{min-height:24px;margin:10px 0;color:var(--green);font-size:11px}
-    .notification-settings-message[data-error="true"]{color:#f2b8ad}
-    .notification-settings-close{float:right;border:0;background:transparent;color:var(--muted);font:inherit;font-size:24px;cursor:pointer}
-    .install-help-dialog{max-height:min(80vh,620px);overflow:auto}
-    .install-help-dialog[dir="rtl"] .notification-settings-close{float:left}
-    .offline-banner{padding:9px 16px;border-bottom:1px solid rgba(112,220,233,.3);background:#10181e;color:#dce8eb;text-align:center;font-size:11px}
-    .offline-banner[hidden]{display:none}
-    :root[data-theme="light"] .offline-banner{background:#eaf4f5;color:#29464d;border-color:#b7d4d8}
-    #notification-toast{position:fixed;z-index:1000;right:18px;bottom:18px;max-width:min(420px,calc(100% - 36px));padding:13px 16px;border:1px solid rgba(112,220,233,.45);border-radius:4px;background:#10181e;color:#f4f7f8;box-shadow:0 12px 35px #0008;font-size:12px}
-    #notification-toast[hidden]{display:none}
-    .theme-select{min-height:35px;padding:0 8px;border:1px solid rgba(205,230,235,.2);border-radius:3px;background:rgba(255,255,255,.025);color:#dce4e7;font:inherit;font-size:10px;cursor:pointer}
-    :root[data-theme="light"] .notification-settings-dialog{background:#f8fbfb;color:#1b2a30;border-color:#b9cdd1}
-    :root[data-theme="light"] .offline-sync-panel{background:rgba(246,250,250,.88);border-color:#d1dfe1}
-    :root[data-theme="light"] .offline-sync-copy strong{color:#147d89}
-    :root[data-theme="light"] .offline-storage-dialog{background:#f8fbfb;color:#1b2a30;border-color:#b9cdd1}
-    :root[data-theme="light"] .offline-storage-dialog p,:root[data-theme="light"] .offline-storage-dialog li{color:#455b63}
-    :root[data-theme="light"] .notification-settings-dialog p,:root[data-theme="light"] .notification-status-card span{color:#455b63}
-    :root[data-theme="light"] .notification-status-card{background:#fff;border-color:#d4dfe1}
-    :root[data-theme="light"] #notification-toast{background:#f8fbfb;color:#1b2a30;border-color:#8bbdc3}
-    @media(max-width:650px){.notification-settings-dialog{padding:19px 16px}.notification-settings-actions{display:grid;grid-template-columns:1fr}.notification-settings-actions button{width:100%}}
   </style>
 </head>
 <body>
-  <div class="offline-banner" id="offline-banner" role="status" aria-live="polite" hidden>You’re offline. The cached site interface is available; portfolio data, sign-in, notifications, and bookings need an internet connection.</div>
   <header class="topbar">
     <div class="shell nav">
       <a class="brand" href="#home" aria-label="YJ Studios home">
@@ -610,10 +459,9 @@
         <a href="#work">Studio work</a>
         <a href="#services">Services</a>
         <a href="#studio">The studio</a>
-        <label class="sr-only" for="site-theme-mode">Color theme</label><select class="theme-select" id="site-theme-mode" aria-label="Color theme"><option value="system">Device theme</option><option value="dark">Dark theme</option><option value="light">Light theme</option></select>
-        <button class="theme-select" id="notification-settings-open" type="button" aria-haspopup="dialog">Notifications</button>
+        <a href="auth.html">Sign in / create account</a>
         <a class="nav-cta" href="#book">Book a session <span class="arrow">↗</span></a>
-        <button class="nav-cta install-button" id="install-app" type="button" aria-haspopup="dialog" hidden>Install App</button>
+        <button class="nav-cta install-button" id="install-app" type="button" hidden>Save to phone ↗</button>
       </nav>
     </div>
   </header>
@@ -660,26 +508,10 @@
               <button class="portfolio-filter" type="button" data-filter="audio" aria-pressed="false">Audio</button>
               <button class="portfolio-filter" type="button" data-filter="video" aria-pressed="false">Video</button>
               <button class="portfolio-filter" type="button" data-filter="image" aria-pressed="false">Images</button>
-              <button class="portfolio-filter" type="button" data-filter="category:Mixing" aria-pressed="false">Mixing</button>
-              <button class="portfolio-filter" type="button" data-filter="category:Mastering" aria-pressed="false">Mastering</button>
-              <button class="portfolio-filter" type="button" data-filter="category:Coptic Hymns" aria-pressed="false">Coptic Hymns</button>
             </div>
-            <label class="sr-only" for="portfolio-search">Search studio work</label><input class="portfolio-search" id="portfolio-search" type="search" placeholder="Search titles, artists, categories…" autocomplete="off">
-            <div class="owner-portfolio-controls" id="owner-portfolio-controls"><button class="portfolio-add" id="owner-add-project" type="button">+ Add Project</button><span class="owner-inline-status" id="owner-portfolio-status" role="status" aria-live="polite"></span><button class="portfolio-add" id="owner-sign-out" type="button" hidden>Sign out</button></div>
           </div>
         </div>
-        <aside class="offline-sync-panel" id="offline-sync-panel" aria-live="polite">
-          <div class="offline-sync-copy">
-            <strong id="offline-connection-state">Checking connection…</strong>
-            <span id="offline-sync-details">Studio Work is loading. Previously synchronized project data is available offline only when enabled on this device.</span>
-          </div>
-          <div class="offline-sync-actions">
-            <button id="offline-sync-retry" type="button">Retry sync</button>
-            <button id="offline-storage-settings" type="button">Offline data settings</button>
-          </div>
-        </aside>
         <div class="portfolio-grid" id="portfolio-grid" aria-live="polite">
-          <p class="portfolio-empty" id="portfolio-empty" role="status">Loading published studio work…</p>
           <article class="portfolio-card reveal" data-kind="audio" data-placeholder="true">
             <div class="portfolio-art audio-portfolio-art">
               <div class="portfolio-topline"><span>Audio portfolio</span><span>MP3 · WAV</span></div>
@@ -713,108 +545,8 @@
 
     <dialog class="media-lightbox" id="media-lightbox" aria-label="Expanded portfolio image">
       <button class="lightbox-close" id="lightbox-close" type="button" aria-label="Close enlarged image">×</button>
-      <button class="lightbox-nav lightbox-prev" id="lightbox-prev" type="button" aria-label="Previous image">‹</button>
-      <button class="lightbox-nav lightbox-next" id="lightbox-next" type="button" aria-label="Next image">›</button>
       <img class="lightbox-image" id="lightbox-image" alt="">
       <p class="lightbox-caption" id="lightbox-caption"></p>
-    </dialog>
-    <dialog class="offline-storage-dialog" id="offline-storage-dialog" aria-labelledby="offline-storage-title">
-      <h2 id="offline-storage-title">Offline data on this device</h2>
-      <p>Firebase Firestore can keep synchronized portfolio data and queued changes in this browser’s IndexedDB. This is separate from the public app shell.</p>
-      <ul>
-        <li>Enable this only on a trusted personal device. It can include private project drafts and booking contact details.</li>
-        <li>Do not enable it on a shared device. Sign out when finished; Firebase authorization is still checked by Firestore when changes sync.</li>
-        <li>Browser site-data cleanup can erase local data and pending work. Turning this off affects future sessions; it does not securely erase existing browser storage.</li>
-        <li>File uploads, sign-in, notifications, WhatsApp, and media playback still need an internet connection.</li>
-      </ul>
-      <p class="offline-storage-message" id="offline-storage-message" role="status"></p>
-      <div class="offline-recovery-actions" id="offline-recovery-actions" hidden>
-        <p>Saved project changes and R2 cleanup records require the authorized owner account. Media paths are checked against Firestore before files are removed. Download a review copy before discarding unresolved changes.</p>
-        <div class="offline-storage-actions">
-          <button id="offline-recovery-download" type="button">Download recovery details</button>
-          <button id="offline-recovery-discard" type="button">Discard saved records</button>
-        </div>
-      </div>
-      <div class="offline-storage-actions">
-        <button class="primary" id="offline-storage-enable" type="button">Enable on this trusted device</button>
-        <button id="offline-storage-disable" type="button" hidden>Turn off for future sessions</button>
-        <button id="offline-storage-close" type="button">Close</button>
-      </div>
-    </dialog>
-    <dialog class="notification-settings-dialog install-help-dialog" id="install-help-dialog" aria-labelledby="install-help-title" aria-describedby="install-help-copy">
-      <button class="notification-settings-close" id="install-help-close" type="button" aria-label="Close installation instructions">×</button>
-      <div class="eyebrow">YJ Studios · App</div>
-      <h2 id="install-help-title">Install YJ Studios</h2>
-      <p id="install-help-copy"></p>
-      <div class="notification-settings-actions"><button id="install-help-done" type="button">Done</button></div>
-    </dialog>
-
-    <dialog class="notification-settings-dialog" id="notification-settings-dialog" aria-labelledby="notification-settings-title">
-      <button class="notification-settings-close" id="notification-settings-close" type="button" aria-label="Close notification settings">×</button>
-      <div class="eyebrow">YJ Studios · Settings</div>
-      <h2 id="notification-settings-title">Web notifications</h2>
-      <p>Subscriptions belong to this signed-in account and this browser. Each phone or computer must be enabled separately.</p>
-      <div class="notification-status-card"><strong>Account</strong><span id="notification-auth-status">Checking Firebase sign-in…</span></div>
-      <div class="notification-status-card"><strong>Permission and device</strong><span id="notification-permission-status">Checking this browser…</span></div>
-      <div class="notification-settings-actions">
-        <button id="notification-enable" type="button">Enable Notifications</button>
-        <button id="notification-disable" type="button">Disable on This Device</button>
-        <button id="notification-test" type="button" disabled>Send Test Notification</button>
-        <button id="notification-sign-in" type="button" hidden>Sign in to continue</button>
-        <button id="notification-account-sign-out" type="button" hidden>Sign out</button>
-      </div>
-      <p class="notification-settings-message" id="notification-settings-status" role="status" aria-live="polite"></p>
-      <p>When permission is blocked, change this site’s notification access in browser or device settings. On iPhone/iPad, use an iOS 16.4+ Home Screen web app. Push delivery can be delayed or suppressed by device settings.</p>
-    </dialog>
-    <div id="notification-toast" role="status" aria-live="polite" hidden></div>
-
-    <dialog class="studio-project-dialog" id="portfolio-sign-in-dialog" aria-labelledby="portfolio-sign-in-title">
-      <form id="portfolio-sign-in-form"><h2 id="portfolio-sign-in-title">Sign in to add projects</h2><p id="portfolio-sign-in-description">Use the authorized YJ Studios account to manage portfolio projects.</p>
-        <label>Email<input id="portfolio-owner-email" type="email" autocomplete="username" required></label>
-        <label>Password<input id="portfolio-owner-password" type="password" autocomplete="current-password" required></label>
-        <div class="owner-form-actions"><button class="owner-submit" type="submit">Sign in securely</button><button id="portfolio-google-sign-in" type="button">Sign in with Google</button><button id="portfolio-sign-in-close" type="button">Cancel</button></div>
-        <p class="owner-form-message" id="portfolio-sign-in-message" role="status" aria-live="polite"></p>
-      </form>
-    </dialog>
-    <dialog class="studio-project-dialog" id="portfolio-project-dialog" aria-labelledby="portfolio-project-title">
-      <form id="portfolio-project-form" novalidate>
-        <h2 id="portfolio-project-title">Add a Studio Work project</h2>
-        <p>Choose a project type to see the fields for your work.</p>
-        <section class="project-type-step" id="project-type-step" aria-label="Choose project type">
-          <div class="project-type-grid" role="group" aria-label="Project type">
-            <button class="project-type-card" type="button" data-project-type="audio-track" aria-pressed="false"><span class="project-type-icon" aria-hidden="true">🎵</span><span><strong>Audio Track</strong><small>Recording, performance, or release audio.</small></span></button>
-            <button class="project-type-card" type="button" data-project-type="video-project" aria-pressed="false"><span class="project-type-icon" aria-hidden="true">🎬</span><span><strong>Video Project</strong><small>Session films, performances, and video work.</small></span></button>
-            <button class="project-type-card" type="button" data-project-type="image-cover" aria-pressed="false"><span class="project-type-icon" aria-hidden="true">🖼️</span><span><strong>Image / Cover Art</strong><small>Artwork, studio stills, and release images.</small></span></button>
-            <button class="project-type-card" type="button" data-project-type="mixing" aria-pressed="false"><span class="project-type-icon" aria-hidden="true">🎚️</span><span><strong>Mixing Project</strong><small>Showcase the mix and optional comparison.</small></span></button>
-            <button class="project-type-card" type="button" data-project-type="mastering" aria-pressed="false"><span class="project-type-icon" aria-hidden="true">🎧</span><span><strong>Mastering Project</strong><small>Present the finished master and source comparison.</small></span></button>
-            <button class="project-type-card" type="button" data-project-type="coptic-hymn" aria-pressed="false"><span class="project-type-icon" aria-hidden="true">⛪</span><span><strong>Coptic Hymn</strong><small>Hymns, taraneem, choirs, and lyrics.</small></span></button>
-          </div>
-          <div class="project-form-actions"><button id="project-type-cancel-start" type="button">Cancel</button></div>
-        </section>
-        <section class="project-form-step" id="project-form-step" hidden>
-          <div class="project-step-header"><button class="project-back" id="project-type-back" type="button">← Back</button><span class="project-selected-type" id="project-selected-type"></span></div>
-          <input id="owner-project-type" type="hidden" value="audio-track">
-          <input id="owner-project-media-type" type="hidden" value="audio">
-          <label id="owner-project-title-label">Project title<input id="owner-project-title" maxlength="100" required></label>
-          <label class="project-dynamic-field" data-show-for="artist"><span id="owner-project-artist-label">Artist name</span><input id="owner-project-artist" maxlength="100"></label>
-          <label class="project-dynamic-field" data-show-for="media">Media file<input id="owner-project-file" type="file" accept="audio/mpeg,audio/wav,audio/aac,audio/mp4,audio/ogg,audio/flac,.mp3,.wav,.aac,.m4a,.ogg,.flac,video/mp4,video/webm,video/quicktime,.mp4,.webm,.mov,image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp"></label>
-          <div id="owner-project-preview" class="form-note project-dynamic-field" data-show-for="media">Select a file to preview it here.</div>
-          <label class="project-dynamic-field" data-show-for="cover">Cover image / thumbnail (optional)<input id="owner-project-cover" type="file" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp"></label>
-          <div id="owner-cover-preview" class="form-note project-dynamic-field" data-show-for="cover"></div>
-          <label class="project-dynamic-field" data-show-for="external"><span id="owner-project-url-label">External media URL (optional)</span><input id="owner-project-url" type="url" maxlength="2048" placeholder="https://…"></label>
-          <label class="project-dynamic-field" data-show-for="genre">Genre (optional)<input id="owner-project-genre" maxlength="80" placeholder="e.g. Taraneem"></label>
-          <label class="project-dynamic-field" data-show-for="tags">Tags (comma separated, optional)<input id="owner-project-tags" maxlength="480"></label>
-          <div class="project-dynamic-field" data-show-for="comparison"><label>Before / original audio file or URL (optional)<input id="owner-project-before-file" type="file" accept="audio/mpeg,audio/wav,audio/aac,audio/mp4,audio/ogg,audio/flac,.mp3,.wav,.aac,.m4a,.ogg,.flac"><input id="owner-project-before" type="url" maxlength="2048" placeholder="Or paste an HTTPS audio URL"></label><div id="owner-project-before-preview" class="form-note"></div><label>After / final audio file or URL (optional)<input id="owner-project-after-file" type="file" accept="audio/mpeg,audio/wav,audio/aac,audio/mp4,audio/ogg,audio/flac,.mp3,.wav,.aac,.m4a,.ogg,.flac"><input id="owner-project-after" type="url" maxlength="2048" placeholder="Or paste an HTTPS audio URL"></label><div id="owner-project-after-preview" class="form-note"></div></div>
-          <label class="project-dynamic-field" data-show-for="lyrics">Lyrics (optional)<textarea id="owner-project-lyrics" maxlength="4000"></textarea></label>
-          <label>Description<textarea id="owner-project-description" maxlength="1000"></textarea></label>
-          <input id="owner-project-category" type="hidden" value="Audio">
-          <label>Project date (optional)<input id="owner-project-date" type="date"></label>
-          <label>Display order<input id="owner-project-order" type="number" min="0" max="9999" value="100"></label>
-          <progress id="owner-upload-progress" max="100" value="0" hidden></progress>
-          <div class="project-form-actions"><button id="owner-project-cancel" type="button">Cancel</button><button id="owner-upload-cancel" type="button" hidden>Cancel upload</button><button id="owner-project-draft" type="button">Save as Draft</button><button class="project-publish" id="owner-project-publish" type="button">Publish Project</button></div>
-          <p class="owner-form-message" id="owner-project-message" role="status" aria-live="polite"></p>
-        </section>
-      </form>
     </dialog>
 
     <section class="work-section" id="craft">
@@ -943,7 +675,7 @@
           <p class="form-footnote">Requests are inquiries, not confirmed bookings. The studio will reply to confirm the session details.</p>
           <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
           <div class="request-preview" id="request-preview" aria-live="polite">
-            <h3>Your request is ready</h3><p id="request-text"></p><button class="copy-button" type="button" id="copy-request">Copy request</button><a class="whatsapp-button" id="whatsapp-request" href="https://wa.me/201208678717" target="_blank" rel="noopener noreferrer" hidden>Open WhatsApp message</a>
+            <h3>Your request is ready</h3><p id="request-text"></p><button class="copy-button" type="button" id="copy-request">Copy request</button>
           </div>
         </form>
       </div>
@@ -954,7 +686,7 @@
     <div class="shell footer-inner">
       <a class="footer-brand" href="#home"><img src="yj-studios-logo.jpg" alt="">YJ STUDIOS</a>
       <p>Sound engineering & recording · © <span id="year"></span> YJ Studios</p>
-      <div class="footer-links"><a href="#work">Studio work</a><a href="#services">Services</a><a href="#book">Book a session ↗</a></div>
+      <div class="footer-links"><a href="#work">Studio work</a><a href="#services">Services</a><a href="#book">Book a session ↗</a><a href="auth.html">My account</a></div>
     </div>
   </footer>
   <script>
@@ -982,15 +714,8 @@
     }
 
     const portfolioGrid = document.getElementById('portfolio-grid');
-    const projectTypeNames = { 'audio-track':'Audio Track', 'video-project':'Video Project', 'image-cover':'Image / Cover Art', mixing:'Mixing Project', mastering:'Mastering Project', 'coptic-hymn':'Coptic Hymn' };
-    const portfolioEmpty = document.getElementById('portfolio-empty');
     const previewUrls = new Map();
     let activePortfolioFilter = 'all';
-    let portfolioDataStatus = 'Loading published studio work…';
-    let portfolioOwnerTools = false;
-    let portfolioOwnerHandlers = {};
-    let publicProjectRecords = [];
-    let ownerProjectRecords = null;
 
     const mediaDatabase = new Promise((resolve, reject) => {
       if (!('indexedDB' in window)) { reject(new Error('Browser storage is unavailable.')); return; }
@@ -1028,47 +753,6 @@
       return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
     }
     let audioContext = null;
-    function formatAudioTime(seconds) {
-      if (!Number.isFinite(seconds) || seconds < 0) return '0:00';
-      return `${Math.floor(seconds / 60)}:${String(Math.floor(seconds % 60)).padStart(2, '0')}`;
-    }
-    function createAudioControls(audio, title) {
-      const controls = document.createElement('div'); controls.className = 'audio-player-controls';
-      const toggle = document.createElement('button'); toggle.type = 'button'; toggle.textContent = '▶'; toggle.setAttribute('aria-label', `Play ${title}`);
-      const seek = document.createElement('input'); seek.type = 'range'; seek.min = '0'; seek.max = '1000'; seek.value = '0'; seek.setAttribute('aria-label', `Seek ${title}`);
-      const elapsed = document.createElement('time'); elapsed.textContent = '0:00';
-      const duration = document.createElement('time'); duration.textContent = '0:00'; duration.setAttribute('aria-label', 'Track duration');
-      const volume = document.createElement('input'); volume.type = 'range'; volume.min = '0'; volume.max = '1'; volume.step = '.01'; volume.value = '1'; volume.className = 'volume-control'; volume.setAttribute('aria-label', `Volume for ${title}`);
-      toggle.addEventListener('click', async () => {
-        if (audio.paused) { try { await audio.play(); } catch { toggle.textContent = '×'; toggle.setAttribute('aria-label', `Unable to play ${title}`); } }
-        else audio.pause();
-      });
-      audio.addEventListener('play', () => { document.querySelectorAll('.uploaded-audio').forEach((other) => { if (other !== audio && !other.paused) other.pause(); }); toggle.textContent = 'Ⅱ'; toggle.setAttribute('aria-label', `Pause ${title}`); });
-      audio.addEventListener('pause', () => { toggle.textContent = '▶'; toggle.setAttribute('aria-label', `Play ${title}`); });
-      audio.addEventListener('ended', () => { audio.currentTime = 0; });
-      audio.addEventListener('error', () => { toggle.textContent = '×'; toggle.setAttribute('aria-label', `Unsupported audio format: ${title}`); toggle.disabled = true; });
-      audio.addEventListener('loadedmetadata', () => { duration.textContent = formatAudioTime(audio.duration); });
-      audio.addEventListener('timeupdate', () => { elapsed.textContent = formatAudioTime(audio.currentTime); seek.value = Number.isFinite(audio.duration) && audio.duration ? String(Math.round(audio.currentTime / audio.duration * 1000)) : '0'; });
-      seek.addEventListener('input', () => { if (Number.isFinite(audio.duration)) audio.currentTime = Number(seek.value) / 1000 * audio.duration; });
-      volume.addEventListener('input', () => { audio.volume = Number(volume.value); });
-      controls.append(toggle, seek, elapsed, duration, volume);
-      return controls;
-    }
-    function safeVideoEmbed(value) {
-      let url;
-      try { url = new URL(value); } catch { return ''; }
-      if (url.protocol !== 'https:') return '';
-      const host = url.hostname.toLowerCase().replace(/^www\./, '');
-      let videoId = '';
-      if (host === 'youtu.be') videoId = url.pathname.split('/').filter(Boolean)[0] || '';
-      else if (host === 'youtube.com' || host === 'm.youtube.com') {
-        videoId = url.searchParams.get('v') || url.pathname.match(/^\/(?:embed|shorts)\/([\w-]+)/)?.[1] || '';
-      } else if (host === 'vimeo.com' || host === 'player.vimeo.com') {
-        videoId = url.pathname.match(/(?:video\/)?(\d{5,})\/?$/)?.[1] || '';
-        return videoId ? `https://player.vimeo.com/video/${videoId}` : '';
-      } else return '';
-      return /^[\w-]{6,}$/.test(videoId) ? `https://www.youtube-nocookie.com/embed/${videoId}` : '';
-    }
     function setupAudioVisualizer(audio, canvas, artwork) {
       const context = canvas.getContext('2d');
       if (!context) return;
@@ -1145,38 +829,25 @@
       const card = document.createElement('article');
       card.className = 'portfolio-card reveal in';
       card.dataset.kind = record.kind;
-      if (record.category) card.dataset.category = record.category;
       card.dataset.uploadId = record.id;
       card.dataset.fileName = record.fileName;
-      card.dataset.category = record.category || '';
-      card.dataset.search = [record.title, record.artist, record.category, record.projectType, record.genre, record.caption, record.credits, ...(record.tags || [])].filter(Boolean).join(' ').toLocaleLowerCase();
 
       const art = document.createElement('div');
       art.className = 'portfolio-art';
       const media = document.createElement('div');
       media.className = 'uploaded-media';
       let audioVisualConfig = null;
-      if (record.deleted === true) {
-        media.textContent = 'This project is hidden from the public portfolio. Finish file cleanup to remove it.';
-      } else if (record.kind === 'image') {
+      if (record.kind === 'image') {
         const image = document.createElement('img');
-        image.className = 'uploaded-image'; image.src = url; image.alt = record.title || 'Studio work';
-        image.loading = 'lazy'; image.decoding = 'async';
+        image.className = 'uploaded-image'; image.src = url; image.alt = record.title;
         image.tabIndex = 0; image.setAttribute('role', 'button'); image.setAttribute('aria-label', `Enlarge ${record.title}`);
         media.appendChild(image);
       } else if (record.kind === 'video') {
-        const embedUrl = safeVideoEmbed(record.externalUrl || record.videoUrl || url);
-        if (embedUrl) {
-          const frame = document.createElement('iframe'); frame.className = 'uploaded-embed'; frame.src = embedUrl; frame.title = `${record.title} video`; frame.loading = 'lazy';
-          frame.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share'; frame.allowFullscreen = true; frame.referrerPolicy = 'strict-origin-when-cross-origin';
-          media.appendChild(frame);
-        } else {
-          const video = document.createElement('video');
-          video.className = 'uploaded-video'; video.src = url; video.controls = true; video.playsInline = true; video.preload = 'none';
-          if (coverUrl) { video.poster = coverUrl; video.setAttribute('poster', coverUrl); }
-          video.setAttribute('aria-label', `${record.title} video preview`);
-          media.appendChild(video);
-        }
+        const video = document.createElement('video');
+        video.className = 'uploaded-video'; video.src = url; video.controls = true; video.playsInline = true; video.preload = 'metadata';
+        if (coverUrl) video.poster = coverUrl;
+        video.setAttribute('aria-label', `${record.title} video preview`);
+        media.appendChild(video);
       } else {
         const audioArtwork = document.createElement('div');
         audioArtwork.className = 'uploaded-audio-art';
@@ -1189,138 +860,66 @@
         const spectrum = document.createElement('canvas');
         spectrum.className = 'audio-spectrum'; spectrum.setAttribute('aria-hidden', 'true');
         const audio = document.createElement('audio');
-        audio.className = 'uploaded-audio'; audio.preload = 'metadata'; audio.setAttribute('aria-label', `Audio track: ${record.title}`);
+        audio.className = 'uploaded-audio'; audio.controls = true; audio.preload = 'metadata';
+        if (record.mediaUrl) audio.crossOrigin = 'anonymous';
         audio.src = url;
+        audio.setAttribute('aria-label', `${record.title} audio preview`);
         audioArtwork.appendChild(spectrum);
-        const player = createAudioControls(audio, record.title);
-        media.append(audioArtwork, player, audio);
+        media.append(audioArtwork, audio);
         audioVisualConfig = { audio, canvas: spectrum, artwork: audioArtwork };
       }
       const topLine = document.createElement('div');
       topLine.className = 'portfolio-topline';
       const kindLabel = document.createElement('span');
-      kindLabel.textContent = record.deleted === true ? 'PENDING DELETE' : `${record.kind} · PREVIEW`;
+      kindLabel.textContent = `${record.kind} · PREVIEW`;
       const fileLabel = document.createElement('span');
-      fileLabel.textContent = record.sourceType === 'external' ? 'LINK' : (record.fileName || '').split('.').pop().toUpperCase();
+      fileLabel.textContent = record.fileName.split('.').pop().toUpperCase();
       topLine.append(kindLabel, fileLabel);
       art.append(media, topLine);
 
       const info = document.createElement('div');
       info.className = 'portfolio-info';
       const type = document.createElement('span');
-      type.textContent = projectTypeNames[record.projectType] || record.category || (record.kind === 'image' ? 'Image · Studio / Release' : `${record.kind} · Studio work`);
-      const title = document.createElement('h3'); title.textContent = record.title || record.fileName || 'Studio project'; title.dir = 'auto';
-      const caption = document.createElement('p'); caption.textContent = record.caption || record.fileName || ''; caption.dir = 'auto';
+      type.textContent = record.kind === 'image' ? 'Image · Studio / Release' : `${record.kind} · Studio work`;
+      const title = document.createElement('h3'); title.textContent = record.title;
+      const caption = document.createElement('p'); caption.textContent = record.caption || record.fileName;
       const meta = document.createElement('div'); meta.className = 'portfolio-meta';
       const dot = document.createElement('span');
-      const detailParts = [record.artist, record.genre, record.projectDate, formatFileSize(record.size || record.file?.size || 0), record.mediaUrl ? 'Cloud portfolio' : 'Saved in this browser'];
-      if (coverUrl) detailParts.push('Cover art attached');
-      const details = document.createElement('span'); details.textContent = detailParts.filter(Boolean).join(' · ');
+      const details = document.createElement('span'); details.textContent = `${formatFileSize(record.size || record.file?.size || 0)} · ${record.mediaUrl ? 'Cloud portfolio' : 'Saved in this browser'}${coverUrl ? ' · Cover art attached' : ''}`;
       meta.append(dot, details);
       info.append(type, title, caption, meta);
-      const comparisons = [
-        ['Before / original', record.comparisonBeforeUrl],
-        ['After / final', record.comparisonAfterUrl]
-      ].filter(([, source]) => source && /^https:\/\//i.test(source));
-      if (comparisons.length) {
-        const comparison = document.createElement('details'); comparison.className = 'project-compare';
-        const summary = document.createElement('summary'); summary.textContent = 'Listen to project comparisons'; comparison.appendChild(summary);
-        comparisons.forEach(([label, source]) => {
-          const heading = document.createElement('span'); heading.textContent = label;
-          const player = document.createElement('audio'); player.controls = true; player.preload = 'none'; player.src = source;
-          comparison.append(heading, player);
-        });
-        info.appendChild(comparison);
-      }
-      if (record.lyrics) {
-        const lyrics = document.createElement('details'); lyrics.className = 'project-lyrics';
-        const summary = document.createElement('summary'); summary.textContent = 'View lyrics';
-        const text = document.createElement('p'); text.textContent = record.lyrics; text.dir = 'auto';
-        lyrics.append(summary, text); info.appendChild(lyrics);
-      }
-      if (portfolioOwnerTools && record.id && !record.file) {
-        const actions = document.createElement('div'); actions.className = 'owner-card-actions';
-        if (record.deleted === true) {
-          const finish = document.createElement('button'); finish.type = 'button'; finish.className = 'owner-delete'; finish.textContent = 'Retry file cleanup'; finish.addEventListener('click', () => portfolioOwnerHandlers.onDelete?.(record));
-          actions.append(finish);
-        } else {
-          const edit = document.createElement('button'); edit.type = 'button'; edit.textContent = 'Edit'; edit.addEventListener('click', () => portfolioOwnerHandlers.onEdit?.(record));
-          const visibility = document.createElement('button'); visibility.type = 'button'; visibility.textContent = record.published ? 'Unpublish' : 'Publish'; visibility.addEventListener('click', () => portfolioOwnerHandlers.onPublish?.(record, !record.published));
-          const remove = document.createElement('button'); remove.type = 'button'; remove.className = 'owner-delete'; remove.textContent = 'Delete'; remove.addEventListener('click', () => portfolioOwnerHandlers.onDelete?.(record));
-          actions.append(edit, visibility, remove);
-        }
-        info.appendChild(actions);
-      }
       card.append(art, info);
       portfolioGrid.insertBefore(card, portfolioGrid.firstChild);
       if (audioVisualConfig) setupAudioVisualizer(audioVisualConfig.audio, audioVisualConfig.canvas, audioVisualConfig.artwork);
     }
     function refreshPortfolioVisibility() {
-      const searchTerm = document.getElementById('portfolio-search').value.trim().toLocaleLowerCase();
-      let visible = 0;
+      const uploadedKinds = new Set([...portfolioGrid.querySelectorAll('[data-upload-id]')].map((card) => card.dataset.kind));
       portfolioGrid.querySelectorAll('.portfolio-card').forEach((card) => {
-        if (card.dataset.placeholder === 'true') { card.hidden = true; return; }
-        const isCategoryFilter = activePortfolioFilter.startsWith('category:');
-        const category = activePortfolioFilter.slice('category:'.length).toLocaleLowerCase();
-        const matchesFilter = activePortfolioFilter === 'all'
-          || (isCategoryFilter ? (card.dataset.category || '').toLocaleLowerCase().includes(category) : card.dataset.kind === activePortfolioFilter);
-        const matchesSearch = !searchTerm || (card.dataset.search || '').includes(searchTerm);
-        card.hidden = !(matchesFilter && matchesSearch);
-        if (!card.hidden) visible++;
+        const hidePlaceholder = card.dataset.placeholder === 'true' && uploadedKinds.has(card.dataset.kind);
+        const hideByFilter = activePortfolioFilter !== 'all' && card.dataset.kind !== activePortfolioFilter;
+        card.hidden = hidePlaceholder || hideByFilter;
       });
-      portfolioEmpty.classList.toggle('hidden', visible > 0);
-      if (!visible) portfolioEmpty.textContent = searchTerm || activePortfolioFilter !== 'all' ? 'No published projects match this search or filter.' : portfolioDataStatus;
     }
     async function restoreUploads() {
       const saved = await readSavedUploads();
-      saved.filter((record) => record.published === true && record.mediaUrl)
-        .sort((a, b) => a.createdAt - b.createdAt).forEach(createUploadedCard);
+      saved.sort((a, b) => a.createdAt - b.createdAt).forEach(createUploadedCard);
       refreshPortfolioVisibility();
     }
     restoreUploads();
-    async function renderPortfolioRecords(records, emptyMessage = 'No published studio work yet.') {
-      portfolioDataStatus = emptyMessage;
-      portfolioGrid.querySelectorAll('[data-placeholder="true"]').forEach((card) => card.remove());
-      const remoteIds = new Set(records.map((record) => record.id));
-      portfolioGrid.querySelectorAll('[data-upload-id]').forEach((card) => {
-        if (remoteIds.has(card.dataset.uploadId)) card.remove();
-      });
-      portfolioGrid.querySelectorAll('[data-remote-project="true"]').forEach((card) => card.remove());
-      records.slice().sort((a, b) => {
-        const aOrder = Number.isFinite(a.sortOrder) ? a.sortOrder : Number.POSITIVE_INFINITY;
-        const bOrder = Number.isFinite(b.sortOrder) ? b.sortOrder : Number.POSITIVE_INFINITY;
-        return aOrder - bOrder || (b.createdAt || 0) - (a.createdAt || 0);
-      }).reverse().forEach((record) => {
-        if (!record.mediaUrl) return;
-        createUploadedCard(record);
-        const card = portfolioGrid.querySelector(`[data-upload-id="${CSS.escape(record.id)}"]`);
-        if (card) card.dataset.remoteProject = 'true';
-      });
-      refreshPortfolioVisibility();
-    }
     window.YJPortfolio = {
-      showError(message) {
-        portfolioDataStatus = message;
-        portfolioGrid.querySelectorAll('[data-placeholder="true"]').forEach((card) => card.remove());
+      async renderRemoteProjects(records) {
+        const remoteIds = new Set(records.map((record) => record.id));
+        portfolioGrid.querySelectorAll('[data-upload-id]').forEach((card) => {
+          if (remoteIds.has(card.dataset.uploadId)) card.remove();
+        });
+        portfolioGrid.querySelectorAll('[data-remote-project="true"]').forEach((card) => card.remove());
+        records.slice().reverse().forEach((record) => {
+          if (!record.mediaUrl) return;
+          createUploadedCard(record);
+          const card = portfolioGrid.querySelector(`[data-upload-id="${CSS.escape(record.id)}"]`);
+          if (card) card.dataset.remoteProject = 'true';
+        });
         refreshPortfolioVisibility();
-      },
-      showStatus(message) {
-        portfolioDataStatus = message;
-        refreshPortfolioVisibility();
-      },
-      async renderRemoteProjects(records, state = {}) {
-        publicProjectRecords = records;
-        await renderPortfolioRecords(portfolioOwnerTools && ownerProjectRecords ? ownerProjectRecords : records, state.emptyMessage);
-      },
-      async renderAdminProjects(records) {
-        ownerProjectRecords = records;
-        if (portfolioOwnerTools) await renderPortfolioRecords(ownerProjectRecords);
-      },
-      setOwnerTools(enabled, handlers = {}) {
-        portfolioOwnerTools = Boolean(enabled);
-        portfolioOwnerHandlers = handlers;
-        if (!portfolioOwnerTools) ownerProjectRecords = null;
-        renderPortfolioRecords(portfolioOwnerTools && ownerProjectRecords ? ownerProjectRecords : publicProjectRecords);
       }
     };
 
@@ -1331,27 +930,15 @@
         refreshPortfolioVisibility();
       });
     });
-    document.getElementById('portfolio-search').addEventListener('input', refreshPortfolioVisibility);
 
     const mediaLightbox = document.getElementById('media-lightbox');
     const lightboxImage = document.getElementById('lightbox-image');
-    let lightboxImages = [];
-    let lightboxIndex = 0;
-    function showLightboxImage(index) {
-      if (!lightboxImages.length) return;
-      lightboxIndex = (index + lightboxImages.length) % lightboxImages.length;
-      const image = lightboxImages[lightboxIndex];
-      lightboxImage.src = image.src;
-      lightboxImage.alt = image.alt;
-      document.getElementById('lightbox-caption').textContent = image.alt;
-      document.getElementById('lightbox-prev').hidden = lightboxImages.length < 2;
-      document.getElementById('lightbox-next').hidden = lightboxImages.length < 2;
-    }
     portfolioGrid.addEventListener('click', (event) => {
       const image = event.target.closest('img.uploaded-image');
       if (!image) return;
-      lightboxImages = [...portfolioGrid.querySelectorAll('.portfolio-card:not([hidden]) img.uploaded-image')];
-      showLightboxImage(lightboxImages.indexOf(image));
+      lightboxImage.src = image.src;
+      lightboxImage.alt = image.alt;
+      document.getElementById('lightbox-caption').textContent = image.alt;
       mediaLightbox.showModal();
     });
     portfolioGrid.addEventListener('keydown', (event) => {
@@ -1360,35 +947,11 @@
       }
     });
     document.getElementById('lightbox-close').addEventListener('click', () => mediaLightbox.close());
-    document.getElementById('lightbox-prev').addEventListener('click', () => showLightboxImage(lightboxIndex - 1));
-    document.getElementById('lightbox-next').addEventListener('click', () => showLightboxImage(lightboxIndex + 1));
-    mediaLightbox.addEventListener('keydown', (event) => {
-      if (event.key === 'ArrowLeft') { event.preventDefault(); showLightboxImage(lightboxIndex - 1); }
-      if (event.key === 'ArrowRight') { event.preventDefault(); showLightboxImage(lightboxIndex + 1); }
-    });
     mediaLightbox.addEventListener('click', (event) => { if (event.target === mediaLightbox) mediaLightbox.close(); });
     mediaLightbox.addEventListener('close', () => lightboxImage.removeAttribute('src'));
 
     const menu = document.querySelector('.menu-toggle');
     const navLinks = document.querySelector('.nav-links');
-    const siteThemeSelect = document.getElementById('site-theme-mode');
-    const themeMediaQuery = window.matchMedia('(prefers-color-scheme: light)');
-    function applySiteTheme(mode, persist = true) {
-      const resolved = mode === 'system' ? (themeMediaQuery.matches ? 'light' : 'dark') : mode;
-      document.documentElement.dataset.theme = resolved;
-      siteThemeSelect.value = mode;
-      document.querySelector('meta[name="theme-color"]')?.setAttribute('content', resolved === 'light' ? '#f5f8f8' : '#090b0e');
-      if (persist) localStorage.setItem('yj-studios-theme-mode', mode);
-    }
-    const storedThemeMode = localStorage.getItem('yj-studios-theme-mode') || 'system';
-    applySiteTheme(['system', 'dark', 'light'].includes(storedThemeMode) ? storedThemeMode : 'system', false);
-    siteThemeSelect.addEventListener('change', () => applySiteTheme(siteThemeSelect.value));
-    themeMediaQuery.addEventListener?.('change', () => {
-      if ((localStorage.getItem('yj-studios-theme-mode') || 'system') === 'system') applySiteTheme('system', false);
-    });
-    window.addEventListener('storage', (event) => {
-      if (event.key === 'yj-studios-theme-mode') applySiteTheme(event.newValue || 'system', false);
-    });
     menu.addEventListener('click', () => { const open = navLinks.classList.toggle('open'); menu.setAttribute('aria-expanded', open); });
     navLinks.querySelectorAll('a').forEach((link) => link.addEventListener('click', () => { navLinks.classList.remove('open'); menu.setAttribute('aria-expanded', 'false'); }));
 
@@ -1439,14 +1002,7 @@
         data.get('project') ? `Project: ${data.get('project')}` : ''
       ].filter(Boolean).join('\n');
       requestText.textContent = details;
-      const whatsappUrl = `https://wa.me/201208678717?text=${encodeURIComponent(details)}`;
-      const whatsappLink = document.getElementById('whatsapp-request');
-      whatsappLink.href = whatsappUrl;
-      whatsappLink.hidden = false;
-      document.querySelector('#request-preview h3').textContent = 'WhatsApp message ready';
-      // Open the prefilled studio chat directly from the user's submit action.
-      // WhatsApp still requires the client to tap Send in WhatsApp.
-      window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+      document.querySelector('#request-preview h3').textContent = 'Your request is ready';
       const submitButton = form.querySelector('[type="submit"]');
       submitButton.disabled = true;
       formStatus.style.color = 'var(--muted)';
@@ -1465,27 +1021,16 @@
         total: Math.round(total)
       };
       try {
-        if (!window.YJCloud?.submitBooking) throw new Error('Firebase booking inbox is not available.');
-        const { id: requestId, committed } = await window.YJCloud.submitBooking(booking);
+        if (!window.YJCloud?.submitBooking) throw new Error('Online booking inbox is not available.');
+        const requestId = await window.YJCloud.submitBooking(booking);
         requestText.textContent = `${details}\nRequest reference: ${requestId}`;
-        formStatus.style.color = 'var(--cyan-2)';
-        formStatus.textContent = 'WhatsApp opened with your request for +20 120 867 8717. Tap Send in WhatsApp. The Firestore request is waiting for server confirmation; the session is not confirmed until YJ Studios replies.';
+        formStatus.style.color = 'var(--green)';
+        formStatus.textContent = 'Request sent to the studio inbox. The session is not confirmed until YJ Studios replies.';
         form.reset();
         updateEstimate();
-        committed.then(() => {
-          if (requestText.textContent.includes(requestId)) {
-            formStatus.style.color = 'var(--green)';
-            formStatus.textContent = 'WhatsApp opened with your request for +20 120 867 8717. Tap Send in WhatsApp; Firestore confirmed the request in the studio inbox. The session is not confirmed until YJ Studios replies.';
-          }
-        }).catch((error) => {
-          if (requestText.textContent.includes(requestId)) {
-            formStatus.style.color = '#f2b8ad';
-            formStatus.textContent = `Firebase did not save request ${requestId} (${error?.code || 'error'}). Its details remain in the prepared WhatsApp message; tap Send there or re-enter the request after resolving the connection or access issue.`;
-          }
-        });
-      } catch (error) {
+      } catch {
         formStatus.style.color = '#f2b8ad';
-        formStatus.textContent = `${error?.message || 'The request could not be saved to the studio inbox.'} WhatsApp is open with your details; tap Send there, or use the Open WhatsApp message link.`;
+        formStatus.textContent = 'The request could not be sent. Copy it here and share it directly with YJ Studios.';
       } finally { submitButton.disabled = false; }
     });
     document.getElementById('copy-request').addEventListener('click', async () => {
@@ -1494,106 +1039,35 @@
     });
 
     const installButton = document.getElementById('install-app');
-    const installHelpDialog = document.getElementById('install-help-dialog');
-    const installHelpTitle = document.getElementById('install-help-title');
-    const installHelpCopy = document.getElementById('install-help-copy');
-    const installHelpClose = document.getElementById('install-help-close');
-    const installHelpDone = document.getElementById('install-help-done');
-    const offlineBanner = document.getElementById('offline-banner');
     const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-    const standaloneQuery = window.matchMedia('(display-mode: standalone)');
-    const isInstalled = () => standaloneQuery.matches || navigator.standalone === true;
+    const isInstalled = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
     const isInstallableOrigin = location.protocol === 'https:' || (location.protocol === 'http:' && ['localhost', '127.0.0.1'].includes(location.hostname));
     let installPrompt = null;
-    const isArabicLanguage = () => /^ar(?:-|$)/i.test(document.documentElement.lang || '');
-    const syncInstallLanguage = () => {
-      const isArabic = isArabicLanguage();
-      installButton.textContent = isArabic ? 'تثبيت التطبيق' : 'Install App';
-      offlineBanner.textContent = isArabic
-        ? 'أنت غير متصل. تظهر بيانات الأعمال المحفوظة مسبقًا فقط إذا فعّلت التخزين على هذا الجهاز؛ تسجيل الدخول والرفع والإشعارات وواتساب تحتاج إلى اتصال.'
-        : 'You’re offline. Previously synced portfolio data appears only if persistent storage was enabled on this device. Sign-in, uploads, notifications and WhatsApp need a connection.';
-      installHelpTitle.textContent = isArabic ? 'تثبيت YJ Studios' : 'Install YJ Studios';
-      installHelpCopy.textContent = isArabic
-        ? (isIOS
-          ? 'في Safari، اضغط «مشاركة» ثم «إضافة إلى الشاشة الرئيسية». في المتصفحات الأخرى على iPhone أو iPad، افتح قائمة المشاركة واختر إضافة الموقع إلى الشاشة الرئيسية.'
-          : 'على Android، افتح قائمة المتصفح واختر «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية». على الكمبيوتر، استخدم أيقونة التثبيت في شريط العنوان أو قائمة Chrome أو Edge. إذا لم يظهر خيار التثبيت، افتح الموقع في Chrome أو Edge حديث.')
-        : (isIOS
-          ? 'In Safari, tap Share, then choose “Add to Home Screen.” On other iPhone or iPad browsers, open the share menu and choose the option to add the site to your Home Screen.'
-          : /Macintosh/i.test(navigator.userAgent) && /Safari/i.test(navigator.userAgent) && !/Chrome|Chromium|Edg/i.test(navigator.userAgent)
-            ? 'In Safari on macOS Sonoma or later, choose File → Add to Dock. In Chrome or Edge, use the install icon in the address bar or choose Install YJ Studios from the browser menu.'
-            : /Android/i.test(navigator.userAgent)
-              ? 'Open your browser menu and choose “Install app” or “Add to Home screen.” Chrome and Samsung Internet can create an app-style installation on supported Android devices; other browsers may create a home-screen shortcut.'
-              : 'In Chrome or Edge, use the install icon in the address bar or choose “Install YJ Studios” from the browser menu. Firefox does not offer manifest-based app installation; open this site in Chrome or Edge to install it.');
-      installHelpDialog.lang = isArabic ? 'ar' : 'en';
-      installHelpDialog.dir = isArabic ? 'rtl' : 'ltr';
-      installHelpClose.setAttribute('aria-label', isArabic ? 'إغلاق تعليمات التثبيت' : 'Close installation instructions');
-      installHelpDone.textContent = isArabic ? 'تم' : 'Done';
-    };
-    const updateOfflineStatus = () => { offlineBanner.hidden = navigator.onLine; };
-    document.documentElement.dir = isArabicLanguage() ? 'rtl' : 'ltr';
-    syncInstallLanguage();
-    updateOfflineStatus();
-    new MutationObserver(() => {
-      document.documentElement.dir = isArabicLanguage() ? 'rtl' : 'ltr';
-      syncInstallLanguage();
-    }).observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
-    window.addEventListener('online', updateOfflineStatus);
-    window.addEventListener('offline', updateOfflineStatus);
-    if (isInstallableOrigin && !isInstalled()) installButton.hidden = false;
+    if (isIOS && !isInstalled) installButton.hidden = false;
     window.addEventListener('beforeinstallprompt', (event) => {
       event.preventDefault();
       installPrompt = event;
-      if (!isInstalled()) installButton.hidden = false;
+      installButton.hidden = false;
     });
     installButton.addEventListener('click', async () => {
       navLinks.classList.remove('open');
       menu.setAttribute('aria-expanded', 'false');
-      if (!isInstallableOrigin) {
-        installHelpCopy.textContent = document.documentElement.lang.toLowerCase().startsWith('ar')
-          ? 'يتطلب التثبيت استضافة الموقع عبر HTTPS. افتح النسخة المنشورة الآمنة، ثم استخدم زر التثبيت أو قائمة المتصفح.'
-          : 'Installation requires a secure HTTPS website. Open the published secure site, then use this button or your browser menu.';
-        installHelpDialog.lang = document.documentElement.lang.toLowerCase().startsWith('ar') ? 'ar' : 'en';
-        installHelpDialog.dir = document.documentElement.lang.toLowerCase().startsWith('ar') ? 'rtl' : 'ltr';
-        if (installHelpDialog.showModal) installHelpDialog.showModal();
-        else alert(installHelpCopy.textContent);
-        return;
-      }
       if (installPrompt) {
-        const prompt = installPrompt;
+        await installPrompt.prompt();
         installPrompt = null;
-        try {
-          await prompt.prompt();
-          const choice = await prompt.userChoice;
-          if (choice?.outcome === 'accepted') installButton.hidden = true;
-          else showInstallHelp();
-        } catch (error) {
-          console.warn('The browser install prompt could not be opened.', error);
-          showInstallHelp();
-        }
-        return;
+        installButton.hidden = true;
+      } else if (!isInstallableOrigin) {
+        alert('Host YJ Studios on an HTTPS website first. Then use this button, or add the site to your phone’s Home Screen.');
+      } else if (isIOS) {
+        alert('In Safari, tap Share, then choose “Add to Home Screen” to keep YJ Studios on your phone.');
+      } else {
+        alert('Open your browser menu and choose “Install app” or “Add to Home screen.”');
       }
-      showInstallHelp();
     });
-    function showInstallHelp() {
-      syncInstallLanguage();
-      if (installHelpDialog.showModal) installHelpDialog.showModal();
-      else alert(installHelpCopy.textContent);
-    }
-    const closeInstallHelp = () => installHelpDialog.close();
-    installHelpClose.addEventListener('click', closeInstallHelp);
-    installHelpDone.addEventListener('click', closeInstallHelp);
-    window.addEventListener('appinstalled', () => { installButton.hidden = true; installPrompt = null; });
-    standaloneQuery.addEventListener?.('change', (event) => { if (event.matches) installButton.hidden = true; });
+    window.addEventListener('appinstalled', () => { installButton.hidden = true; });
 
     if ('serviceWorker' in navigator && isInstallableOrigin) {
-      window.addEventListener('load', async () => {
-        try {
-          const registration = await navigator.serviceWorker.register('./sw.js', { scope: './', updateViaCache: 'none' });
-          await registration.update();
-        } catch (error) {
-          console.warn('YJ Studios offline shell could not be registered.', error);
-        }
-      });
+      window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
     }
 
     const dateField = document.getElementById('date');
@@ -1601,11 +1075,6 @@
     dateField.min = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
     document.getElementById('year').textContent = new Date().getFullYear();
   </script>
-  <script type="module" src="./offline-sync.mjs"></script>
   <script type="module" src="./site-cloud.js"></script>
-  <script type="module" src="./studio-projects.js"></script>
-  <script type="module" src="./notifications.js"></script>
 </body>
 </html>
-
-
