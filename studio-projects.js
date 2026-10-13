@@ -8,6 +8,7 @@ import { offlineProjectWriteFailure, projectRevisionAfterEdit } from './offline-
 import { listRejectedProjectWrites, removeRejectedProjectWrite, saveRejectedProjectWrite } from './offline-recovery.mjs';
 import { replayOfflineProjectChanges, SERVER_TIMESTAMP_RECOVERY_MARKER } from './offline-replay.mjs';
 import { unreferencedUploadedKeys } from './project-upload-policy.mjs';
+import { createProjectUploadFlow } from './project-upload-flow.mjs';
 
 const [authApi, firestoreApi] = await Promise.all([
   import('https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js'),
@@ -48,6 +49,12 @@ let signInIntent = 'project';
 let projectPreviewUrl = '';
 let coverPreviewUrl = '';
 const comparisonPreviewUrls = new Map();
+let selectedPrimaryFile = null;
+const primaryUploadFlow = createProjectUploadFlow({
+  upload: ({ file, kind, projectId }) => upload(projectId, file, kind, 'Media'),
+  getResumeProjectId,
+  createProjectId: () => crypto.randomUUID()
+});
 
 function status(element, message, isError = false) {
   element.textContent = message;
@@ -291,13 +298,18 @@ function resetProjectForm() {
   cancelRequested = false;
   closePreviewUrls();
   byId('portfolio-project-form').reset();
+  byId('owner-primary-file-picker').value = '';
+  selectedPrimaryFile = null;
+  primaryUploadFlow.clear();
   selectedProjectType = '';
   projectTypeCards.forEach((card) => card.setAttribute('aria-pressed', 'false'));
+  projectTypeCards.forEach((card) => { card.hidden = false; });
   projectTypeStep.hidden = false;
   projectFormStep.hidden = true;
   byId('owner-project-type').value = '';
   byId('owner-project-media-type').value = '';
   byId('owner-project-preview').textContent = 'Select a media file to preview it here.';
+  status(byId('owner-project-type-message'), '');
   byId('owner-cover-preview').replaceChildren();
   progress.hidden = true;
   progress.value = 0;
@@ -313,7 +325,12 @@ function resetProjectForm() {
 function chooseProjectType(type) {
   const settings = projectTypeSettings[type];
   if (!settings) return;
+  if (selectedPrimaryFile && identify(selectedPrimaryFile) !== settings.mediaType) {
+    status(projectMessage, 'Choose a project type that matches the selected media file.', true);
+    return;
+  }
   const previous = projectTypeSettings[selectedProjectType];
+  status(byId('owner-project-type-message'), '');
   if (previous && previous.mediaType !== settings.mediaType) {
     byId('owner-project-file').value = '';
     if (projectPreviewUrl) URL.revokeObjectURL(projectPreviewUrl);
@@ -336,6 +353,9 @@ function chooseProjectType(type) {
   byId('owner-project-url-label').textContent = settings.mediaType === 'video' ? 'YouTube or external video URL (optional)' : 'External media URL (optional)';
   byId('owner-project-file').accept = settings.accept;
   byId('owner-project-file').required = type === 'image-cover';
+  projectTypeCards.forEach((card) => {
+    card.hidden = Boolean(selectedPrimaryFile && projectTypeSettings[card.dataset.projectType]?.mediaType !== identify(selectedPrimaryFile));
+  });
   document.querySelectorAll('.project-dynamic-field').forEach((field) => {
     const requiredField = field.dataset.showFor.split(',').some((name) => settings.fields.includes(name));
     field.hidden = !requiredField;
@@ -374,7 +394,143 @@ function previewFile(file, container, kind) {
 }
 
 function upload(projectId, file, kind, label) {
-  return uploadR2({ file, kind, projectId, prefix: label.startsWith('Before') ? 'before' : label.startsWith('After') ? 'after' : label.toLowerCase().replace(/[^a-z]/g, ''), auth, onProgress: (percent) => { progress.value = percent; status(projectMessage, `${label}: ${percent}% uploaded · ${(file.size / 1048576).toFixed(1)} MB`); }, onTask: (task) => { activeUploadTask = task; } });
+  return uploadR2({
+    file, kind, projectId,
+    prefix: label.startsWith('Before') ? 'before' : label.startsWith('After') ? 'after' : label.toLowerCase().replace(/[^a-z]/g, ''),
+    auth,
+    onProgress: (percent) => {
+      progress.value = percent;
+      status(projectMessage, `${label}: ${percent}% uploaded · ${(file.size / 1048576).toFixed(1)} MB`);
+    },
+    onTask: (task) => {
+      activeUploadTask = task;
+      progress.hidden = false;
+      cancelButton.hidden = false;
+      cancelButton.disabled = false;
+      if (cancelRequested) task.cancel?.();
+    }
+  });
+}
+
+function setPrimaryFileInput(file) {
+  selectedPrimaryFile = file || null;
+  const input = byId('owner-project-file');
+  input.value = '';
+  if (!file) return;
+  // Keep the native form control in sync where supported; the in-memory File
+  // reference remains the source of truth on browsers that disallow assignment.
+  try {
+    const transfer = new DataTransfer();
+    transfer.items.add(file);
+    input.files = transfer.files;
+  } catch { /* selectedPrimaryFile still supports older mobile browsers. */ }
+}
+
+function defaultProjectType(kind) {
+  return ({ audio: 'audio-track', video: 'video-project', image: 'image-cover' })[kind] || '';
+}
+
+function sameSelectedFile(left, right) {
+  return left === right || Boolean(left && right
+    && left.name === right.name
+    && left.size === right.size
+    && left.lastModified === right.lastModified);
+}
+
+function startPrimaryUpload(file) {
+  if (!ownerUser || !canManageProjects) return Promise.reject(new Error('Sign in with the authorized account before uploading media.'));
+  const kind = identify(file);
+  if (!kind) return Promise.reject(new Error('Choose a supported audio, video, or image file.'));
+
+  const prior = primaryUploadFlow.state(file);
+  if (prior?.status === 'complete') return Promise.resolve(prior.result);
+  if (!prior || prior.status === 'failed') {
+    progress.hidden = false;
+    progress.value = 0;
+    cancelButton.hidden = false;
+    cancelButton.disabled = false;
+    cancelRequested = false;
+    status(projectMessage, `Starting upload · ${file.name} · ${(file.size / 1048576).toFixed(1)} MB`);
+  }
+  const promise = primaryUploadFlow.start(file, kind);
+  return promise.then((result) => {
+    if (!submitButton.disabled) cancelButton.hidden = true;
+    status(projectMessage, `Media uploaded · ${file.name} · ${(file.size / 1048576).toFixed(1)} MB. Add project details, then save or publish.`);
+    return result;
+  }).catch((error) => {
+    const retryHint = error?.retryable ? ' Select Save as Draft or Publish Project to retry the same file.' : '';
+    status(projectMessage, `${projectError(error)}${retryHint}`, true);
+    if (!submitButton.disabled) cancelButton.hidden = true;
+    throw error;
+  }).finally(() => {
+    activeUploadTask = null;
+  });
+}
+
+async function abandonPrimaryUpload({ closeDialog = false } = {}) {
+  const state = primaryUploadFlow.state();
+  if (state && state.status === 'uploading') {
+    cancelRequested = true;
+    activeUploadTask?.cancel?.();
+    try { await state.promise; } catch { /* Preserve the failure for cleanup/retry. */ }
+  }
+
+  const completed = primaryUploadFlow.state();
+  if (completed?.result?.key && ownerUser) {
+    const cleanup = await cleanupFailedProjectUploads(completed.projectId, [completed.result.key], ownerUser);
+    if (cleanup.state === 'deleted') status(byId('owner-portfolio-status'), 'Canceled project upload; the unused media file was removed.');
+    else if (cleanup.state !== 'none') status(byId('owner-portfolio-status'), `Project canceled. Uploaded media was preserved for safe recovery (${cleanup.state}).`, true);
+    forgetR2Session(completed.file);
+  }
+
+  if (completed?.file) {
+    // An interrupted multipart session is intentionally retained on retryable
+    // network failure so selecting this same file later can resume it.
+    if (completed.status === 'complete' || completed.error?.name === 'AbortError' || completed.error?.code === 'storage/canceled') {
+      forgetR2Session(completed.file);
+    }
+    primaryUploadFlow.clear(completed.file);
+  }
+  setPrimaryFileInput(null);
+  cancelRequested = false;
+  if (closeDialog && projectDialog.open) projectDialog.close();
+}
+
+async function cancelProjectCreation() {
+  if (submitButton.disabled) return;
+  await abandonPrimaryUpload({ closeDialog: true });
+}
+
+async function handlePrimaryFileSelection(file, { inferProjectType = false } = {}) {
+  if (!file) return;
+  const kind = identify(file);
+  if (!kind) {
+    status(projectDialog.open ? byId('owner-project-type-message') : byId('owner-portfolio-status'), 'Choose a supported audio, video, or image file.', true);
+    return;
+  }
+  const settings = projectTypeSettings[selectedProjectType];
+  if (settings && settings.mediaType !== kind && !inferProjectType) {
+    status(projectMessage, `This project is set to ${settings.mediaType}; choose a matching ${kind} project type first.`, true);
+    return;
+  }
+  try { validateMediaFile(file, kind, MAX_MEDIA_BYTES); }
+  catch (error) {
+    const messageElement = projectDialog.open && !selectedProjectType ? byId('owner-project-type-message') : (projectDialog.open ? projectMessage : byId('owner-portfolio-status'));
+    status(messageElement, error.message, true);
+    return;
+  }
+
+  if (selectedPrimaryFile && !sameSelectedFile(selectedPrimaryFile, file)) await abandonPrimaryUpload();
+
+  setPrimaryFileInput(file);
+  if (inferProjectType || !selectedProjectType || projectTypeSettings[selectedProjectType]?.mediaType !== kind) {
+    const type = defaultProjectType(kind);
+    if (type) chooseProjectType(type);
+  }
+  if (projectPreviewUrl) URL.revokeObjectURL(projectPreviewUrl);
+  projectPreviewUrl = '';
+  previewFile(file, byId('owner-project-preview'), kind);
+  void startPrimaryUpload(file).catch(() => {});
 }
 
 async function cleanupFailedProjectUploads(projectId, keys, user) {
@@ -417,7 +573,7 @@ async function saveProject(published) {
   }
   const settings = projectTypeSettings[selectedProjectType];
   if (!settings) { status(projectMessage, 'Choose a project type first.', true); return; }
-  const file = byId('owner-project-file').files[0] || null;
+  const file = selectedPrimaryFile || byId('owner-project-file').files[0] || null;
   const cover = settings.fields.includes('cover') ? byId('owner-project-cover').files[0] || null : null;
   const externalUrl = settings.fields.includes('external') ? byId('owner-project-url').value.trim() : '';
   const beforeFile = settings.fields.includes('comparison') ? byId('owner-project-before-file').files[0] || null : null;
@@ -458,7 +614,8 @@ async function saveProject(published) {
   } catch (error) { status(projectMessage, error.message, true); return; }
 
   const resumeFile = file || cover || beforeFile || afterFile;
-  const id = getResumeProjectId(resumeFile) || crypto.randomUUID();
+  const pendingUpload = file ? primaryUploadFlow.state(file) : null;
+  const id = pendingUpload?.projectId || getResumeProjectId(resumeFile) || crypto.randomUUID();
   let mediaPath = ''; let coverPath = ''; let beforePath = ''; let afterPath = '';
   const uploadedKeys = [];
   let mediaUploaded = false;
@@ -473,13 +630,13 @@ async function saveProject(published) {
   submitButton.textContent = 'Uploading…';
   cancelButton.hidden = false;
   progress.hidden = false;
-  progress.value = 0;
+  progress.value = pendingUpload?.status === 'complete' ? 100 : 0;
   cancelRequested = false;
 
   try {
     let mediaUrl = externalUrl;
     if (file) {
-      const result = await upload(id, file, kind, 'Media'); mediaUrl = result.url; mediaPath = result.key; uploadedKeys.push(result.key);
+      const result = await startPrimaryUpload(file); mediaUrl = result.url; mediaPath = result.key; uploadedKeys.push(result.key);
       mediaUploaded = true;
       activeUploadTask = null;
       if (cancelRequested) throw Object.assign(new Error('Upload canceled.'), { code: 'storage/canceled' });
@@ -520,6 +677,7 @@ async function saveProject(published) {
     if (isActuallyOfflineHint() && !persistentOfflineStorageEnabled()) {
       throw new Error('Connectivity was lost before Firestore could save the project. Offline Firestore storage is disabled; reconnect and retry.');
     }
+    cancelButton.hidden = true;
     await setR2Visibility(uploadedKeys, published, auth);
     if (uploadedKeys.length) {
       submitButton.textContent = 'Saving…';
@@ -548,6 +706,8 @@ async function saveProject(published) {
     }
     await write;
     [file, cover, beforeFile, afterFile].forEach(forgetR2Session);
+    if (file) primaryUploadFlow.clear(file);
+    selectedPrimaryFile = null;
     cancellationHandled = true;
     cancelButton.hidden = true;
     progress.value = 100;
@@ -561,6 +721,12 @@ async function saveProject(published) {
       status(projectMessage, `${projectError(error)} The project details and uploaded media paths are saved locally for an authorized retry; uploaded files were preserved.`, true);
     } else {
       const cleanup = await cleanupFailedProjectUploads(id, uploadedKeys, ownerUser);
+      if (cleanup.state === 'deleted') {
+        for (const [path, uploadedFile] of [[mediaPath, file], [coverPath, cover], [beforePath, beforeFile], [afterPath, afterFile]]) {
+          if (path && uploadedFile) forgetR2Session(uploadedFile);
+        }
+        if (file && mediaPath) primaryUploadFlow.markRetryable(file, error);
+      }
       status(projectMessage, `${projectError(error)}${uploadCleanupMessage({ ...cleanup, projectId: id })}`, true);
     }
   } finally {
@@ -701,7 +867,16 @@ async function deleteProject(project) {
 
 byId('portfolio-sign-in-close').addEventListener('click', () => signInDialog.close());
 byId('owner-add-project').addEventListener('click', () => {
-  if (canManageProjects) { resetProjectForm(); projectDialog.showModal(); }
+  if (canManageProjects) {
+    resetProjectForm();
+    projectDialog.showModal();
+    const picker = byId('owner-primary-file-picker');
+    picker.value = '';
+    // This stays inside the Add Project click gesture so browsers open the
+    // native file chooser immediately. The type wizard remains as a fallback
+    // if the visitor cancels the chooser or wants an external URL.
+    picker.click();
+  }
   else { signInIntent = 'project'; byId('portfolio-sign-in-title').textContent = 'Sign in to add projects'; byId('portfolio-sign-in-description').textContent = 'Use the authorized YJ Studios account to manage portfolio projects.'; status(signInMessage, 'Sign in with the authorized Firebase account to manage Studio Work.'); signInDialog.showModal(); }
 });
 window.addEventListener('yj:open-owner-sign-in', () => {
@@ -718,41 +893,44 @@ byId('project-type-back').addEventListener('click', () => {
   projectFormStep.hidden = true;
   projectTypeCards.find((card) => card.dataset.projectType === selectedProjectType)?.focus();
 });
-byId('project-type-cancel-start').addEventListener('click', () => projectDialog.close());
-byId('owner-project-cancel').addEventListener('click', () => { if (!submitButton.disabled) projectDialog.close(); });
+byId('project-type-cancel-start').addEventListener('click', () => { void cancelProjectCreation(); });
+byId('owner-project-cancel').addEventListener('click', () => { void cancelProjectCreation(); });
 byId('owner-project-draft').addEventListener('click', () => saveProject(false));
 byId('owner-project-publish').addEventListener('click', () => saveProject(true));
 projectDialog.addEventListener('cancel', (event) => {
+  event.preventDefault();
   if (submitButton.disabled) {
-    event.preventDefault();
-    cancelRequested = true;
-    activeUploadTask?.cancel();
-    cancelButton.disabled = true;
-    status(projectMessage, 'Canceling upload…');
+    if (activeUploadTask) {
+      cancelRequested = true;
+      activeUploadTask.cancel?.();
+      cancelButton.disabled = true;
+      status(projectMessage, 'Canceling upload…');
+    } else {
+      status(projectMessage, 'Project details are being saved. Wait for Firebase to confirm the save.', true);
+    }
+    return;
   }
+  void cancelProjectCreation();
 });
 byId('owner-upload-cancel').addEventListener('click', () => {
   cancelRequested = true;
-  if (activeUploadTask) activeUploadTask.cancel();
-  status(projectMessage, 'Canceling upload…');
-  cancelButton.disabled = true;
+  if (activeUploadTask) {
+    activeUploadTask.cancel?.();
+    status(projectMessage, 'Canceling upload…');
+    cancelButton.disabled = true;
+  } else if (submitButton.disabled) {
+    status(projectMessage, 'The file upload has finished; Firebase is saving the project details now.', true);
+    cancelButton.hidden = true;
+  }
 });
 projectDialog.addEventListener('close', () => { if (!activeUploadTask) resetProjectForm(); });
+byId('owner-primary-file-picker').addEventListener('change', (event) => {
+  void handlePrimaryFileSelection(event.target.files?.[0] || null, { inferProjectType: true });
+});
 byId('owner-project-file').addEventListener('change', (event) => {
-  if (projectPreviewUrl) URL.revokeObjectURL(projectPreviewUrl);
-  projectPreviewUrl = '';
   const file = event.target.files?.[0];
   if (!file) { byId('owner-project-preview').textContent = 'Select a media file to preview it here.'; return; }
-  const kind = identify(file);
-  const expectedKind = projectTypeSettings[selectedProjectType]?.mediaType;
-  if (!kind || kind !== expectedKind) {
-    event.target.value = '';
-    byId('owner-project-preview').textContent = 'This file does not match the selected project type. Choose a supported file and try again.';
-    status(projectMessage, 'Selected file type does not match this project.', true);
-    return;
-  }
-  status(projectMessage, '');
-  previewFile(file, byId('owner-project-preview'), expectedKind);
+  void handlePrimaryFileSelection(file);
 });
 byId('owner-project-cover').addEventListener('change', (event) => {
   if (coverPreviewUrl) URL.revokeObjectURL(coverPreviewUrl);

@@ -3,5 +3,5 @@ import './firebase-public-config.js';
 export const firebaseConfig = globalThis.YJ_FIREBASE_CONFIG;
 export const fcmVapidKey = globalThis.YJ_FCM_VAPID_KEY;
 
-// Public endpoint URL only; all Cloudflare R2 credentials remain in the Worker.
-export const r2WorkerUrl = 'https://SET-YOUR-WORKER-URL.workers.dev';
+// Set this to the deployed public HTTPS endpoint; R2 credentials remain in the Worker.
+export const r2WorkerUrl = '';

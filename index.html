@@ -776,10 +776,11 @@
         <p class="owner-form-message" id="portfolio-sign-in-message" role="status" aria-live="polite"></p>
       </form>
     </dialog>
+    <input class="sr-only" id="owner-primary-file-picker" type="file" accept="audio/mpeg,audio/wav,audio/aac,audio/mp4,audio/ogg,audio/flac,audio/opus,audio/webm,video/mp4,video/webm,video/quicktime,video/ogg,image/jpeg,image/png,image/webp,image/avif,image/gif,.mp3,.wav,.aac,.m4a,.ogg,.flac,.opus,.mp4,.webm,.mov,.m4v,.ogv,.jpg,.jpeg,.png,.webp,.avif,.gif" aria-hidden="true" tabindex="-1">
     <dialog class="studio-project-dialog" id="portfolio-project-dialog" aria-labelledby="portfolio-project-title">
       <form id="portfolio-project-form" novalidate>
         <h2 id="portfolio-project-title">Add a Studio Work project</h2>
-        <p>Choose a project type to see the fields for your work.</p>
+        <p>Select a media file to start its upload, or choose a project type to add an external link.</p>
         <section class="project-type-step" id="project-type-step" aria-label="Choose project type">
           <div class="project-type-grid" role="group" aria-label="Project type">
             <button class="project-type-card" type="button" data-project-type="audio-track" aria-pressed="false"><span class="project-type-icon" aria-hidden="true">🎵</span><span><strong>Audio Track</strong><small>Recording, performance, or release audio.</small></span></button>
@@ -789,6 +790,7 @@
             <button class="project-type-card" type="button" data-project-type="mastering" aria-pressed="false"><span class="project-type-icon" aria-hidden="true">🎧</span><span><strong>Mastering Project</strong><small>Present the finished master and source comparison.</small></span></button>
             <button class="project-type-card" type="button" data-project-type="coptic-hymn" aria-pressed="false"><span class="project-type-icon" aria-hidden="true">⛪</span><span><strong>Coptic Hymn</strong><small>Hymns, taraneem, choirs, and lyrics.</small></span></button>
           </div>
+          <p class="owner-form-message" id="owner-project-type-message" role="status" aria-live="polite"></p>
           <div class="project-form-actions"><button id="project-type-cancel-start" type="button">Cancel</button></div>
         </section>
         <section class="project-form-step" id="project-form-step" hidden>

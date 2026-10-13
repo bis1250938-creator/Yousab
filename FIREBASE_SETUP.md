@@ -1,6 +1,6 @@
 # Firebase setup for YJ Studios
 
-Firebase Authentication and Firestore continue to power owner sign-in, trusted administrator authorization, booking requests, and portfolio metadata. New audio, image, and video files use the authenticated Cloudflare R2 Worker documented in [R2_SETUP.md](./R2_SETUP.md); Firebase Storage is not used for new uploads.
+Firebase Authentication and Firestore continue to power owner sign-in, trusted administrator authorization, booking requests, and portfolio metadata. New audio, image, and video files use the authenticated Cloudflare R2 Worker documented in [R2_SETUP.md](./R2_SETUP.md); Firebase Storage is not used for new uploads. Cloud Storage for Firebase currently requires the Blaze pay-as-you-go plan, so this setup deliberately does not activate it or attach billing. Current no-cost allowances and billing requirements are in the [Firebase Storage FAQ](https://firebase.google.com/docs/storage/faqs-storage-changes-announced-sept-2024).
 
 ## Cross-device Web Push notifications
 
@@ -51,8 +51,9 @@ The source changes and local policy tests are implemented, but the VAPID public 
 
 ## Current implementation
 
-- `index.html` preserves the Studio Work design and hosts the six-type project wizard.
-- `studio-projects.js` retains Firebase owner sign-in and Firestore metadata management, and sends media uploads/deletes through the authenticated R2 adapter.
+- `index.html` preserves the Studio Work design, hosts the six-type project wizard, and provides the immediate native media picker.
+- `studio-projects.js` retains Firebase owner sign-in and Firestore metadata management, and starts media uploads immediately after file selection through the authenticated R2 adapter.
+- `project-upload-flow.mjs` keeps the selected file's stable project ID, reuses an in-flight transfer when Save/Publish is pressed, and lets failed transfers retry without duplicate records.
 - `r2-uploader.js` uploads resumable 16 MiB chunks with progress, retry, cancellation, and local resume state.
 - `r2-worker/` validates Firebase ID tokens and claims, manages multipart uploads in R2, maintains active-object and operation quota inventory in D1, serves public media with byte-range support, and periodically cleans up stale upload reservations.
 - `firebase-config.js` contains the public Worker endpoint setting. It must be updated after deployment.

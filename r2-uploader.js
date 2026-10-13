@@ -12,8 +12,10 @@ function uploadError(message, code, status = 0, retryable = false) {
 }
 
 export function normalizeR2WorkerUrl(value) {
-  const url = new URL(value);
-  if (url.protocol !== 'https:' || url.hostname.toLowerCase().includes('set-your')) throw new Error('Invalid R2 Worker URL.');
+  let url;
+  try { url = new URL(value); }
+  catch { throw new Error('Invalid R2 Worker URL.'); }
+  if (url.protocol !== 'https:' || !url.hostname || url.hostname.toLowerCase().includes('set-your')) throw new Error('Invalid R2 Worker URL.');
   return url.href.replace(/\/$/, '');
 }
 

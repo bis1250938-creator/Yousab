@@ -9,6 +9,7 @@ import { getAnalytics } from "firebase/analytics";
 const firebaseConfig = {
   apiKey: "AIzaSyAMDW3JJZ-nNnXLQveUd3gcwiBLX4F0nB4",
   authDomain: "yj-studio-50df5.firebaseapp.com",
+  databaseURL: "https://yj-studio-50df5-default-rtdb.firebaseio.com",
   projectId: "yj-studio-50df5",
   storageBucket: "yj-studio-50df5.firebasestorage.app",
   messagingSenderId: "1058803606124",
