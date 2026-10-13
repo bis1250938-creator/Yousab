@@ -1,11 +1,7 @@
-// Web app configuration is public client-side data. Keep Firebase security rules
-// and the owner-email check in place; never put private service-account keys here.
-export const firebaseConfig = {
-  apiKey: "AIzaSyAMDW3JJZ-nNnXLQveUd3gcwiBLX4F0nB4",
-  authDomain: "yj-studio-50df5.firebaseapp.com",
-  projectId: "yj-studio-50df5",
-  storageBucket: "yj-studio-50df5.firebasestorage.app",
-  messagingSenderId: "1058803606124",
-  appId: "1:1058803606124:web:eeba1a216634fb8a33ae49",
-  measurementId: "G-Q348KHB9WP"
-};
+// Keep the same public configuration available to the page and classic worker.
+import './firebase-public-config.js';
+export const firebaseConfig = globalThis.YJ_FIREBASE_CONFIG;
+export const fcmVapidKey = globalThis.YJ_FCM_VAPID_KEY;
+
+// Public endpoint URL only; all Cloudflare R2 credentials remain in the Worker.
+export const r2WorkerUrl = 'https://SET-YOUR-WORKER-URL.workers.dev';

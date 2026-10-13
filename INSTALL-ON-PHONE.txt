@@ -1,15 +1,17 @@
-YJ STUDIOS — INSTALL ON YOUR PHONE
+YJ Studios — install and use the website app
 
-1. Upload the contents of this package to an HTTPS website. Keep the dashboard, Firebase config, manifests, service worker, icons, and pages in their supplied paths.
-2. Open the public website on your phone while online and let it finish loading once. Add it to the Home Screen for quick access to the studio site.
-3. To keep the owner dashboard as its own phone app, open `https://YOUR-DOMAIN/dashboard.html` while online. Sign in through the shared account page, then use “Add dashboard to phone” in the dashboard.
-4. Android: accept the install prompt, or choose Install app / Add to Home screen from the browser menu.
-5. iPhone: open the dashboard in Safari, tap Share, choose Add to Home Screen, then tap Add.
+1. Open the published website over HTTPS. Opening `index.html` from a files app does not enable installation, Firebase sign-in, or uploads.
+2. On Android, use the browser menu and choose **Install app** or **Add to Home screen**. Chrome and Samsung Internet can provide an app-style install on supported devices; some other browsers create a browser shortcut.
+3. On iPhone or iPad, open the site in Safari, tap **Share**, then **Add to Home Screen**. On recent iOS/iPadOS versions, other browsers can also offer the Home Screen option in their share menu.
+4. On Windows, Linux, and Chrome/Edge on macOS, choose the install icon in the address bar or **Install YJ Studios** in the browser menu. On macOS Sonoma or later, Safari provides **File → Add to Dock**. Firefox desktop does not provide manifest-based PWA installation; use Chrome or Edge for a separate app window.
+5. The **Install App** button opens the browser prompt where available and shows device-specific instructions otherwise.
 
-The home-screen app caches the site shell for offline use after the first online visit. New projects uploaded from the owner dashboard are stored in Firebase Cloud Storage and appear in the public gallery across devices once Firebase Storage is set up. Older projects previously saved in this browser remain local until you choose Publish beside each one in the dashboard. Cloud media needs an internet connection to play on other devices.
+The site shell can open offline after it has been visited online once. In **Studio Work → Offline data settings**, you may opt in to Firestore's IndexedDB cache on a trusted personal device. Previously synchronized project metadata and pending metadata-only changes can then survive a refresh. The browser may still evict its storage; do not enable this on a shared device. The service worker itself does not cache private documents, auth responses, or media files. Audio/video playback, remote images, uploads, notifications, sign-in, and WhatsApp still need an internet connection.
 
-When Firebase Firestore is enabled and its security rules are deployed, website booking requests appear in the owner dashboard. Requests are inquiries only; YJ Studios still confirms each session. If sending fails, visitors can copy and share their request.
+The Studio Work upload workflow remains online-only: choose **+ Add Project**, sign in using the authorized Firebase account when prompted, select media and details, preview, then save as a draft or publish. Upload progress appears in the form. Metadata-only external-link projects can be queued offline after trusted-device storage is enabled; R2-backed publish/unpublish/delete actions require a connection. Firebase and the R2 Worker must be configured before uploads can succeed.
 
-For account sign-in and booking requests, enable the Google provider, add your published hostname in Authentication → Settings → Authorized domains, and configure Firestore and Storage rules using `firestore.rules`, `firestore.indexes.json`, and `storage.rules`. `firebase-config.js` needs the exact `authDomain` and `projectId` from Firebase Console; do not guess them. Firebase Cloud Storage currently requires the Blaze pay-as-you-go plan. Use the shared account page; an owner account with the trusted role opens the private dashboard after sign-in. Google handles passwords directly. See `README.md` for details.
+For supported offline workflows, conflict handling, pending-write behavior, and device test steps, see `OFFLINE_SETUP.md`.
 
-Opening either HTML file directly from a files app does not install the app or enable offline caching. PWA installation and service workers require HTTPS (localhost is suitable only for local development). The owner dashboard still requires an internet connection to sign in and load bookings.
+Firebase setup is required first: enable the selected Authentication provider, add the website domain to Authorized domains, grant the Firebase UID its trusted custom claim from a trusted environment, deploy Firestore rules, and deploy/configure the Cloudflare R2 Worker. See `FIREBASE_SETUP.md` and `R2_SETUP.md` for exact commands and limitations.
+
+Do not publish `admin-tools/`, backend credentials, or service-account keys with the site.

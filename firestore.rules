@@ -4,7 +4,7 @@ service cloud.firestore {
     function isOwner() {
       return request.auth != null
         && request.auth.token.owner == true
-        && request.auth.token.firebase.sign_in_provider == 'google.com'
+        && request.auth.token.firebase.sign_in_provider in ['google.com', 'password']
         && request.auth.token.email_verified == true;
     }
 
@@ -42,7 +42,69 @@ service cloud.firestore {
 
     match /projects/{projectId} {
       allow get, list: if isOwner() || resource.data.published == true;
-      allow create, update, delete: if isOwner();
+      function validProject(data) {
+        return data.title is string && data.title.size() > 0 && data.title.size() <= 100
+          && data.description is string && data.description.size() <= 1000
+          && data.category is string && data.category.size() <= 60
+          && data.mediaType in ['audio', 'video', 'image']
+          && (!data.keys().hasAny(['projectType']) || data.projectType in ['audio-track', 'video-project', 'image-cover', 'mixing', 'mastering', 'coptic-hymn'])
+          && data.fileUrl is string && data.fileUrl.matches('https://.*')
+          && !data.fileUrl.matches('https://example[.]com.*')
+          && !data.fileUrl.matches('.*placeholder.*')
+          && data.filePath is string && data.filePath.size() <= 500
+          && data.published is bool
+          && data.createdAt is timestamp
+          && (!data.keys().hasAny(['revision']) || (data.revision is int && data.revision >= 0))
+          && (!data.keys().hasAny(['deleted']) || data.deleted == false)
+          && (!data.keys().hasAny(['sortOrder']) || (data.sortOrder is int && data.sortOrder >= 0 && data.sortOrder <= 9999))
+          && (!data.keys().hasAny(['artist']) || (data.artist is string && data.artist.size() <= 100))
+          && (!data.keys().hasAny(['genre']) || (data.genre is string && data.genre.size() <= 80))
+          && (!data.keys().hasAny(['lyrics']) || (data.lyrics is string && data.lyrics.size() <= 4000))
+          && (!data.keys().hasAny(['comparisonBeforeUrl']) || (data.comparisonBeforeUrl is string && data.comparisonBeforeUrl.size() <= 2048 && (data.comparisonBeforeUrl == '' || data.comparisonBeforeUrl.matches('https://.*'))))
+          && (!data.keys().hasAny(['comparisonAfterUrl']) || (data.comparisonAfterUrl is string && data.comparisonAfterUrl.size() <= 2048 && (data.comparisonAfterUrl == '' || data.comparisonAfterUrl.matches('https://.*'))))
+          && (!data.keys().hasAny(['beforePath']) || (data.beforePath is string && (data.beforePath == '' || data.beforePath.matches('portfolio/' + request.auth.uid + '/' + projectId + '/before-.*'))))
+          && (!data.keys().hasAny(['afterPath']) || (data.afterPath is string && (data.afterPath == '' || data.afterPath.matches('portfolio/' + request.auth.uid + '/' + projectId + '/after-.*'))))
+          && (!data.keys().hasAny(['credits']) || (data.credits is string && data.credits.size() <= 240))
+          && (!data.keys().hasAny(['tags']) || (data.tags is list && data.tags.size() <= 12))
+          && (!data.keys().hasAny(['projectDate']) || (data.projectDate is string && (data.projectDate == '' || data.projectDate.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$'))))
+          && (!data.keys().hasAny(['thumbnailUrl']) || (data.thumbnailUrl is string && data.thumbnailUrl.size() <= 2048))
+          && (!data.keys().hasAny(['featured']) || data.featured is bool)
+          && (!data.keys().hasAny(['kind']) || data.kind == data.mediaType)
+          && (!data.keys().hasAny(['mediaUrl']) || data.mediaUrl == data.fileUrl)
+          && (data.filePath == '' || data.filePath.matches('portfolio/' + request.auth.uid + '/' + projectId + '/media-.*'))
+          && (!data.keys().hasAny(['ownerUid']) || data.ownerUid == request.auth.uid);
+      }
+      allow create: if isOwner() && validProject(request.resource.data) && request.resource.data.createdAt == request.time;
+      allow update: if isOwner()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['title', 'description', 'caption', 'category', 'featured', 'updatedAt', 'published', 'sortOrder', 'artist', 'credits', 'thumbnailUrl', 'coverUrl', 'tags', 'projectDate', 'revision', 'deleted'])
+        && request.resource.data.revision is int
+        && request.resource.data.revision == resource.data.get('revision', 0) + 1
+        && resource.data.get('deleted', false) != true
+        && (!request.resource.data.keys().hasAny(['deleted']) || (request.resource.data.deleted == true && request.resource.data.published == false))
+        && request.resource.data.title is string && request.resource.data.title.size() > 0 && request.resource.data.title.size() <= 100
+        && (!request.resource.data.keys().hasAny(['description']) || (request.resource.data.description is string && request.resource.data.description.size() <= 1000))
+        && request.resource.data.category is string && request.resource.data.category.size() <= 60
+        && (!request.resource.data.keys().hasAny(['sortOrder']) || (request.resource.data.sortOrder is int && request.resource.data.sortOrder >= 0 && request.resource.data.sortOrder <= 9999))
+        && (!request.resource.data.keys().hasAny(['artist']) || (request.resource.data.artist is string && request.resource.data.artist.size() <= 100))
+        && (!request.resource.data.keys().hasAny(['credits']) || (request.resource.data.credits is string && request.resource.data.credits.size() <= 240))
+        && (!request.resource.data.keys().hasAny(['tags']) || (request.resource.data.tags is list && request.resource.data.tags.size() <= 12))
+        && (!request.resource.data.keys().hasAny(['projectDate']) || (request.resource.data.projectDate is string && (request.resource.data.projectDate == '' || request.resource.data.projectDate.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$'))))
+        && (!request.resource.data.keys().hasAny(['thumbnailUrl']) || (request.resource.data.thumbnailUrl is string && request.resource.data.thumbnailUrl.size() <= 2048))
+        && (!request.resource.data.keys().hasAny(['published']) || request.resource.data.published is bool)
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if isOwner();
+    }
+
+    // Device tokens are private server-managed records. Callable Functions
+    // scope all registration and sending operations to request.auth.uid.
+    match /notificationDevices/{userId}/devices/{deviceId} {
+      allow read, write: if false;
+    }
+    match /notificationRateLimits/{userId} {
+      allow read, write: if false;
+    }
+    match /notificationDeviceCounts/{userId} {
+      allow read, write: if false;
     }
   }
 }
