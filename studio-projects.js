@@ -1,25 +1,29 @@
-import { app, auth, db } from './firebase-client.js';
+import { getFirebaseFirestore } from './firebase-client.js';
+import { ensureAuthSession, subscribeAuthState } from './auth-session.mjs';
 import { firebaseConfig } from './firebase-config.js';
 import { studioProjectAccessFailure, verifyStudioProjectSessionWithCachedToken } from './auth-flow.mjs';
-import { contentTypeForMedia, MAX_COVER_BYTES, MAX_MEDIA_BYTES, validateMediaFile } from './media-storage.js';
-import { uploadR2, deleteR2Objects, setR2Visibility, getResumeProjectId, forgetR2Session, forgetR2SessionDescriptor } from './r2-uploader.js';
-import { enqueueFirestoreWrite, isActuallyOfflineHint, observeFirestoreSnapshot, persistentOfflineStorageEnabled } from './offline-sync.mjs';
-import { offlineProjectWriteFailure, projectRevisionAfterEdit } from './offline-policy.mjs';
-import { listRejectedProjectWrites, removeRejectedProjectWrite, saveRejectedProjectWrite } from './offline-recovery.mjs';
-import { replayOfflineProjectChanges, SERVER_TIMESTAMP_RECOVERY_MARKER } from './offline-replay.mjs';
-import { unreferencedUploadedKeys } from './project-upload-policy.mjs';
 import { createProjectUploadFlow } from './project-upload-flow.mjs';
 
-const [authApi, firestoreApi] = await Promise.all([
-  import('https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js'),
-  import('https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js')
-]);
-
+const authRuntime = await ensureAuthSession();
+const auth = authRuntime.auth;
+const authApi = authRuntime.api;
+let db = null;
+let firestoreApi = null;
+let firestoreRuntimePromise = null;
+let ownerSupportPromise = null;
+let contentTypeForMedia, MAX_COVER_BYTES, MAX_MEDIA_BYTES, validateMediaFile;
+let uploadR2, deleteR2Objects, setR2Visibility, getResumeProjectId, forgetR2Session, forgetR2SessionDescriptor;
+let configureOfflineSync, enqueueFirestoreWrite, isActuallyOfflineHint, observeFirestoreSnapshot;
+let persistentOfflineStorageEnabled, setOfflineRetryHandler;
+let offlineProjectWriteFailure, projectRevisionAfterEdit;
+let listRejectedProjectWrites, removeRejectedProjectWrite, saveRejectedProjectWrite;
+let replayOfflineProjectChanges, SERVER_TIMESTAMP_RECOVERY_MARKER, unreferencedUploadedKeys;
 const {
-  GoogleAuthProvider, getIdTokenResult, onAuthStateChanged, signInWithEmailAndPassword,
+  GoogleAuthProvider, getIdTokenResult, signInWithEmailAndPassword,
   signInWithPopup, signOut
 } = authApi;
-const { collection, deleteDoc, doc, getDocFromServer, onSnapshot, serverTimestamp, setDoc, updateDoc } = firestoreApi;
+let collection, deleteDoc, doc, enableNetwork, getDocsFromServer, getDocFromServer, onSnapshot;
+let query, serverTimestamp, setDoc, updateDoc, waitForPendingWrites, where;
 const byId = (id) => document.getElementById(id);
 const signInDialog = byId('portfolio-sign-in-dialog');
 const projectDialog = byId('portfolio-project-dialog');
@@ -43,6 +47,7 @@ let selectedProjectType = '';
 let ownerUser = null;
 let canManageProjects = false;
 let stopOwnerProjects = null;
+let workSectionActive = Boolean(window.YJWorkSectionActive);
 let activeUploadTask = null;
 let cancelRequested = false;
 let signInIntent = 'project';
@@ -50,11 +55,70 @@ let projectPreviewUrl = '';
 let coverPreviewUrl = '';
 const comparisonPreviewUrls = new Map();
 let selectedPrimaryFile = null;
-const primaryUploadFlow = createProjectUploadFlow({
-  upload: ({ file, kind, projectId }) => upload(projectId, file, kind, 'Media'),
-  getResumeProjectId,
-  createProjectId: () => crypto.randomUUID()
-});
+let primaryUploadFlow = null;
+
+async function ensureOwnerProjectSupport() {
+  if (!ownerSupportPromise) {
+    ownerSupportPromise = Promise.all([
+      import('./media-storage.js'),
+      import('./r2-uploader.js'),
+      import('./offline-sync.mjs'),
+      import('./offline-policy.mjs'),
+      import('./offline-recovery.mjs'),
+      import('./offline-replay.mjs'),
+      import('./project-upload-policy.mjs')
+    ]).then(([media, r2, offline, policy, recovery, replay, uploadPolicy]) => {
+      ({ contentTypeForMedia, MAX_COVER_BYTES, MAX_MEDIA_BYTES, validateMediaFile } = media);
+      ({ uploadR2, deleteR2Objects, setR2Visibility, getResumeProjectId, forgetR2Session, forgetR2SessionDescriptor } = r2);
+      ({ configureOfflineSync, enqueueFirestoreWrite, isActuallyOfflineHint, observeFirestoreSnapshot, persistentOfflineStorageEnabled, setOfflineRetryHandler } = offline);
+      ({ offlineProjectWriteFailure, projectRevisionAfterEdit } = policy);
+      ({ listRejectedProjectWrites, removeRejectedProjectWrite, saveRejectedProjectWrite } = recovery);
+      ({ replayOfflineProjectChanges, SERVER_TIMESTAMP_RECOVERY_MARKER } = replay);
+      ({ unreferencedUploadedKeys } = uploadPolicy);
+      primaryUploadFlow = createProjectUploadFlow({
+        upload: ({ file, kind, projectId }) => upload(projectId, file, kind, 'Media'),
+        getResumeProjectId,
+        createProjectId: () => crypto.randomUUID()
+      });
+      window.YJOffline?.setRecoveryHandler(retrySavedProjectWrites);
+      return offline;
+    }).catch((error) => {
+      ownerSupportPromise = null;
+      throw error;
+    });
+  }
+  return ownerSupportPromise;
+}
+
+async function ensureProjectFirestore() {
+  if (db) return;
+  if (!firestoreRuntimePromise) {
+    firestoreRuntimePromise = Promise.all([getFirebaseFirestore(), ensureOwnerProjectSupport()]).then(([runtime]) => {
+      db = runtime.db;
+      firestoreApi = runtime.api;
+      ({
+        collection, deleteDoc, doc, enableNetwork, getDocsFromServer, getDocFromServer,
+        onSnapshot, query, serverTimestamp, setDoc, updateDoc, waitForPendingWrites, where
+      } = firestoreApi);
+      configureOfflineSync({
+        db,
+        persistent: runtime.offlineCacheMode === 'persistent',
+        enableNetwork,
+        waitForPendingWrites
+      });
+      setOfflineRetryHandler(async () => {
+        await enableNetwork(db);
+        await waitForPendingWrites(db);
+        await getDocsFromServer(query(collection(db, 'projects'), where('published', '==', true)));
+      });
+      return runtime;
+    }).catch((error) => {
+      firestoreRuntimePromise = null;
+      throw error;
+    });
+  }
+  await firestoreRuntimePromise;
+}
 
 function status(element, message, isError = false) {
   element.textContent = message;
@@ -131,6 +195,31 @@ function completeOwnerSignIn() {
   byId('portfolio-sign-in-title').textContent = 'Sign in to add projects';
   byId('portfolio-sign-in-description').textContent = 'Use the authorized YJ Studios account to manage portfolio projects.';
 }
+
+function showOwnerSignIn(intent = 'project') {
+  signInIntent = intent;
+  byId('portfolio-sign-in-title').textContent = intent === 'notifications' ? 'Sign in for notifications' : 'Sign in to add projects';
+  byId('portfolio-sign-in-description').textContent = intent === 'notifications'
+    ? 'Use an existing verified Google or email/password Firebase account. It can manage only its own notification devices.'
+    : 'Use the authorized YJ Studios account to manage portfolio projects.';
+  status(signInMessage, intent === 'notifications'
+    ? 'Sign in with a verified Firebase account to register this browser.'
+    : 'Sign in with the authorized Firebase account to manage Studio Work.');
+  signInDialog.showModal();
+}
+
+let resolveInitialOwnerState;
+let initialOwnerStateResolved = false;
+const initialOwnerState = new Promise((resolve) => { resolveInitialOwnerState = resolve; });
+
+window.YJProjectManager = {
+  async openOwnerProjectDialog() {
+    await initialOwnerState;
+    if (!canManageProjects) { showOwnerSignIn('project'); return; }
+    resetProjectForm();
+    projectDialog.showModal();
+  }
+};
 
 function requireVerifiedNotificationAccount(user) {
   if (!user?.emailVerified) throw new Error('Verify this Firebase account email before registering notification devices.');
@@ -213,12 +302,10 @@ async function discardProjectRecovery() {
   return operations.length;
 }
 
-window.YJOffline?.setRecoveryHandler(retrySavedProjectWrites);
-
 const tombstoneCleanup = new Set();
 
 function listenToOwnerProjects() {
-  if (stopOwnerProjects) stopOwnerProjects();
+  if (!canManageProjects || !workSectionActive || !db || stopOwnerProjects) return;
   stopOwnerProjects = onSnapshot(collection(db, 'projects'), { includeMetadataChanges: true }, (snapshot) => {
     observeFirestoreSnapshot('owner-projects', snapshot);
     const projects = snapshot.docs.map(normalizeProject);
@@ -274,6 +361,7 @@ async function acceptUser(user) {
       setOwnerAccess(false, studioProjectAccessFailure(user, access.tokenResult, firebaseConfig.projectId));
       return;
     }
+    await ensureProjectFirestore();
     setOwnerAccess(true, access.offline
       ? 'Owner identity verified from a valid cached Firebase token. Offline writes remain pending until Firestore validates them.'
       : `Signed in as ${user.email || 'YJ Studios account'}.`);
@@ -877,15 +965,9 @@ byId('owner-add-project').addEventListener('click', () => {
     // if the visitor cancels the chooser or wants an external URL.
     picker.click();
   }
-  else { signInIntent = 'project'; byId('portfolio-sign-in-title').textContent = 'Sign in to add projects'; byId('portfolio-sign-in-description').textContent = 'Use the authorized YJ Studios account to manage portfolio projects.'; status(signInMessage, 'Sign in with the authorized Firebase account to manage Studio Work.'); signInDialog.showModal(); }
+  else showOwnerSignIn('project');
 });
-window.addEventListener('yj:open-owner-sign-in', () => {
-  signInIntent = 'notifications';
-  byId('portfolio-sign-in-title').textContent = 'Sign in for notifications';
-  byId('portfolio-sign-in-description').textContent = 'Use an existing verified Google or email/password Firebase account. It can manage only its own notification devices.';
-  status(signInMessage, 'Sign in with a verified Firebase account to register this browser.');
-  signInDialog.showModal();
-});
+window.addEventListener('yj:open-owner-sign-in', () => showOwnerSignIn('notifications'));
 projectTypeCards.forEach((card) => card.addEventListener('click', () => chooseProjectType(card.dataset.projectType)));
 byId('project-type-back').addEventListener('click', () => {
   if (submitButton.disabled) return;
@@ -969,6 +1051,7 @@ byId('portfolio-sign-in-form').addEventListener('submit', async (event) => {
     }
     const access = await verifyOwner(auth.currentUser);
     if (!access.authorized) throw new Error(studioProjectAccessFailure(auth.currentUser, access.tokenResult, firebaseConfig.projectId));
+    await ensureProjectFirestore();
     completeOwnerSignIn();
   } catch (error) { status(signInMessage, authMessage(error), true); }
 });
@@ -985,16 +1068,40 @@ byId('portfolio-google-sign-in').addEventListener('click', async () => {
     }
     const access = await verifyOwner(result.user);
     if (!access.authorized) throw new Error(studioProjectAccessFailure(result.user, access.tokenResult, firebaseConfig.projectId));
+    await ensureProjectFirestore();
     completeOwnerSignIn();
   } catch (error) { status(signInMessage, authMessage(error), true); }
 });
 byId('owner-sign-out').addEventListener('click', async () => {
   try { await window.YJOffline?.flushBeforeOwnerSignOut?.(); }
   catch (error) { status(byId('owner-portfolio-status'), error.message, true); return; }
-  await window.YJNotifications?.unregisterCurrentDevice?.();
+  const hasOptedIn = (() => { try { return localStorage.getItem(`yj-fcm-enabled:${auth.currentUser?.uid}`) === 'true'; } catch { return false; } })();
+  if (window.YJNotifications?.unregisterCurrentDevice) await window.YJNotifications.unregisterCurrentDevice();
+  else if (hasOptedIn) {
+    try { await (await import('./notifications.js')).unregisterCurrentDevice(); }
+    catch { /* Signing out must remain possible if notification cleanup cannot load. */ }
+  }
   signOut(auth).catch((error) => status(byId('owner-portfolio-status'), authMessage(error), true));
 });
 
-onAuthStateChanged(auth, (user) => { acceptUser(user).catch((error) => setOwnerAccess(false, authMessage(error))); });
+window.addEventListener('yj:work-section-active', (event) => {
+  workSectionActive = Boolean(event.detail?.active);
+  if (workSectionActive) listenToOwnerProjects();
+  else if (stopOwnerProjects) {
+    stopOwnerProjects();
+    stopOwnerProjects = null;
+  }
+});
+
+subscribeAuthState((user) => {
+  acceptUser(user).catch((error) => setOwnerAccess(false, authMessage(error))).finally(() => {
+    if (!initialOwnerStateResolved) {
+      initialOwnerStateResolved = true;
+      resolveInitialOwnerState();
+    }
+  });
+});
+
+window.YJProjectManagerLoaded = true;
 
 

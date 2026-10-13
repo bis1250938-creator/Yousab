@@ -1,4 +1,4 @@
-const CACHE_NAME = 'yj-studios-shell-v38';
+const CACHE_NAME = 'yj-studios-shell-v42';
 const BASE_URL = new URL('./', self.registration.scope);
 const APP_URL = new URL('index.html', BASE_URL).href;
 const OFFLINE_URL = new URL('offline.html', BASE_URL).href;
@@ -41,6 +41,16 @@ const SHELL_FILES = [
   './',
   './index.html',
   './offline.html',
+  './site.webmanifest',
+  './fonts/dm-sans-latin.woff2',
+  './fonts/manrope-latin.woff2',
+  './yj-studios-logo-190.webp',
+  './yj-studios-logo-380.webp',
+  './icons/yj-icon-192.png',
+  './icons/yj-icon-512.png',
+  './icons/apple-touch-icon.png'
+].map((path) => new URL(path, BASE_URL).href);
+const LAZY_FILES = [
   './auth-flow.mjs',
   './offline-policy.mjs',
   './offline-recovery.mjs',
@@ -51,19 +61,32 @@ const SHELL_FILES = [
   './firebase-config.js',
   './firebase-public-config.js',
   './firebase-client.js',
+  './auth-session.mjs',
   './media-storage.js',
   './r2-uploader.js',
   './site-cloud.js',
   './studio-projects.js',
   './notifications.js',
-  './notification-policy.mjs',
-  './site.webmanifest',
-  './yj-studios-logo.jpg',
-  './icons/yj-icon-192.png',
-  './icons/yj-icon-512.png',
-  './icons/apple-touch-icon.png'
+  './notification-policy.mjs'
 ].map((path) => new URL(path, BASE_URL).href);
-const SHELL_ASSET_PATHS = new Set(SHELL_FILES.map((url) => new URL(url).pathname));
+const CACHEABLE_FILES = [...SHELL_FILES, ...LAZY_FILES];
+const CACHEABLE_ASSET_PATHS = new Set(CACHEABLE_FILES.map((url) => new URL(url).pathname));
+const LOGO_ASSETS = [
+  './yj-studios-logo.jpg',
+  './yj-studios-logo-64.webp',
+  './yj-studios-logo-80.webp',
+  './yj-studios-logo-190.webp',
+  './yj-studios-logo-288.webp',
+  './yj-studios-logo-336.webp',
+  './yj-studios-logo-380.webp',
+  './yj-studios-logo-64.jpg',
+  './yj-studios-logo-80.jpg',
+  './yj-studios-logo-190.jpg',
+  './yj-studios-logo-288.jpg',
+  './yj-studios-logo-336.jpg',
+  './yj-studios-logo-380.jpg'
+].map((path) => new URL(path, BASE_URL).href);
+const LOGO_ASSET_PATHS = new Set(LOGO_ASSETS.map((url) => new URL(url).pathname));
 const FIREBASE_VERSION = '12.19.0';
 const FIREBASE_MODULES = [
   'firebase-app.js',
@@ -77,10 +100,8 @@ self.addEventListener('install', (event) => {
     caches.open(CACHE_NAME)
       .then(async (cache) => {
         await cache.addAll(SHELL_FILES);
-        // These versioned, public SDK modules are required to initialize
-        // Firebase from its ES module graph offline. No API/data endpoint is
-        // included in this cache list.
-        await Promise.allSettled(FIREBASE_MODULES.map((url) => cache.add(url)));
+        // Firebase ES modules are cached on first real use by the fetch handler
+        // below; do not fetch Auth and Firestore just to install the app shell.
       })
       .then(() => self.skipWaiting())
   );
@@ -88,9 +109,20 @@ self.addEventListener('install', (event) => {
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys()
-      .then((keys) => Promise.all(keys.filter((key) => key.startsWith('yj-studios-shell-') && key !== CACHE_NAME).map((key) => caches.delete(key))))
-      .then(() => self.clients.claim())
+    (async () => {
+      const previousCaches = (await caches.keys()).filter((key) => key.startsWith('yj-studios-shell-') && key !== CACHE_NAME);
+      const currentCache = await caches.open(CACHE_NAME);
+      for (const previousName of previousCaches) {
+        const previousCache = await caches.open(previousName);
+        for (const request of await previousCache.keys()) {
+          if (await currentCache.match(request)) continue;
+          const response = await previousCache.match(request);
+          if (response) await currentCache.put(request, response);
+        }
+        await caches.delete(previousName);
+      }
+      await self.clients.claim();
+    })()
   );
 });
 
@@ -160,11 +192,24 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  const logoUrl = LOGO_ASSETS.find((url) => new URL(url).pathname === requestUrl.pathname);
+  if (logoUrl && LOGO_ASSET_PATHS.has(requestUrl.pathname)) {
+    event.respondWith((async () => {
+      const cache = await caches.open(CACHE_NAME);
+      const cached = await cache.match(logoUrl);
+      if (cached) return cached;
+      const response = await fetch(request);
+      if (response.ok) await cache.put(logoUrl, response.clone());
+      return response;
+    })());
+    return;
+  }
+
   // Cache only the reviewed, same-origin app shell allowlist. Firebase data,
   // authentication responses, API calls, and media are intentionally never
   // stored by this worker.
-  const cachedAssetUrl = SHELL_FILES.find((url) => new URL(url).pathname === requestUrl.pathname);
-  if (!cachedAssetUrl || !SHELL_ASSET_PATHS.has(requestUrl.pathname)) return;
+  const cachedAssetUrl = CACHEABLE_FILES.find((url) => new URL(url).pathname === requestUrl.pathname);
+  if (!cachedAssetUrl || !CACHEABLE_ASSET_PATHS.has(requestUrl.pathname)) return;
   event.respondWith((async () => {
     const cache = await caches.open(CACHE_NAME);
     const cached = await cache.match(cachedAssetUrl);

@@ -22,11 +22,60 @@
   <link rel="canonical" href="https://yjstudio.com/">
   <title>YJ Studios | Recording, Mixing & Sound Engineering</title>
   <link rel="manifest" href="./site.webmanifest">
+  <link rel="icon" type="image/png" sizes="192x192" href="./icons/yj-icon-192.png">
   <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="preload" href="./fonts/dm-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="./fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
   <style>
+    @font-face {
+      font-family: 'DM Sans'; font-style: normal; font-weight: 400 700; font-display: swap;
+      src: url('./fonts/dm-sans-latin-ext.woff2') format('woff2');
+      unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+    }
+    @font-face {
+      font-family: 'DM Sans'; font-style: normal; font-weight: 400 700; font-display: swap;
+      src: url('./fonts/dm-sans-latin.woff2') format('woff2');
+      unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+    }
+    @font-face {
+      font-family: 'Manrope'; font-style: normal; font-weight: 400 800; font-display: swap;
+      src: url('./fonts/manrope-cyrillic-ext.woff2') format('woff2');
+      unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+    }
+    @font-face {
+      font-family: 'Manrope'; font-style: normal; font-weight: 400 800; font-display: swap;
+      src: url('./fonts/manrope-cyrillic.woff2') format('woff2');
+      unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+    }
+    @font-face {
+      font-family: 'Manrope'; font-style: normal; font-weight: 400 800; font-display: swap;
+      src: url('./fonts/manrope-greek.woff2') format('woff2');
+      unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+    }
+    @font-face {
+      font-family: 'Manrope'; font-style: normal; font-weight: 400 800; font-display: swap;
+      src: url('./fonts/manrope-vietnamese.woff2') format('woff2');
+      unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+    }
+    @font-face {
+      font-family: 'Manrope'; font-style: normal; font-weight: 400 800; font-display: swap;
+      src: url('./fonts/manrope-latin-ext.woff2') format('woff2');
+      unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+    }
+    @font-face {
+      font-family: 'Manrope'; font-style: normal; font-weight: 400 800; font-display: swap;
+      src: url('./fonts/manrope-latin.woff2') format('woff2');
+      unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+    }
+    /* Arial metric overrides keep the first paint close to the local webfonts. */
+    @font-face {
+      font-family: 'DM Sans Fallback'; src: local('Arial'); font-style: normal; font-weight: 400 700;
+      size-adjust: 97.2%; ascent-override: 102.05%; descent-override: 31.89%; line-gap-override: 0%;
+    }
+    @font-face {
+      font-family: 'Manrope Fallback'; src: local('Arial'); font-style: normal; font-weight: 400 800;
+      size-adjust: 104.1%; ascent-override: 102.35%; descent-override: 28.80%; line-gap-override: 0%;
+    }
     :root {
       color-scheme: dark;
       --ink: #090b0e;
@@ -38,8 +87,8 @@
       --cyan: #61e6f6;
       --cyan-2: #a0f4fb;
       --green: #7de5bd;
-      --sans: 'DM Sans', sans-serif;
-      --display: 'Manrope', sans-serif;
+      --sans: 'DM Sans', 'DM Sans Fallback', Arial, sans-serif;
+      --display: 'Manrope', 'Manrope Fallback', Arial, sans-serif;
     }
     * { box-sizing: border-box; }
     html { scroll-behavior: smooth; scroll-padding-top: 96px; }
@@ -52,6 +101,7 @@
     .topbar { position: sticky; top: 0; z-index: 10; height: 78px; border-bottom: 1px solid rgba(255,255,255,.07); background: rgba(9,11,14,.84); backdrop-filter: blur(18px); }
     .nav { height: 100%; display: flex; align-items: center; justify-content: space-between; }
     .brand { display: inline-flex; align-items: center; gap: 11px; min-width: 185px; }
+    .brand picture { display: block; flex: none; }
     .brand img { display: block; width: 43px; height: 43px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(97,230,246,.65); box-shadow: 0 0 20px rgba(67,222,245,.18); }
     .brand-lockup { display: grid; gap: 1px; }
     .brand-name { font: 800 14px/1 var(--display); letter-spacing: .16em; }
@@ -87,6 +137,7 @@
     .hero-orbit::before, .hero-orbit::after { content: ''; position: absolute; inset: 17px; border: 1px dashed rgba(97,230,246,.16); border-radius: 50%; }
     .hero-orbit::after { inset: 47px; border-style: solid; opacity: .42; }
     .hero-logo { position: relative; width: min(290px, 65%); aspect-ratio: 1; border-radius: 50%; border: 1px solid rgba(126,235,249,.6); box-shadow: 0 0 60px rgba(29,201,226,.16), 0 23px 90px rgba(0,0,0,.68); overflow: hidden; }
+    .hero-logo picture { display: block; width: 100%; height: 100%; }
     .hero-logo img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .float-tag { position: absolute; display: flex; align-items: center; gap: 9px; padding: 12px 14px; background: rgba(16,20,25,.9); border: 1px solid var(--line); color: #dce4e7; border-radius: 3px; box-shadow: 0 15px 36px rgba(0,0,0,.28); font-size: 10px; letter-spacing: .05em; }
     .float-tag svg { width: 15px; height: 15px; color: var(--cyan); }
@@ -226,7 +277,7 @@
     .audio-art i:nth-child(5n) { background: linear-gradient(180deg, rgba(125,229,189,.35), #7de5bd, rgba(125,229,189,.35)); }
     .audio-core { position: absolute; z-index: 3; left: 50%; top: 50%; width: 52px; height: 52px; transform: translate(-50%,-50%); border: 1px solid rgba(97,230,246,.54); background: rgba(8,13,16,.82); border-radius: 50%; display: grid; place-items: center; color: var(--cyan); box-shadow: 0 0 30px rgba(97,230,246,.17); }
     .audio-core svg { width: 18px; height: 18px; }
-    .video-frame { position: relative; width: 74%; aspect-ratio: 16 / 9; display: grid; place-items: center; margin-top: 15px; border: 1px solid rgba(158,222,186,.37); background: linear-gradient(145deg, rgba(120,192,151,.14), rgba(7,13,15,.86)), url('yj-studios-logo.jpg') center 45% / 40% no-repeat; box-shadow: 0 16px 45px rgba(0,0,0,.4); }
+    .video-frame { position: relative; width: 74%; aspect-ratio: 16 / 9; display: grid; place-items: center; margin-top: 15px; border: 1px solid rgba(158,222,186,.37); background: linear-gradient(145deg, rgba(120,192,151,.14), rgba(7,13,15,.86)), url('yj-studios-logo-380.jpg') center 45% / 40% no-repeat; box-shadow: 0 16px 45px rgba(0,0,0,.4); }
     .video-frame::before, .video-frame::after { content: ''; position: absolute; width: 15px; height: 15px; border-color: rgba(178,237,201,.65); border-style: solid; }
     .video-frame::before { top: -6px; left: -6px; border-width: 1px 0 0 1px; }
     .video-frame::after { bottom: -6px; right: -6px; border-width: 0 1px 1px 0; }
@@ -235,7 +286,11 @@
     .image-collage { width: 73%; height: 150px; position: relative; margin-top: 15px; }
     .image-print { position: absolute; width: 54%; height: 100%; overflow: hidden; border: 1px solid rgba(191,205,242,.32); background: #111923; box-shadow: 0 17px 40px rgba(0,0,0,.5); }
     .image-print:first-child { left: 3%; top: 0; transform: rotate(-8deg); background: radial-gradient(circle at 51% 47%, rgba(97,230,246,.63) 0 2px, transparent 4px), repeating-radial-gradient(circle at 51% 47%, rgba(149,215,229,.15) 0 1px, transparent 2px 7px), linear-gradient(140deg, #293d48, #0a1118 72%); }
-    .image-print:last-child { right: 3%; top: 3px; transform: rotate(8deg); background: linear-gradient(145deg, rgba(48,99,115,.4), rgba(7,11,16,.9)), url('yj-studios-logo.jpg') center / cover; }
+    .image-print:last-child { right: 3%; top: 3px; transform: rotate(8deg); background: linear-gradient(145deg, rgba(48,99,115,.4), rgba(7,11,16,.9)), url('yj-studios-logo-380.jpg') center / cover; }
+    @supports (background-image: image-set(url('yj-studios-logo-380.webp') type('image/webp'))) {
+      .video-frame { background-image: linear-gradient(145deg, rgba(120,192,151,.14), rgba(7,13,15,.86)), image-set(url('yj-studios-logo-380.webp') type('image/webp') 1x, url('yj-studios-logo-380.jpg') type('image/jpeg') 1x); }
+      .image-print:last-child { background-image: linear-gradient(145deg, rgba(48,99,115,.4), rgba(7,11,16,.9)), image-set(url('yj-studios-logo-380.webp') type('image/webp') 1x, url('yj-studios-logo-380.jpg') type('image/jpeg') 1x); }
+    }
     .image-print:last-child::after { content: ''; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(5,8,11,.43), transparent 65%); }
     .portfolio-hint { position: absolute; bottom: 25px; left: 0; right: 0; text-align: center; color: #829097; font-size: 9px; letter-spacing: .13em; text-transform: uppercase; }
     .portfolio-info { padding: 18px 20px 20px; }
@@ -308,7 +363,8 @@
     .about-mark { min-height: 360px; position: relative; display: grid; place-items: center; border: 1px solid var(--line); background: radial-gradient(circle at 50% 50%, rgba(68,200,221,.09), rgba(15,20,25,.5) 46%, rgba(10,13,16,.8)); overflow: hidden; }
     .about-mark::before, .about-mark::after { content: ''; position: absolute; width: 360px; height: 360px; border-radius: 50%; border: 1px solid rgba(97,230,246,.16); }
     .about-mark::after { width: 292px; height: 292px; border-style: dashed; opacity: .72; }
-    .about-mark img { position: relative; z-index: 1; width: 184px; height: 184px; object-fit: cover; border-radius: 50%; border: 1px solid rgba(97,230,246,.55); box-shadow: 0 0 45px rgba(97,230,246,.13); }
+    .about-mark picture { position: relative; z-index: 1; display: block; }
+    .about-mark img { display: block; width: 184px; height: 184px; object-fit: cover; border-radius: 50%; border: 1px solid rgba(97,230,246,.55); box-shadow: 0 0 45px rgba(97,230,246,.13); }
     .about-copy h2 { margin: 15px 0 20px; font: 600 clamp(36px, 4.5vw, 53px)/1.08 var(--display); letter-spacing: -.065em; }
     .about-copy h2 span { color: var(--cyan); }
     .about-copy > p { color: #9aa4aa; font-size: 13px; line-height: 1.9; max-width: 490px; }
@@ -371,6 +427,7 @@
     .footer { padding: 28px 0; border-top: 1px solid rgba(255,255,255,.07); }
     .footer-inner { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
     .footer-brand { display: flex; align-items: center; gap: 9px; color: #bbc4c8; font: 700 10px var(--display); letter-spacing: .14em; }
+    .footer-brand picture { display: block; line-height: 0; }
     .footer-brand img { width: 29px; height: 29px; object-fit: cover; border-radius: 50%; }
     .footer p { color: #747f85; font-size: 9px; margin: 0; }
     .footer-links { display: flex; gap: 19px; color: #9aa4aa; font-size: 10px; }
@@ -600,7 +657,10 @@
   <header class="topbar">
     <div class="shell nav">
       <a class="brand" href="#home" aria-label="YJ Studios home">
-        <img src="yj-studios-logo.jpg" alt="YJ Studios logo">
+        <picture>
+          <source type="image/webp" srcset="yj-studios-logo-64.webp 64w, yj-studios-logo-80.webp 80w, yj-studios-logo-190.webp 190w, yj-studios-logo-288.webp 288w, yj-studios-logo-336.webp 336w, yj-studios-logo-380.webp 380w" sizes="43px">
+          <img src="yj-studios-logo.jpg" srcset="yj-studios-logo-64.jpg 64w, yj-studios-logo-80.jpg 80w, yj-studios-logo-190.jpg 190w, yj-studios-logo-288.jpg 288w, yj-studios-logo-336.jpg 336w, yj-studios-logo-380.jpg 380w" sizes="43px" width="380" height="380" loading="auto" decoding="async" alt="YJ Studios logo">
+        </picture>
         <span class="brand-lockup"><span class="brand-name">YJ STUDIOS</span><span class="brand-sub">Sound engineering</span></span>
       </a>
       <button class="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false">
@@ -637,7 +697,10 @@
         </div>
         <div class="hero-art" aria-label="YJ Studios emblem">
           <div class="hero-orbit"></div>
-          <div class="hero-logo"><img src="yj-studios-logo.jpg" alt="YJ Studios sound engineering and recording emblem"></div>
+          <div class="hero-logo"><picture>
+              <source type="image/webp" srcset="yj-studios-logo-64.webp 64w, yj-studios-logo-80.webp 80w, yj-studios-logo-190.webp 190w, yj-studios-logo-288.webp 288w, yj-studios-logo-336.webp 336w, yj-studios-logo-380.webp 380w" sizes="(max-width: 640px) 190px, 288px">
+              <img src="yj-studios-logo.jpg" srcset="yj-studios-logo-64.jpg 64w, yj-studios-logo-80.jpg 80w, yj-studios-logo-190.jpg 190w, yj-studios-logo-288.jpg 288w, yj-studios-logo-336.jpg 336w, yj-studios-logo-380.jpg 380w" sizes="(max-width: 640px) 190px, 288px" width="380" height="380" loading="auto" decoding="async" alt="YJ Studios sound engineering and recording emblem">
+          </picture></div>
           <div class="float-tag tag-one"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M12 3v18M8 7v10M4 10v4M16 7v10M20 10v4"/></svg>Sound with intention</div>
           <div class="float-tag tag-two"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="12" cy="12" r="8"/><path d="M12 8v5l3 2"/></svg>Made around your session</div>
           <div class="art-note">Feel every detail · YJ Studios</div>
@@ -898,7 +961,10 @@
 
     <section id="studio">
       <div class="shell about-grid">
-        <div class="about-mark reveal"><img src="yj-studios-logo.jpg" alt="YJ Studios logo"></div>
+        <div class="about-mark reveal"><picture>
+          <source type="image/webp" srcset="yj-studios-logo-64.webp 64w, yj-studios-logo-80.webp 80w, yj-studios-logo-190.webp 190w, yj-studios-logo-288.webp 288w, yj-studios-logo-336.webp 336w, yj-studios-logo-380.webp 380w" sizes="(max-width: 640px) 148px, 184px">
+          <img src="yj-studios-logo.jpg" srcset="yj-studios-logo-64.jpg 64w, yj-studios-logo-80.jpg 80w, yj-studios-logo-190.jpg 190w, yj-studios-logo-288.jpg 288w, yj-studios-logo-336.jpg 336w, yj-studios-logo-380.jpg 380w" sizes="(max-width: 640px) 148px, 184px" width="380" height="380" loading="lazy" decoding="async" alt="YJ Studios logo">
+        </picture></div>
         <div class="about-copy reveal">
           <div class="eyebrow">04 — A little about the room</div>
           <h2>Your sound,<br>with <span>room to grow.</span></h2>
@@ -954,7 +1020,10 @@
 
   <footer class="footer">
     <div class="shell footer-inner">
-      <a class="footer-brand" href="#home"><img src="yj-studios-logo.jpg" alt="">YJ STUDIOS</a>
+      <a class="footer-brand" href="#home"><picture>
+        <source type="image/webp" srcset="yj-studios-logo-64.webp 64w, yj-studios-logo-80.webp 80w, yj-studios-logo-190.webp 190w, yj-studios-logo-288.webp 288w, yj-studios-logo-336.webp 336w, yj-studios-logo-380.webp 380w" sizes="29px">
+        <img src="yj-studios-logo.jpg" srcset="yj-studios-logo-64.jpg 64w, yj-studios-logo-80.jpg 80w, yj-studios-logo-190.jpg 190w, yj-studios-logo-288.jpg 288w, yj-studios-logo-336.jpg 336w, yj-studios-logo-380.jpg 380w" sizes="29px" width="380" height="380" loading="lazy" decoding="async" alt="">
+      </picture>YJ STUDIOS</a>
       <p>Sound engineering & recording · © <span id="year"></span> YJ Studios</p>
       <div class="footer-links"><a href="#work">Studio work</a><a href="#services">Services</a><a href="#book">Book a session ↗</a></div>
     </div>
@@ -1467,7 +1536,8 @@
         total: Math.round(total)
       };
       try {
-        if (!window.YJCloud?.submitBooking) throw new Error('Firebase booking inbox is not available.');
+        const cloud = await import('./site-cloud.js');
+        await cloud.initializeCloudFeatures();
         const { id: requestId, committed } = await window.YJCloud.submitBooking(booking);
         requestText.textContent = `${details}\nRequest reference: ${requestId}`;
         formStatus.style.color = 'var(--cyan-2)';
@@ -1603,10 +1673,140 @@
     dateField.min = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
     document.getElementById('year').textContent = new Date().getFullYear();
   </script>
-  <script type="module" src="./offline-sync.mjs"></script>
-  <script type="module" src="./site-cloud.js"></script>
-  <script type="module" src="./studio-projects.js"></script>
-  <script type="module" src="./notifications.js"></script>
+  <script type="module">
+    const byId = (id) => document.getElementById(id);
+    const lazyModules = new Map();
+    const loadModule = (name) => {
+      if (!lazyModules.has(name)) {
+        const pending = import(`./${name}`).catch((error) => {
+          lazyModules.delete(name);
+          throw error;
+        });
+        lazyModules.set(name, pending);
+      }
+      return lazyModules.get(name);
+    };
+    let authUser = null;
+    let workActive = false;
+    let authRestorationStarted = false;
+    const ownerClaimChecks = new WeakMap();
+    window.YJWorkSectionActive = false;
+    window.YJAuthUser = null;
+
+    function loadOwnerToolsIfAuthorized(user) {
+      if (!user || !workActive || typeof user.getIdTokenResult !== 'function') return;
+      if (!ownerClaimChecks.has(user)) {
+        ownerClaimChecks.set(user, user.getIdTokenResult().then((token) => {
+          if (token.claims?.owner === true && workActive) return loadModule('studio-projects.js');
+        }).catch(() => {}));
+      }
+      return ownerClaimChecks.get(user);
+    }
+
+    async function restoreSession() {
+      if (authRestorationStarted) return;
+      authRestorationStarted = true;
+      try {
+        const authSession = await loadModule('auth-session.mjs');
+        authSession.subscribeAuthState((user) => {
+          authUser = user || null;
+          window.YJAuthUser = authUser;
+          loadOwnerToolsIfAuthorized(user);
+          if (user && 'Notification' in window && Notification.permission === 'granted') {
+            let optedIn = false;
+            try { optedIn = localStorage.getItem(`yj-fcm-enabled:${user.uid}`) === 'true'; } catch { /* Storage can be disabled. */ }
+            if (optedIn) loadModule('notifications.js').then((module) => module.startNotificationSession()).catch((error) => console.warn('Notification registration could not refresh yet.', error));
+          }
+        });
+      } catch (error) {
+        authRestorationStarted = false;
+        console.warn('Firebase session restoration will retry when an account feature is opened.', error);
+      }
+    }
+
+    window.addEventListener('load', () => {
+      window.setTimeout(restoreSession, 2500);
+    }, { once: true });
+
+    const workSection = byId('work');
+    function setWorkActive(active) {
+      if (workActive === active) return;
+      workActive = active;
+      window.YJWorkSectionActive = active;
+      window.dispatchEvent(new CustomEvent('yj:work-section-active', { detail: { active } }));
+      if (active) {
+        restoreSession();
+        loadModule('site-cloud.js').then((module) => module.startPublicProjects()).catch((error) => console.warn('The public project list could not start yet.', error));
+        loadOwnerToolsIfAuthorized(authUser);
+      } else {
+        lazyModules.get('site-cloud.js')?.then((module) => module.stopPublicProjectListener());
+      }
+    }
+    if ('IntersectionObserver' in window && workSection) {
+      const workObserver = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.target === workSection) setWorkActive(entry.isIntersecting && entry.intersectionRatio >= 0.25);
+        }
+      }, { rootMargin: '0px', threshold: 0.25 });
+      workObserver.observe(workSection);
+    } else {
+      document.querySelectorAll('a[href="#work"]').forEach((link) => link.addEventListener('click', () => setWorkActive(true), { once: true }));
+    }
+
+    document.addEventListener('click', async (event) => {
+      const target = event.target instanceof Element ? event.target.closest('#notification-settings-open, #offline-storage-settings, #offline-sync-retry, #owner-add-project') : null;
+      if (!target) return;
+      if (target.id === 'notification-settings-open') {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        const dialog = byId('notification-settings-dialog');
+        if (!dialog.open) dialog.showModal();
+        try { (await loadModule('notifications.js')).openNotificationSettings(); }
+        catch (error) { byId('notification-settings-status').textContent = 'Firebase notification settings could not load. Check your connection and retry.'; console.warn(error); }
+        return;
+      }
+      if (target.id === 'offline-storage-settings' || target.id === 'offline-sync-retry') {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        try {
+          const offline = await loadModule('offline-sync.mjs');
+          if (target.id === 'offline-storage-settings') offline.openOfflineSettings();
+          else await offline.retrySync();
+        } catch (error) {
+          const message = byId('offline-storage-message');
+          if (message) message.textContent = error?.message || 'Offline settings could not load. Check your connection and retry.';
+          console.warn('Offline controls could not load.', error);
+        }
+        return;
+      }
+      if (target.id === 'owner-add-project' && !window.YJProjectManagerLoaded) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        byId('owner-portfolio-status').textContent = 'Checking account access…';
+        try {
+          await loadModule('studio-projects.js');
+          await window.YJProjectManager?.openOwnerProjectDialog();
+        } catch (error) {
+          byId('owner-portfolio-status').textContent = 'Project tools could not load. Check the connection and try again.';
+          console.warn('Project tools could not load yet.', error);
+        }
+      }
+    }, true);
+
+    window.addEventListener('yj:open-owner-sign-in', async (event) => {
+      if (window.YJProjectManagerLoaded) return;
+      event.stopImmediatePropagation();
+      byId('notification-settings-status').textContent = 'Preparing secure sign-in…';
+      try {
+        await loadModule('studio-projects.js');
+        byId('notification-settings-status').textContent = '';
+        window.dispatchEvent(new Event('yj:open-owner-sign-in'));
+      } catch (error) {
+        byId('notification-settings-status').textContent = 'Sign-in tools could not load. Check the connection and try again.';
+        console.warn('Sign-in tools could not load yet.', error);
+      }
+    }, true);
+  </script>
 </body>
 </html>
 

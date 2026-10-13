@@ -1,28 +1,63 @@
-import { app, auth } from './firebase-client.js';
+import { getFirebaseApp, getFirebaseFunctions } from './firebase-client.js';
+import { ensureAuthSession, subscribeAuthState } from './auth-session.mjs';
 import { fcmVapidKey } from './firebase-config.js';
 import { friendlyMessagingError, isInstalledWebApp, isIosDevice } from './notification-policy.mjs';
 
-let onAuthStateChanged = null;
+let app = null;
+let auth = null;
 let firebaseSignOut = null;
-let sdkLoadError = null;
-let registerDeviceCall = async () => { throw sdkLoadError || new Error('Firebase Functions is unavailable.'); };
-let removeDeviceCall = registerDeviceCall;
-let sendTestCall = registerDeviceCall;
-try {
-  const authApi = await import('https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js');
-  onAuthStateChanged = authApi.onAuthStateChanged;
-  firebaseSignOut = authApi.signOut;
-} catch (error) {
-  sdkLoadError = error;
+let authInitialization = null;
+let authUnsubscribe = null;
+let resolveAuthStateReady;
+let authStateWasReceived = false;
+const authStateReady = new Promise((resolve) => { resolveAuthStateReady = resolve; });
+
+async function callNotificationFunction(name, data = {}) {
+  const { api, functions } = await getFirebaseFunctions('us-central1');
+  return api.httpsCallable(functions, name)(data);
 }
-try {
-  const functionsApi = await import('https://www.gstatic.com/firebasejs/12.19.0/firebase-functions.js');
-  const functions = functionsApi.getFunctions(app, 'us-central1');
-  registerDeviceCall = functionsApi.httpsCallable(functions, 'registerNotificationDevice');
-  removeDeviceCall = functionsApi.httpsCallable(functions, 'removeNotificationDevice');
-  sendTestCall = functionsApi.httpsCallable(functions, 'sendTestNotification');
-} catch (error) {
-  sdkLoadError ||= error;
+
+const registerDeviceCall = (data) => callNotificationFunction('registerNotificationDevice', data);
+const removeDeviceCall = (data) => callNotificationFunction('removeNotificationDevice', data);
+const sendTestCall = (data) => callNotificationFunction('sendTestNotification', data);
+
+function startAuthSession() {
+  if (!authInitialization) {
+    authInitialization = ensureAuthSession().then((runtime) => {
+      app = runtime.app;
+      auth = runtime.auth;
+      firebaseSignOut = runtime.api.signOut;
+      if (!authUnsubscribe) {
+        authUnsubscribe = subscribeAuthState((user, error) => {
+          currentUser = user || null;
+          registeredForCurrentDevice = false;
+          updateView();
+          if (!authStateWasReceived) {
+            authStateWasReceived = true;
+            resolveAuthStateReady(currentUser);
+          }
+          if (error && dialog.open) setStatus('Firebase Authentication could not load. Check your connection and try again.', true);
+          if (user && isNotificationApiAvailable() && Notification.permission === 'granted' && hasExplicitOptIn(user.uid)) {
+            registerGrantedDevice({ quiet: true }).catch((registrationError) => {
+              registeredForCurrentDevice = false;
+              updateView();
+              if (dialog.open) setStatus(friendlyMessagingError(registrationError), true);
+            });
+          }
+        });
+      }
+      return runtime;
+    }).catch((error) => {
+      authInitialization = null;
+      throw error;
+    });
+  }
+  return authInitialization;
+}
+
+export async function startNotificationSession() {
+  await startAuthSession();
+  return authStateReady;
 }
 
 const byId = (id) => document.getElementById(id);
@@ -141,7 +176,7 @@ async function getMessagingRuntime() {
   if (!await checkWorkerMessaging(registration)) {
     throw new Error('Background messaging did not initialize. Check access to Firebase SDK files and reload the website.');
   }
-  if (!messaging) messaging = messagingApi.getMessaging(app);
+  if (!messaging) messaging = messagingApi.getMessaging(app || await getFirebaseApp());
   if (!messageUnsubscribe) {
     messageUnsubscribe = messagingApi.onMessage(messaging, (payload) => {
       const message = payload?.data || {};
@@ -329,12 +364,20 @@ async function disableNotifications({ signingOut = false } = {}) {
 }
 
 export async function unregisterCurrentDevice() {
+  await startNotificationSession();
   if (!auth.currentUser) return;
   try { await disableNotifications({ signingOut: true }); }
   catch { /* Signing out must remain possible if a cleanup request cannot reach Firebase. */ }
 }
 
 window.YJNotifications = { unregisterCurrentDevice };
+
+export function openNotificationSettings() {
+  updateView();
+  setStatus('');
+  if (!dialog.open) dialog.showModal();
+  startAuthSession().catch((error) => setStatus(friendlyMessagingError(error), true));
+}
 
 async function sendTest() {
   testButton.disabled = true;
@@ -351,6 +394,8 @@ async function sendTest() {
 }
 
 async function signOutFromSettings() {
+  try { await startNotificationSession(); }
+  catch (error) { setStatus(friendlyMessagingError(error), true); return; }
   try { await disableNotifications({ signingOut: true }); }
   catch { /* Auth sign-out must continue even if remote cleanup is offline. */ }
   try {
@@ -362,34 +407,12 @@ async function signOutFromSettings() {
   }
 }
 
-byId('notification-settings-open').addEventListener('click', () => {
-  updateView();
-  setStatus('');
-  dialog.showModal();
-});
 byId('notification-settings-close').addEventListener('click', () => dialog.close());
 enableButton.addEventListener('click', enableNotifications);
 disableButton.addEventListener('click', () => disableNotifications().catch(() => {}));
 testButton.addEventListener('click', sendTest);
 signOutButton.addEventListener('click', signOutFromSettings);
 signInButton.addEventListener('click', () => window.dispatchEvent(new Event('yj:open-owner-sign-in')));
-
-if (onAuthStateChanged) {
-  onAuthStateChanged(auth, (user) => {
-    currentUser = user;
-    registeredForCurrentDevice = false;
-    updateView();
-    if (user && isNotificationApiAvailable() && Notification.permission === 'granted' && hasExplicitOptIn(user.uid)) {
-      registerGrantedDevice({ quiet: true }).catch((error) => {
-        registeredForCurrentDevice = false;
-        updateView();
-        if (dialog.open) setStatus(friendlyMessagingError(error), true);
-      });
-    }
-  });
-} else {
-  setStatus('Firebase notification libraries could not load. Check the connection and reload this page.', true);
-}
 
 window.addEventListener('focus', () => {
   if (currentUser && isNotificationApiAvailable() && Notification.permission === 'granted' && hasExplicitOptIn(currentUser.uid)) {

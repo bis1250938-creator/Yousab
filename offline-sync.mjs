@@ -2,10 +2,6 @@ import {
   LAST_SERVER_SYNC_KEY,
   setPersistentCacheChoice
 } from './offline-policy.mjs';
-import {
-  countRejectedProjectWrites, markRejectedProjectWrite,
-  removeRejectedProjectWrite, saveRejectedProjectWrite
-} from './offline-recovery.mjs';
 
 const connectionState = document.getElementById('offline-connection-state');
 const details = document.getElementById('offline-sync-details');
@@ -31,8 +27,20 @@ let serverState = 'unknown';
 let lastServerSync = '';
 let latestFailure = '';
 let recoverableCount = null;
+let configuredDatabase = null;
 const sources = new Map();
 const pendingOperations = new Map();
+let recoveryModulePromise = null;
+
+function getRecoveryModule() {
+  if (!recoveryModulePromise) {
+    recoveryModulePromise = import('./offline-recovery.mjs').catch((error) => {
+      recoveryModulePromise = null;
+      throw error;
+    });
+  }
+  return recoveryModulePromise;
+}
 
 try { lastServerSync = localStorage.getItem(LAST_SERVER_SYNC_KEY) || ''; } catch { /* Storage can be disabled. */ }
 
@@ -81,7 +89,7 @@ function renderStatus() {
 }
 
 async function refreshRecoverableCount() {
-  try { recoverableCount = await countRejectedProjectWrites(); }
+  try { recoverableCount = await (await getRecoveryModule()).countRejectedProjectWrites(); }
   catch { recoverableCount = null; }
   renderStatus();
 }
@@ -93,6 +101,7 @@ function reportServerConfirmed() {
 }
 
 export function configureOfflineSync({ db, persistent = false, enableNetwork, waitForPendingWrites }) {
+  const alreadyConfigured = configuredDatabase === db && Boolean(db);
   database = db;
   cacheMode = persistent ? 'persistent' : 'memory';
   if (enableNetwork && waitForPendingWrites) {
@@ -102,13 +111,14 @@ export function configureOfflineSync({ db, persistent = false, enableNetwork, wa
     };
   }
   if (persistent && waitForPendingWrites) {
+    if (alreadyConfigured) { renderStatus(); return; }
     waitForPendingWrites(db).catch((error) => {
       latestFailure = `A restored Firestore write was rejected (${error?.code || 'unknown'}). Check authorization/rules and reapply the change from the latest server version.`;
       serverState = 'unknown';
       renderStatus();
     });
   }
-  refreshRecoverableCount();
+  configuredDatabase = db;
   renderStatus();
 }
 
@@ -162,10 +172,12 @@ export function trackFirestoreWrite(key, promise) {
 
 export async function enqueueFirestoreWrite(key, writeFactory, recovery = null) {
   let recoveryId = '';
+  let recoveryApi = null;
   if (recovery && cacheMode === 'persistent') {
+    recoveryApi = await getRecoveryModule();
     recoveryId = crypto.randomUUID();
     try {
-      await saveRejectedProjectWrite({ ...recovery, id: recoveryId, createdAt: Date.now() });
+      await recoveryApi.saveRejectedProjectWrite({ ...recovery, id: recoveryId, createdAt: Date.now() });
       await refreshRecoverableCount();
     } catch (error) {
       recoveryId = '';
@@ -178,18 +190,18 @@ export async function enqueueFirestoreWrite(key, writeFactory, recovery = null) 
   let write;
   try { write = writeFactory(); }
   catch (error) {
-    if (recoveryId) await markRejectedProjectWrite(recoveryId, error?.message || 'Could not queue this write.').catch(() => {});
+    if (recoveryId) await recoveryApi.markRejectedProjectWrite(recoveryId, error?.message || 'Could not queue this write.').catch(() => {});
     throw error;
   }
 
   let tracked = trackFirestoreWrite(key, write);
   if (recoveryId) {
     tracked = tracked.then(async (value) => {
-      await removeRejectedProjectWrite(recoveryId).catch(() => {});
+      await recoveryApi.removeRejectedProjectWrite(recoveryId).catch(() => {});
       await refreshRecoverableCount();
       return value;
     }, async (error) => {
-      await markRejectedProjectWrite(recoveryId, `${error?.code || 'unknown'}: ${error?.message || 'Firebase rejected this project change.'}`).catch(() => {});
+      await recoveryApi.markRejectedProjectWrite(recoveryId, `${error?.code || 'unknown'}: ${error?.message || 'Firebase rejected this project change.'}`).catch(() => {});
       await refreshRecoverableCount();
       throw error;
     });
@@ -237,6 +249,10 @@ window.addEventListener('online', () => {
 });
 window.addEventListener('offline', renderStatus);
 retryButton?.addEventListener('click', async () => {
+  await retrySync();
+});
+
+export async function retrySync() {
   if (navigator.onLine === false) {
     latestFailure = 'This device reports no connection. Firebase will continue retrying when connectivity returns.';
     renderStatus();
@@ -268,13 +284,18 @@ retryButton?.addEventListener('click', async () => {
     retrying = false;
     renderStatus();
   }
-});
+}
 
-settingsButton?.addEventListener('click', () => {
+export function openOfflineSettings() {
   settingsMessage.textContent = cacheMode === 'persistent'
     ? 'Persistent mode is active for this browser session.'
     : 'This browser is currently using temporary memory cache.';
   if (!settingsDialog.open) settingsDialog.showModal();
+  void refreshRecoverableCount();
+}
+
+settingsButton?.addEventListener('click', () => {
+  openOfflineSettings();
 });
 closeButton?.addEventListener('click', () => settingsDialog.close());
 settingsDialog?.addEventListener('click', (event) => { if (event.target === settingsDialog) settingsDialog.close(); });
