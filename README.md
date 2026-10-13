@@ -10,3 +10,5 @@ Static vanilla HTML, CSS, and JavaScript site for YJ Studios.
 - `site-cloud.js` — real-time public published-project rendering.
 
 Setup, current R2 free-tier limits, safeguards, deployment, and test instructions: [R2_SETUP.md](./R2_SETUP.md). Firebase settings: [FIREBASE_SETUP.md](./FIREBASE_SETUP.md).
+
+Offline PWA behavior, trusted-device Firestore persistence, supported offline operations, deployment, and device testing: [OFFLINE_SETUP.md](./OFFLINE_SETUP.md).

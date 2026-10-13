@@ -1,6 +1,9 @@
-const CACHE_NAME = 'yj-studios-shell-v33';
+const CACHE_NAME = 'yj-studios-shell-v36';
 const BASE_URL = new URL('./', self.registration.scope);
 const APP_URL = new URL('index.html', BASE_URL).href;
+const OFFLINE_URL = new URL('offline.html', BASE_URL).href;
+const APP_ROOT_PATH = new URL('./', BASE_URL).pathname;
+const APP_INDEX_PATH = new URL('index.html', BASE_URL).pathname;
 let firebaseMessagingReady = false;
 
 // Messaging runs inside this existing root-scoped worker so the site keeps one
@@ -37,7 +40,12 @@ try {
 const SHELL_FILES = [
   './',
   './index.html',
+  './offline.html',
   './auth-flow.mjs',
+  './offline-policy.mjs',
+  './offline-recovery.mjs',
+  './offline-replay.mjs',
+  './offline-sync.mjs',
   './firebase-config.js',
   './firebase-public-config.js',
   './firebase-client.js',
@@ -53,11 +61,25 @@ const SHELL_FILES = [
   './icons/yj-icon-512.png',
   './icons/apple-touch-icon.png'
 ].map((path) => new URL(path, BASE_URL).href);
+const SHELL_ASSET_PATHS = new Set(SHELL_FILES.map((url) => new URL(url).pathname));
+const FIREBASE_VERSION = '12.19.0';
+const FIREBASE_MODULES = [
+  'firebase-app.js',
+  'firebase-auth.js',
+  'firebase-firestore.js'
+].map((file) => `https://www.gstatic.com/firebasejs/${FIREBASE_VERSION}/${file}`);
+const FIREBASE_MODULE_PATHS = new Set(FIREBASE_MODULES.map((url) => new URL(url).pathname));
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then((cache) => cache.addAll(SHELL_FILES))
+      .then(async (cache) => {
+        await cache.addAll(SHELL_FILES);
+        // These versioned, public SDK modules are required to initialize
+        // Firebase from its ES module graph offline. No API/data endpoint is
+        // included in this cache list.
+        await Promise.allSettled(FIREBASE_MODULES.map((url) => cache.add(url)));
+      })
       .then(() => self.skipWaiting())
   );
 });
@@ -97,29 +119,58 @@ self.addEventListener('fetch', (event) => {
   if (request.method !== 'GET') return;
 
   const requestUrl = new URL(request.url);
+
+  if (requestUrl.origin === 'https://www.gstatic.com'
+    && request.mode !== 'no-cors'
+    && FIREBASE_MODULE_PATHS.has(requestUrl.pathname)) {
+    event.respondWith((async () => {
+      const cache = await caches.open(CACHE_NAME);
+      const cached = await cache.match(request);
+      if (cached) return cached;
+      const response = await fetch(request);
+      if (response.ok && response.type !== 'opaque') await cache.put(request, response.clone());
+      return response;
+    })());
+    return;
+  }
+
   if (requestUrl.origin !== self.location.origin) return;
 
   if (request.mode === 'navigate') {
     event.respondWith(
-      fetch(request)
-        .then((response) => {
-          if (response.ok) caches.open(CACHE_NAME).then((cache) => cache.put(request, response.clone()));
+      (async () => {
+        try {
+          const response = await fetch(request);
+          if ((requestUrl.pathname === APP_ROOT_PATH || requestUrl.pathname === APP_INDEX_PATH)
+            && response.ok && response.headers.get('content-type')?.includes('text/html')) {
+            const cache = await caches.open(CACHE_NAME);
+            await cache.put(APP_URL, response.clone());
+          }
           return response;
-        })
-        .catch(async () => (await caches.match(request)) || (await caches.match(APP_URL)) || Response.error())
+        } catch {
+          if (requestUrl.pathname === APP_ROOT_PATH || requestUrl.pathname === APP_INDEX_PATH) {
+            return (await caches.match(request, { ignoreSearch: true })) || (await caches.match(APP_URL)) || Response.error();
+          }
+          return (await caches.match(OFFLINE_URL)) || Response.error();
+        }
+      })()
     );
     return;
   }
 
-  event.respondWith(
-    caches.match(request).then((cached) => {
-      if (cached) return cached;
-      return fetch(request).then((response) => {
-        if (response.ok) caches.open(CACHE_NAME).then((cache) => cache.put(request, response.clone()));
-        return response;
-      });
-    })
-  );
+  // Cache only the reviewed, same-origin app shell allowlist. Firebase data,
+  // authentication responses, API calls, and media are intentionally never
+  // stored by this worker.
+  const cachedAssetUrl = SHELL_FILES.find((url) => new URL(url).pathname === requestUrl.pathname);
+  if (!cachedAssetUrl || !SHELL_ASSET_PATHS.has(requestUrl.pathname)) return;
+  event.respondWith((async () => {
+    const cache = await caches.open(CACHE_NAME);
+    const cached = await cache.match(cachedAssetUrl);
+    if (cached) return cached;
+    const response = await fetch(request);
+    if (response.ok) await cache.put(cachedAssetUrl, response.clone());
+    return response;
+  })());
 });
 
 

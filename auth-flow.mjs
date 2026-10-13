@@ -59,6 +59,24 @@ export async function verifyStudioProjectSession(user, getIdTokenResult, project
   return { authorized: hasStudioProjectAccess(user, tokenResult, projectId), tokenResult, failure: studioProjectAccessFailure(user, tokenResult, projectId) };
 }
 
+export async function verifyStudioProjectSessionWithCachedToken(user, getIdTokenResult, projectId, now = Date.now()) {
+  try {
+    return await verifyStudioProjectSession(user, getIdTokenResult, projectId);
+  } catch (error) {
+    if (!['auth/network-request-failed', 'unavailable'].includes(String(error?.code || '')) && error?.name !== 'TypeError') throw error;
+    const tokenResult = await getIdTokenResult(user, false);
+    const expiry = Date.parse(tokenResult?.expirationTime || '');
+    if (!Number.isFinite(expiry) || expiry <= now) {
+      return {
+        authorized: false, tokenResult,
+        failure: 'The cached Firebase owner session has expired. Reconnect and sign in again before managing projects.'
+      };
+    }
+    const failure = studioProjectAccessFailure(user, tokenResult, projectId);
+    return { authorized: !failure, tokenResult, failure, offline: !failure };
+  }
+}
+
 export function googleAuthErrorMessage(error, { hostname }) {
   switch (error?.code) {
     case 'auth/unauthorized-domain': return `This website is not authorized for sign-in. Add ${hostname} under Firebase Authentication → Settings → Authorized domains.`;

@@ -54,6 +54,8 @@ service cloud.firestore {
           && data.filePath is string && data.filePath.size() <= 500
           && data.published is bool
           && data.createdAt is timestamp
+          && (!data.keys().hasAny(['revision']) || (data.revision is int && data.revision >= 0))
+          && (!data.keys().hasAny(['deleted']) || data.deleted == false)
           && (!data.keys().hasAny(['sortOrder']) || (data.sortOrder is int && data.sortOrder >= 0 && data.sortOrder <= 9999))
           && (!data.keys().hasAny(['artist']) || (data.artist is string && data.artist.size() <= 100))
           && (!data.keys().hasAny(['genre']) || (data.genre is string && data.genre.size() <= 80))
@@ -74,7 +76,11 @@ service cloud.firestore {
       }
       allow create: if isOwner() && validProject(request.resource.data) && request.resource.data.createdAt == request.time;
       allow update: if isOwner()
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['title', 'description', 'caption', 'category', 'featured', 'updatedAt', 'published', 'sortOrder', 'artist', 'credits', 'thumbnailUrl', 'coverUrl', 'tags', 'projectDate'])
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['title', 'description', 'caption', 'category', 'featured', 'updatedAt', 'published', 'sortOrder', 'artist', 'credits', 'thumbnailUrl', 'coverUrl', 'tags', 'projectDate', 'revision', 'deleted'])
+        && request.resource.data.revision is int
+        && request.resource.data.revision == resource.data.get('revision', 0) + 1
+        && resource.data.get('deleted', false) != true
+        && (!request.resource.data.keys().hasAny(['deleted']) || (request.resource.data.deleted == true && request.resource.data.published == false))
         && request.resource.data.title is string && request.resource.data.title.size() > 0 && request.resource.data.title.size() <= 100
         && (!request.resource.data.keys().hasAny(['description']) || (request.resource.data.description is string && request.resource.data.description.size() <= 1000))
         && request.resource.data.category is string && request.resource.data.category.size() <= 60

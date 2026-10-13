@@ -1,8 +1,12 @@
 import { app, auth, db } from './firebase-client.js';
 import { firebaseConfig } from './firebase-config.js';
-import { studioProjectAccessFailure, verifyStudioProjectSession } from './auth-flow.mjs';
+import { studioProjectAccessFailure, verifyStudioProjectSessionWithCachedToken } from './auth-flow.mjs';
 import { contentTypeForMedia, MAX_COVER_BYTES, MAX_MEDIA_BYTES, validateMediaFile } from './media-storage.js';
 import { uploadR2, deleteR2Objects, setR2Visibility, getResumeProjectId, forgetR2Session } from './r2-uploader.js';
+import { enqueueFirestoreWrite, isActuallyOfflineHint, observeFirestoreSnapshot, persistentOfflineStorageEnabled, trackFirestoreWrite } from './offline-sync.mjs';
+import { offlineProjectWriteFailure, projectRevisionAfterEdit } from './offline-policy.mjs';
+import { listRejectedProjectWrites, removeRejectedProjectWrite } from './offline-recovery.mjs';
+import { replayOfflineProjectChanges, SERVER_TIMESTAMP_RECOVERY_MARKER } from './offline-replay.mjs';
 
 const [authApi, firestoreApi] = await Promise.all([
   import('https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js'),
@@ -13,7 +17,7 @@ const {
   GoogleAuthProvider, getIdTokenResult, onAuthStateChanged, signInWithEmailAndPassword,
   signInWithPopup, signOut
 } = authApi;
-const { collection, deleteDoc, doc, onSnapshot, serverTimestamp, setDoc, updateDoc } = firestoreApi;
+const { collection, deleteDoc, doc, getDocFromServer, onSnapshot, serverTimestamp, setDoc, updateDoc } = firestoreApi;
 const byId = (id) => document.getElementById(id);
 const signInDialog = byId('portfolio-sign-in-dialog');
 const projectDialog = byId('portfolio-project-dialog');
@@ -26,12 +30,12 @@ const projectTypeStep = byId('project-type-step');
 const projectFormStep = byId('project-form-step');
 const projectTypeCards = [...document.querySelectorAll('[data-project-type]')];
 const projectTypeSettings = {
-  'audio-track': { label: 'Audio Track', mediaType: 'audio', category: 'Audio', fields: ['media', 'artist', 'cover', 'external', 'genre', 'tags'], accept: 'audio/mpeg,audio/wav,audio/aac,audio/mp4,audio/ogg,audio/flac,.mp3,.wav,.aac,.m4a,.ogg,.flac' },
-  'video-project': { label: 'Video Project', mediaType: 'video', category: 'Video', fields: ['media', 'cover', 'external'], accept: 'video/mp4,video/webm,video/quicktime,.mp4,.webm,.mov' },
-  'image-cover': { label: 'Image / Cover Art', mediaType: 'image', category: 'Images', fields: ['media'], accept: 'image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp' },
-  mixing: { label: 'Mixing Project', mediaType: 'audio', category: 'Mixing', fields: ['media', 'cover', 'external', 'comparison'], accept: 'audio/mpeg,audio/wav,audio/aac,audio/mp4,audio/ogg,audio/flac,.mp3,.wav,.aac,.m4a,.ogg,.flac' },
-  mastering: { label: 'Mastering Project', mediaType: 'audio', category: 'Mastering', fields: ['media', 'cover', 'external', 'comparison'], accept: 'audio/mpeg,audio/wav,audio/aac,audio/mp4,audio/ogg,audio/flac,.mp3,.wav,.aac,.m4a,.ogg,.flac' },
-  'coptic-hymn': { label: 'Coptic Hymn', mediaType: 'audio', category: 'Coptic Hymns', fields: ['media', 'artist', 'cover', 'external', 'genre', 'tags', 'lyrics'], accept: 'audio/mpeg,audio/wav,audio/aac,audio/mp4,audio/ogg,audio/flac,.mp3,.wav,.aac,.m4a,.ogg,.flac' }
+  'audio-track': { label: 'Audio Track', mediaType: 'audio', category: 'Audio', fields: ['media', 'artist', 'cover', 'external', 'genre', 'tags'], accept: 'audio/mpeg,audio/wav,audio/aac,audio/mp4,audio/ogg,audio/flac,audio/opus,audio/webm,.mp3,.wav,.aac,.m4a,.ogg,.flac,.opus,.webm' },
+  'video-project': { label: 'Video Project', mediaType: 'video', category: 'Video', fields: ['media', 'cover', 'external'], accept: 'video/mp4,video/webm,video/quicktime,video/ogg,.mp4,.webm,.mov,.m4v,.ogv' },
+  'image-cover': { label: 'Image / Cover Art', mediaType: 'image', category: 'Images', fields: ['media'], accept: 'image/jpeg,image/png,image/webp,image/avif,image/gif,.jpg,.jpeg,.png,.webp,.avif,.gif' },
+  mixing: { label: 'Mixing Project', mediaType: 'audio', category: 'Mixing', fields: ['media', 'cover', 'external', 'comparison'], accept: 'audio/mpeg,audio/wav,audio/aac,audio/mp4,audio/ogg,audio/flac,audio/opus,audio/webm,.mp3,.wav,.aac,.m4a,.ogg,.flac,.opus,.webm' },
+  mastering: { label: 'Mastering Project', mediaType: 'audio', category: 'Mastering', fields: ['media', 'cover', 'external', 'comparison'], accept: 'audio/mpeg,audio/wav,audio/aac,audio/mp4,audio/ogg,audio/flac,audio/opus,audio/webm,.mp3,.wav,.aac,.m4a,.ogg,.flac,.opus,.webm' },
+  'coptic-hymn': { label: 'Coptic Hymn', mediaType: 'audio', category: 'Coptic Hymns', fields: ['media', 'artist', 'cover', 'external', 'genre', 'tags', 'lyrics'], accept: 'audio/mpeg,audio/wav,audio/aac,audio/mp4,audio/ogg,audio/flac,audio/opus,audio/webm,.mp3,.wav,.aac,.m4a,.ogg,.flac,.opus,.webm' }
 };
 let selectedProjectType = '';
 let ownerUser = null;
@@ -88,7 +92,14 @@ function authMessage(error) {
 
 function projectError(error) {
   const code = error?.code || '';
-  if (code === 'permission-denied') return 'Firestore denied this action. Confirm the signed-in Firebase UID has the trusted owner claim and that Firestore rules are deployed to the configured project, then sign out and back in.';
+  if (code === 'r2/not-configured') return error.message;
+  if (code === 'r2/unreachable') return error.message;
+  if (code === 'r2/unauthenticated') return 'Your Firebase sign-in expired during the upload. Sign out and back in, then retry; completed chunks can resume.';
+  if (code === 'r2/forbidden') return 'Cloudflare rejected this account. Confirm the signed-in UID has the verified owner claim and that the Worker uses Firebase project yj-studio-50df5.';
+  if (code === 'r2/quota') return `${error.message} Review Cloudflare R2/D1 usage and the configured safety quota before retrying.`;
+  if (code === 'r2/not-found') return `${error.message} Confirm the latest R2 Worker version is deployed; if this is an old interrupted upload, select the file and retry.`;
+  if (code === 'r2/server') return `${error.message} The upload service failed temporarily; retry to resume completed chunks.`;
+  if (code === 'permission-denied') return 'Firestore denied this change. Confirm the signed-in owner and deployed rules. If this device was offline, a newer server revision may exist; reconnect, reload the latest project, and reapply your change.';
   if (code === 'storage/bucket-not-found') return 'The configured media storage bucket is unavailable.';
   if (code === 'storage/unauthorized') return 'Firebase denied a legacy Storage action. Check the account permissions and deployed Storage rules.';
   if (code === 'storage/canceled') return 'Upload canceled. No project was published.';
@@ -98,7 +109,7 @@ function projectError(error) {
 }
 
 function verifyOwner(user) {
-  return verifyStudioProjectSession(user, getIdTokenResult, firebaseConfig.projectId);
+  return verifyStudioProjectSessionWithCachedToken(user, getIdTokenResult, firebaseConfig.projectId);
 }
 
 function completeOwnerSignIn() {
@@ -130,15 +141,53 @@ function normalizeProject(snapshot) {
     coverUrl: data.thumbnailUrl || data.coverUrl || '',
     tags: Array.isArray(data.tags) ? data.tags : [],
     published: data.published === true,
+    revision: Number.isSafeInteger(data.revision) && data.revision >= 0 ? data.revision : 0,
+    deleted: data.deleted === true,
     createdAt: data.createdAt?.toMillis?.() || Number(data.createdAt) || 0
   };
 }
 
+function projectR2Paths(data) {
+  return [data.mediaPath || data.filePath, data.coverPath, data.beforePath, data.afterPath]
+    .filter((path) => typeof path === 'string' && path.startsWith(`portfolio/${ownerUser?.uid || ''}/`));
+}
+
+async function retrySavedProjectWrites() {
+  if (!ownerUser || !canManageProjects) throw new Error('Sign in with the authorized owner account before retrying saved project changes.');
+  const operations = await listRejectedProjectWrites();
+  const completed = await replayOfflineProjectChanges(operations, {
+    ownerUid: ownerUser.uid,
+    remove: removeRejectedProjectWrite,
+    firestore: { db, doc, getDocFromServer, setDoc, updateDoc, deleteDoc, serverTimestamp }
+  });
+  if (completed) status(byId('owner-portfolio-status'), `${completed} saved offline project change${completed === 1 ? '' : 's'} synchronized.`);
+}
+
+window.YJOffline?.setRecoveryHandler(retrySavedProjectWrites);
+
+const tombstoneCleanup = new Set();
+
 function listenToOwnerProjects() {
   if (stopOwnerProjects) stopOwnerProjects();
-  stopOwnerProjects = onSnapshot(collection(db, 'projects'), (snapshot) => {
+  stopOwnerProjects = onSnapshot(collection(db, 'projects'), { includeMetadataChanges: true }, (snapshot) => {
+    observeFirestoreSnapshot('owner-projects', snapshot);
     const projects = snapshot.docs.map(normalizeProject);
     window.YJPortfolio?.renderAdminProjects(projects);
+    if (!snapshot.metadata.fromCache) {
+      for (const entry of snapshot.docs) {
+        const data = entry.data();
+        const paths = projectR2Paths(data);
+        if (data.deleted !== true || entry.metadata.hasPendingWrites || paths.length || tombstoneCleanup.has(entry.id)) continue;
+        tombstoneCleanup.add(entry.id);
+        enqueueFirestoreWrite(`project-delete:${entry.id}`, () => deleteDoc(entry.ref), {
+          type: 'finalize-delete', docId: entry.id, expectedRevision: Number.isSafeInteger(data.revision) ? data.revision : 0
+        }).then(({ promise }) => promise.then(
+          () => status(byId('owner-portfolio-status'), 'Offline deletion synchronized and the project record was removed.'),
+          (error) => status(byId('owner-portfolio-status'), `The project is hidden from the portfolio, but final cleanup failed: ${projectError(error)}`, true)
+        )).catch((error) => status(byId('owner-portfolio-status'), `The project is hidden from the portfolio, but final cleanup failed: ${projectError(error)}`, true))
+          .finally(() => tombstoneCleanup.delete(entry.id));
+      }
+    }
   }, (error) => status(byId('owner-portfolio-status'), `Project list failed: ${projectError(error)}`, true));
 }
 
@@ -172,7 +221,9 @@ async function acceptUser(user) {
       setOwnerAccess(false, studioProjectAccessFailure(user, access.tokenResult, firebaseConfig.projectId));
       return;
     }
-    setOwnerAccess(true, `Signed in as ${user.email || 'YJ Studios account'}.`);
+    setOwnerAccess(true, access.offline
+      ? 'Owner identity verified from a valid cached Firebase token. Offline writes remain pending until Firestore validates them.'
+      : `Signed in as ${user.email || 'YJ Studios account'}.`);
     listenToOwnerProjects();
   } catch (error) {
     if (stopOwnerProjects) stopOwnerProjects();
@@ -312,6 +363,13 @@ async function saveProject(published) {
   if (tags.length > 12 || tags.some((tag) => tag.length > 40)) { status(projectMessage, 'Use up to 12 tags, no longer than 40 characters each.', true); return; }
   if (!Number.isInteger(sortOrder) || sortOrder < 0 || sortOrder > 9999) { status(projectMessage, 'Display order must be a number from 0 to 9999.', true); return; }
   const kind = settings.mediaType;
+  const usesUploadedFiles = Boolean(file || cover || beforeFile || afterFile);
+  const offlineFailure = offlineProjectWriteFailure({
+    offline: isActuallyOfflineHint(),
+    persistent: persistentOfflineStorageEnabled(),
+    usesFiles: usesUploadedFiles
+  });
+  if (offlineFailure) { status(projectMessage, offlineFailure, true); return; }
   try {
     if (file) validateMediaFile(file, kind, MAX_MEDIA_BYTES);
     if (cover) validateMediaFile(cover, 'image', MAX_COVER_BYTES);
@@ -377,10 +435,25 @@ async function saveProject(published) {
       filePath: mediaPath, mediaPath, coverPath, coverUrl, thumbnailUrl: coverUrl,
       beforePath, afterPath,
       size: file?.size || 0, contentType: file ? contentTypeForMedia(file, kind) : '',
-      published, sortOrder, ownerUid: ownerUser.uid, createdAt: serverTimestamp(), updatedAt: serverTimestamp()
+      published, sortOrder, ownerUid: ownerUser.uid, revision: 0, createdAt: serverTimestamp(), updatedAt: serverTimestamp()
     };
     await setR2Visibility(uploadedKeys, published, auth);
-    await setDoc(doc(db, 'projects', id), record);
+    const recoveryRecord = { ...record, createdAt: SERVER_TIMESTAMP_RECOVERY_MARKER, updatedAt: SERVER_TIMESTAMP_RECOVERY_MARKER };
+    const { promise: write } = await enqueueFirestoreWrite(`project:${id}`, () => setDoc(doc(db, 'projects', id), record),
+      usesUploadedFiles ? null : { type: 'create', docId: id, data: recoveryRecord });
+    if (isActuallyOfflineHint()) {
+      write.catch((error) => status(byId('owner-portfolio-status'), `Project ${id} was queued locally but Firebase rejected it: ${projectError(error)}`, true));
+      cancellationHandled = true;
+      progress.value = 100;
+      status(projectMessage, 'Project saved in this device’s Firestore queue. It is not published on the server until connectivity returns and Firebase accepts the write.');
+      byId('portfolio-project-form').reset();
+      byId('owner-project-preview').textContent = 'Select a media file to preview it here.';
+      byId('owner-cover-preview').replaceChildren();
+      cancelButton.hidden = true;
+      setTimeout(() => { if (projectDialog.open) projectDialog.close(); resetProjectForm(); }, 1800);
+      return;
+    }
+    await write;
     [file, cover, beforeFile, afterFile].forEach(forgetR2Session);
     cancellationHandled = true;
     cancelButton.hidden = true;
@@ -392,7 +465,6 @@ async function saveProject(published) {
     setTimeout(() => { if (projectDialog.open) projectDialog.close(); resetProjectForm(); }, 1300);
   } catch (error) {
     await deleteR2Objects(uploadedKeys, auth).catch(() => {});
-    [file, cover, beforeFile, afterFile].forEach(forgetR2Session);
     status(projectMessage, projectError(error), true);
   } finally {
     activeUploadTask = null;
@@ -427,33 +499,105 @@ async function editProject(project) {
   const projectDate = prompt('Project date (YYYY-MM-DD or blank)', project.projectDate || '');
   if (projectDate === null) return;
   if (projectDate && !/^\d{4}-\d{2}-\d{2}$/.test(projectDate)) { status(byId('owner-portfolio-status'), 'Project date must use YYYY-MM-DD.', true); return; }
+  const offlineFailure = offlineProjectWriteFailure({ offline: isActuallyOfflineHint(), persistent: persistentOfflineStorageEnabled() });
+  if (offlineFailure) { status(byId('owner-portfolio-status'), offlineFailure, true); return; }
   try {
-    await updateDoc(doc(db, 'projects', project.id), {
+    const changes = {
       title: title.trim().slice(0, 100), description: description.trim().slice(0, 1000),
       caption: description.trim().slice(0, 180), category: category.trim().slice(0, 60),
       thumbnailUrl, coverUrl: thumbnailUrl,
-      artist: artist.trim().slice(0, 100), tags, projectDate, updatedAt: serverTimestamp()
+      artist: artist.trim().slice(0, 100), tags, projectDate,
+      revision: projectRevisionAfterEdit(project.revision), updatedAt: serverTimestamp()
+    };
+    const recoveryData = { ...changes, updatedAt: SERVER_TIMESTAMP_RECOVERY_MARKER };
+    const { promise: write } = await enqueueFirestoreWrite(`project:${project.id}`, () => updateDoc(doc(db, 'projects', project.id), changes), {
+      type: 'update', docId: project.id, expectedRevision: project.revision, data: recoveryData
     });
+    if (isActuallyOfflineHint()) {
+      write.catch((error) => status(byId('owner-portfolio-status'), `Project update was queued but Firebase rejected it: ${projectError(error)}`, true));
+      status(byId('owner-portfolio-status'), `Changes to “${title.trim()}” are saved locally and awaiting Firestore validation.`);
+      return;
+    }
+    await write;
     status(byId('owner-portfolio-status'), `Updated “${title.trim()}”.`);
   } catch (error) { status(byId('owner-portfolio-status'), projectError(error), true); }
 }
 
 async function setPublished(project, published) {
+  const keys = [project.mediaPath || project.filePath, project.coverPath, project.beforePath, project.afterPath].filter((path) => typeof path === 'string' && path.startsWith(`portfolio/${ownerUser.uid}/`));
+  const offlineFailure = offlineProjectWriteFailure({ offline: isActuallyOfflineHint(), persistent: persistentOfflineStorageEnabled(), usesFiles: keys.length > 0 });
+  if (offlineFailure) { status(byId('owner-portfolio-status'), offlineFailure, true); return; }
   try {
-    const keys = [project.mediaPath || project.filePath, project.coverPath, project.beforePath, project.afterPath].filter((path) => typeof path === 'string' && path.startsWith(`portfolio/${ownerUser.uid}/`));
+    if (isActuallyOfflineHint()) {
+      const changes = { published, revision: projectRevisionAfterEdit(project.revision), updatedAt: serverTimestamp() };
+      const { promise: write } = await enqueueFirestoreWrite(`project:${project.id}`, () => updateDoc(doc(db, 'projects', project.id), changes), {
+        type: 'update', docId: project.id, expectedRevision: project.revision,
+        data: { ...changes, updatedAt: SERVER_TIMESTAMP_RECOVERY_MARKER }
+      });
+      write.catch((error) => status(byId('owner-portfolio-status'), `Visibility change was queued but Firebase rejected it: ${projectError(error)}`, true));
+      status(byId('owner-portfolio-status'), `Project visibility change is saved locally; Firebase must confirm it before it takes effect publicly.`);
+      return;
+    }
     await setR2Visibility(keys, published, auth);
-    try { await updateDoc(doc(db, 'projects', project.id), { published, updatedAt: serverTimestamp() }); }
+    try {
+      const changes = { published, revision: projectRevisionAfterEdit(project.revision), updatedAt: serverTimestamp() };
+      const recovery = keys.length ? null : {
+        type: 'update', docId: project.id, expectedRevision: project.revision,
+        data: { ...changes, updatedAt: SERVER_TIMESTAMP_RECOVERY_MARKER }
+      };
+      const { promise: write } = await enqueueFirestoreWrite(`project:${project.id}`, () => updateDoc(doc(db, 'projects', project.id), changes), recovery);
+      await write;
+    }
     catch (error) { await setR2Visibility(keys, !published, auth).catch(() => {}); throw error; }
     status(byId('owner-portfolio-status'), published ? 'Project published.' : 'Project unpublished.');
   } catch (error) { status(byId('owner-portfolio-status'), projectError(error), true); }
 }
 
 async function deleteProject(project) {
-  if (!confirm(`Delete “${project.title || 'this project'}” and its uploaded files?`)) return;
+  if (!confirm(project.deleted
+    ? `Retry cleanup and finish deleting “${project.title || 'this project'}”?`
+    : `Delete “${project.title || 'this project'}” and its uploaded files?`)) return;
+  const paths = projectR2Paths(project);
+  const offlineFailure = offlineProjectWriteFailure({ offline: isActuallyOfflineHint(), persistent: persistentOfflineStorageEnabled(), usesFiles: paths.length > 0 });
+  if (offlineFailure) { status(byId('owner-portfolio-status'), offlineFailure, true); return; }
   try {
-    const paths = [project.mediaPath || project.filePath, project.coverPath, project.beforePath, project.afterPath].filter((path) => typeof path === 'string' && path.startsWith(`portfolio/${ownerUser.uid}/`));
-    await deleteR2Objects(paths, auth);
-    await deleteDoc(doc(db, 'projects', project.id));
+    if (project.deleted) {
+      if (paths.length) await deleteR2Objects(paths, auth);
+      const { promise: removeRecord } = await enqueueFirestoreWrite(`project-delete:${project.id}`, () => deleteDoc(doc(db, 'projects', project.id)), {
+        type: 'finalize-delete', docId: project.id, expectedRevision: project.revision, r2CleanupConfirmed: paths.length > 0
+      });
+      await removeRecord;
+      status(byId('owner-portfolio-status'), 'Project and its authorized media cleanup are complete.');
+      return;
+    }
+
+    const tombstone = {
+      published: false, deleted: true,
+      revision: projectRevisionAfterEdit(project.revision), updatedAt: serverTimestamp()
+    };
+    const { promise: markDeleted } = await enqueueFirestoreWrite(`project:${project.id}`, () => updateDoc(doc(db, 'projects', project.id), tombstone), {
+      type: 'update', docId: project.id, expectedRevision: project.revision,
+      data: { ...tombstone, updatedAt: SERVER_TIMESTAMP_RECOVERY_MARKER }
+    });
+
+    if (isActuallyOfflineHint()) {
+      markDeleted.catch((error) => status(byId('owner-portfolio-status'), `Deletion was queued but Firebase rejected it: ${projectError(error)}`, true));
+      status(byId('owner-portfolio-status'), 'Project hidden locally and queued for deletion. It leaves the public portfolio only after Firestore confirms the change; reconnect to finish cleanup.');
+      return;
+    }
+
+    await markDeleted;
+    if (paths.length) {
+      try { await deleteR2Objects(paths, auth); }
+      catch (error) {
+        status(byId('owner-portfolio-status'), `The project is safely hidden from the public portfolio, but its R2 files remain. Use “Retry file cleanup” on the pending-delete card. ${projectError(error)}`, true);
+        return;
+      }
+      const { promise: removeRecord } = await enqueueFirestoreWrite(`project-delete:${project.id}`, () => deleteDoc(doc(db, 'projects', project.id)), {
+        type: 'finalize-delete', docId: project.id, expectedRevision: tombstone.revision, r2CleanupConfirmed: true
+      });
+      await removeRecord;
+    }
     status(byId('owner-portfolio-status'), 'Project and R2 media files deleted.');
   } catch (error) { status(byId('owner-portfolio-status'), projectError(error), true); }
 }
@@ -570,6 +714,8 @@ byId('portfolio-google-sign-in').addEventListener('click', async () => {
   } catch (error) { status(signInMessage, authMessage(error), true); }
 });
 byId('owner-sign-out').addEventListener('click', async () => {
+  try { await window.YJOffline?.flushBeforeOwnerSignOut?.(); }
+  catch (error) { status(byId('owner-portfolio-status'), error.message, true); return; }
   await window.YJNotifications?.unregisterCurrentDevice?.();
   signOut(auth).catch((error) => status(byId('owner-portfolio-status'), authMessage(error), true));
 });

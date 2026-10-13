@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -137,6 +137,26 @@
     .portfolio-search:focus { outline: 1px solid rgba(97,230,246,.7); }
     .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
     .portfolio-empty.hidden { display:none; }
+    .offline-sync-panel { display:flex; align-items:center; justify-content:space-between; gap:16px; margin:-7px 0 22px; padding:12px 14px; border:1px solid rgba(97,230,246,.16); background:rgba(16,24,29,.72); }
+    .offline-sync-copy { min-width:0; display:grid; gap:4px; }
+    .offline-sync-copy strong { color:var(--cyan-2); font-size:10px; font-weight:600; }
+    .offline-sync-copy span { color:var(--muted); font-size:9px; line-height:1.6; }
+    .offline-sync-actions { display:flex; align-items:center; gap:8px; flex-shrink:0; }
+    .offline-sync-actions button { min-height:31px; padding:0 10px; border:1px solid rgba(97,230,246,.3); color:var(--cyan-2); background:transparent; font-size:9px; cursor:pointer; }
+    .offline-sync-actions button:disabled { opacity:.55; cursor:wait; }
+    .offline-storage-dialog { width:min(480px,calc(100% - 24px)); padding:23px; border:1px solid #365660; background:#10181e; color:var(--white); box-shadow:0 25px 100px #000b; }
+    .offline-storage-dialog::backdrop { background:rgba(2,5,7,.8); backdrop-filter:blur(5px); }
+    .offline-storage-dialog h2 { margin:0 0 10px; font:600 21px var(--display); }
+    .offline-storage-dialog p,.offline-storage-dialog li { color:#aab7bd; font-size:11px; line-height:1.75; }
+    .offline-storage-dialog ul { padding-left:20px; }
+    .offline-storage-dialog .offline-storage-actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:18px; }
+    .offline-recovery-actions { display:grid; gap:8px; margin-top:14px; padding-top:13px; border-top:1px solid var(--line); }
+    .offline-recovery-actions[hidden] { display:none; }
+    .offline-recovery-actions p { margin:0; }
+    .offline-storage-dialog button { min-height:37px; padding:0 12px; border:1px solid #3e737c; color:var(--cyan-2); background:#101e23; font-size:10px; cursor:pointer; }
+    .offline-storage-dialog button.primary { color:#071115; background:var(--cyan); border-color:var(--cyan); font-weight:700; }
+    .offline-storage-dialog button:disabled { opacity:.55; cursor:wait; }
+    .offline-storage-message { min-height:18px; margin:8px 0 0!important; color:var(--cyan-2)!important; }
     .portfolio-controls { display: flex; align-items: center; gap: 13px; }
     .portfolio-add { min-height: 34px; padding: 0 11px; color: var(--cyan-2); background: rgba(97,230,246,.07); border: 1px solid rgba(97,230,246,.38); border-radius: 2px; font-size: 10px; cursor: pointer; white-space: nowrap; }
     .portfolio-add:hover { background: rgba(97,230,246,.14); border-color: var(--cyan); }
@@ -369,6 +389,7 @@
       .work-art { height: 235px; }
       .portfolio-art { min-height: 220px; }
       .portfolio-toolbar { align-items: flex-start; flex-direction: column; }
+      .offline-sync-panel { align-items:flex-start; flex-direction:column; }
       .portfolio-controls { width: 100%; flex-wrap: wrap; gap: 9px; }
       .owner-portfolio-controls { width:100%; flex-wrap:wrap; }
       .project-type-grid { grid-template-columns:1fr; }
@@ -391,6 +412,8 @@
       .portfolio-controls { align-items: stretch; }
       .portfolio-search { min-width:0; }
       .owner-inline-status { flex-basis:100%; }
+      .offline-sync-actions { width:100%; flex-wrap:wrap; }
+      .offline-sync-actions button { flex:1; }
       .studio-project-dialog { padding:19px; }
       .hero { padding: 58px 0 40px; }
       .hero-grid { grid-template-columns: 1fr; gap: 20px; }
@@ -553,10 +576,19 @@
     .notification-settings-message{min-height:24px;margin:10px 0;color:var(--green);font-size:11px}
     .notification-settings-message[data-error="true"]{color:#f2b8ad}
     .notification-settings-close{float:right;border:0;background:transparent;color:var(--muted);font:inherit;font-size:24px;cursor:pointer}
+    .install-help-dialog{max-height:min(80vh,620px);overflow:auto}
+    .install-help-dialog[dir="rtl"] .notification-settings-close{float:left}
+    .offline-banner{padding:9px 16px;border-bottom:1px solid rgba(112,220,233,.3);background:#10181e;color:#dce8eb;text-align:center;font-size:11px}
+    .offline-banner[hidden]{display:none}
+    :root[data-theme="light"] .offline-banner{background:#eaf4f5;color:#29464d;border-color:#b7d4d8}
     #notification-toast{position:fixed;z-index:1000;right:18px;bottom:18px;max-width:min(420px,calc(100% - 36px));padding:13px 16px;border:1px solid rgba(112,220,233,.45);border-radius:4px;background:#10181e;color:#f4f7f8;box-shadow:0 12px 35px #0008;font-size:12px}
     #notification-toast[hidden]{display:none}
     .theme-select{min-height:35px;padding:0 8px;border:1px solid rgba(205,230,235,.2);border-radius:3px;background:rgba(255,255,255,.025);color:#dce4e7;font:inherit;font-size:10px;cursor:pointer}
     :root[data-theme="light"] .notification-settings-dialog{background:#f8fbfb;color:#1b2a30;border-color:#b9cdd1}
+    :root[data-theme="light"] .offline-sync-panel{background:rgba(246,250,250,.88);border-color:#d1dfe1}
+    :root[data-theme="light"] .offline-sync-copy strong{color:#147d89}
+    :root[data-theme="light"] .offline-storage-dialog{background:#f8fbfb;color:#1b2a30;border-color:#b9cdd1}
+    :root[data-theme="light"] .offline-storage-dialog p,:root[data-theme="light"] .offline-storage-dialog li{color:#455b63}
     :root[data-theme="light"] .notification-settings-dialog p,:root[data-theme="light"] .notification-status-card span{color:#455b63}
     :root[data-theme="light"] .notification-status-card{background:#fff;border-color:#d4dfe1}
     :root[data-theme="light"] #notification-toast{background:#f8fbfb;color:#1b2a30;border-color:#8bbdc3}
@@ -564,6 +596,7 @@
   </style>
 </head>
 <body>
+  <div class="offline-banner" id="offline-banner" role="status" aria-live="polite" hidden>You’re offline. The cached site interface is available; portfolio data, sign-in, notifications, and bookings need an internet connection.</div>
   <header class="topbar">
     <div class="shell nav">
       <a class="brand" href="#home" aria-label="YJ Studios home">
@@ -580,7 +613,7 @@
         <label class="sr-only" for="site-theme-mode">Color theme</label><select class="theme-select" id="site-theme-mode" aria-label="Color theme"><option value="system">Device theme</option><option value="dark">Dark theme</option><option value="light">Light theme</option></select>
         <button class="theme-select" id="notification-settings-open" type="button" aria-haspopup="dialog">Notifications</button>
         <a class="nav-cta" href="#book">Book a session <span class="arrow">↗</span></a>
-        <button class="nav-cta install-button" id="install-app" type="button" hidden>Save to phone ↗</button>
+        <button class="nav-cta install-button" id="install-app" type="button" aria-haspopup="dialog" hidden>Install App</button>
       </nav>
     </div>
   </header>
@@ -635,6 +668,16 @@
             <div class="owner-portfolio-controls" id="owner-portfolio-controls"><button class="portfolio-add" id="owner-add-project" type="button">+ Add Project</button><span class="owner-inline-status" id="owner-portfolio-status" role="status" aria-live="polite"></span><button class="portfolio-add" id="owner-sign-out" type="button" hidden>Sign out</button></div>
           </div>
         </div>
+        <aside class="offline-sync-panel" id="offline-sync-panel" aria-live="polite">
+          <div class="offline-sync-copy">
+            <strong id="offline-connection-state">Checking connection…</strong>
+            <span id="offline-sync-details">Studio Work is loading. Previously synchronized project data is available offline only when enabled on this device.</span>
+          </div>
+          <div class="offline-sync-actions">
+            <button id="offline-sync-retry" type="button">Retry sync</button>
+            <button id="offline-storage-settings" type="button">Offline data settings</button>
+          </div>
+        </aside>
         <div class="portfolio-grid" id="portfolio-grid" aria-live="polite">
           <p class="portfolio-empty" id="portfolio-empty" role="status">Loading published studio work…</p>
           <article class="portfolio-card reveal" data-kind="audio" data-placeholder="true">
@@ -674,6 +717,36 @@
       <button class="lightbox-nav lightbox-next" id="lightbox-next" type="button" aria-label="Next image">›</button>
       <img class="lightbox-image" id="lightbox-image" alt="">
       <p class="lightbox-caption" id="lightbox-caption"></p>
+    </dialog>
+    <dialog class="offline-storage-dialog" id="offline-storage-dialog" aria-labelledby="offline-storage-title">
+      <h2 id="offline-storage-title">Offline data on this device</h2>
+      <p>Firebase Firestore can keep synchronized portfolio data and queued changes in this browser’s IndexedDB. This is separate from the public app shell.</p>
+      <ul>
+        <li>Enable this only on a trusted personal device. It can include private project drafts and booking contact details.</li>
+        <li>Do not enable it on a shared device. Sign out when finished; Firebase authorization is still checked by Firestore when changes sync.</li>
+        <li>Browser site-data cleanup can erase local data and pending work. Turning this off affects future sessions; it does not securely erase existing browser storage.</li>
+        <li>File uploads, sign-in, notifications, WhatsApp, and media playback still need an internet connection.</li>
+      </ul>
+      <p class="offline-storage-message" id="offline-storage-message" role="status"></p>
+      <div class="offline-recovery-actions" id="offline-recovery-actions" hidden>
+        <p>Saved project changes require the authorized owner account. Download a review copy before discarding any unresolved conflicts.</p>
+        <div class="offline-storage-actions">
+          <button id="offline-recovery-download" type="button">Download saved changes</button>
+          <button id="offline-recovery-discard" type="button">Discard saved changes</button>
+        </div>
+      </div>
+      <div class="offline-storage-actions">
+        <button class="primary" id="offline-storage-enable" type="button">Enable on this trusted device</button>
+        <button id="offline-storage-disable" type="button" hidden>Turn off for future sessions</button>
+        <button id="offline-storage-close" type="button">Close</button>
+      </div>
+    </dialog>
+    <dialog class="notification-settings-dialog install-help-dialog" id="install-help-dialog" aria-labelledby="install-help-title" aria-describedby="install-help-copy">
+      <button class="notification-settings-close" id="install-help-close" type="button" aria-label="Close installation instructions">×</button>
+      <div class="eyebrow">YJ Studios · App</div>
+      <h2 id="install-help-title">Install YJ Studios</h2>
+      <p id="install-help-copy"></p>
+      <div class="notification-settings-actions"><button id="install-help-done" type="button">Done</button></div>
     </dialog>
 
     <dialog class="notification-settings-dialog" id="notification-settings-dialog" aria-labelledby="notification-settings-title">
@@ -1083,7 +1156,9 @@
       const media = document.createElement('div');
       media.className = 'uploaded-media';
       let audioVisualConfig = null;
-      if (record.kind === 'image') {
+      if (record.deleted === true) {
+        media.textContent = 'This project is hidden from the public portfolio. Finish file cleanup to remove it.';
+      } else if (record.kind === 'image') {
         const image = document.createElement('img');
         image.className = 'uploaded-image'; image.src = url; image.alt = record.title || 'Studio work';
         image.loading = 'lazy'; image.decoding = 'async';
@@ -1124,7 +1199,7 @@
       const topLine = document.createElement('div');
       topLine.className = 'portfolio-topline';
       const kindLabel = document.createElement('span');
-      kindLabel.textContent = `${record.kind} · PREVIEW`;
+      kindLabel.textContent = record.deleted === true ? 'PENDING DELETE' : `${record.kind} · PREVIEW`;
       const fileLabel = document.createElement('span');
       fileLabel.textContent = record.sourceType === 'external' ? 'LINK' : (record.fileName || '').split('.').pop().toUpperCase();
       topLine.append(kindLabel, fileLabel);
@@ -1165,10 +1240,16 @@
       }
       if (portfolioOwnerTools && record.id && !record.file) {
         const actions = document.createElement('div'); actions.className = 'owner-card-actions';
-        const edit = document.createElement('button'); edit.type = 'button'; edit.textContent = 'Edit'; edit.addEventListener('click', () => portfolioOwnerHandlers.onEdit?.(record));
-        const visibility = document.createElement('button'); visibility.type = 'button'; visibility.textContent = record.published ? 'Unpublish' : 'Publish'; visibility.addEventListener('click', () => portfolioOwnerHandlers.onPublish?.(record, !record.published));
-        const remove = document.createElement('button'); remove.type = 'button'; remove.className = 'owner-delete'; remove.textContent = 'Delete'; remove.addEventListener('click', () => portfolioOwnerHandlers.onDelete?.(record));
-        actions.append(edit, visibility, remove); info.appendChild(actions);
+        if (record.deleted === true) {
+          const finish = document.createElement('button'); finish.type = 'button'; finish.className = 'owner-delete'; finish.textContent = 'Retry file cleanup'; finish.addEventListener('click', () => portfolioOwnerHandlers.onDelete?.(record));
+          actions.append(finish);
+        } else {
+          const edit = document.createElement('button'); edit.type = 'button'; edit.textContent = 'Edit'; edit.addEventListener('click', () => portfolioOwnerHandlers.onEdit?.(record));
+          const visibility = document.createElement('button'); visibility.type = 'button'; visibility.textContent = record.published ? 'Unpublish' : 'Publish'; visibility.addEventListener('click', () => portfolioOwnerHandlers.onPublish?.(record, !record.published));
+          const remove = document.createElement('button'); remove.type = 'button'; remove.className = 'owner-delete'; remove.textContent = 'Delete'; remove.addEventListener('click', () => portfolioOwnerHandlers.onDelete?.(record));
+          actions.append(edit, visibility, remove);
+        }
+        info.appendChild(actions);
       }
       card.append(art, info);
       portfolioGrid.insertBefore(card, portfolioGrid.firstChild);
@@ -1197,8 +1278,8 @@
       refreshPortfolioVisibility();
     }
     restoreUploads();
-    async function renderPortfolioRecords(records) {
-      portfolioDataStatus = 'No published studio work yet.';
+    async function renderPortfolioRecords(records, emptyMessage = 'No published studio work yet.') {
+      portfolioDataStatus = emptyMessage;
       portfolioGrid.querySelectorAll('[data-placeholder="true"]').forEach((card) => card.remove());
       const remoteIds = new Set(records.map((record) => record.id));
       portfolioGrid.querySelectorAll('[data-upload-id]').forEach((card) => {
@@ -1227,13 +1308,13 @@
         portfolioDataStatus = message;
         refreshPortfolioVisibility();
       },
-      async renderRemoteProjects(records) {
+      async renderRemoteProjects(records, state = {}) {
         publicProjectRecords = records;
-        await renderPortfolioRecords(portfolioOwnerTools && ownerProjectRecords ? ownerProjectRecords : records);
+        await renderPortfolioRecords(portfolioOwnerTools && ownerProjectRecords ? ownerProjectRecords : records, state.emptyMessage);
       },
       async renderAdminProjects(records) {
         ownerProjectRecords = records;
-        if (portfolioOwnerTools) await renderPortfolioRecords(records);
+        if (portfolioOwnerTools) await renderPortfolioRecords(ownerProjectRecords);
       },
       setOwnerTools(enabled, handlers = {}) {
         portfolioOwnerTools = Boolean(enabled);
@@ -1384,16 +1465,27 @@
         total: Math.round(total)
       };
       try {
-        if (!window.YJCloud?.submitBooking) throw new Error('Online booking inbox is not available.');
-        const requestId = await window.YJCloud.submitBooking(booking);
+        if (!window.YJCloud?.submitBooking) throw new Error('Firebase booking inbox is not available.');
+        const { id: requestId, committed } = await window.YJCloud.submitBooking(booking);
         requestText.textContent = `${details}\nRequest reference: ${requestId}`;
-        formStatus.style.color = 'var(--green)';
-        formStatus.textContent = 'WhatsApp opened with your request for +20 120 867 8717. Tap Send in WhatsApp; your request was also saved to the studio inbox. The session is not confirmed until YJ Studios replies.';
+        formStatus.style.color = 'var(--cyan-2)';
+        formStatus.textContent = 'WhatsApp opened with your request for +20 120 867 8717. Tap Send in WhatsApp. The Firestore request is waiting for server confirmation; the session is not confirmed until YJ Studios replies.';
         form.reset();
         updateEstimate();
-      } catch {
+        committed.then(() => {
+          if (requestText.textContent.includes(requestId)) {
+            formStatus.style.color = 'var(--green)';
+            formStatus.textContent = 'WhatsApp opened with your request for +20 120 867 8717. Tap Send in WhatsApp; Firestore confirmed the request in the studio inbox. The session is not confirmed until YJ Studios replies.';
+          }
+        }).catch((error) => {
+          if (requestText.textContent.includes(requestId)) {
+            formStatus.style.color = '#f2b8ad';
+            formStatus.textContent = `Firebase did not save request ${requestId} (${error?.code || 'error'}). Its details remain in the prepared WhatsApp message; tap Send there or re-enter the request after resolving the connection or access issue.`;
+          }
+        });
+      } catch (error) {
         formStatus.style.color = '#f2b8ad';
-        formStatus.textContent = 'The request could not be saved to the studio inbox. WhatsApp is open with your details; tap Send there, or use the Open WhatsApp message link.';
+        formStatus.textContent = `${error?.message || 'The request could not be saved to the studio inbox.'} WhatsApp is open with your details; tap Send there, or use the Open WhatsApp message link.`;
       } finally { submitButton.disabled = false; }
     });
     document.getElementById('copy-request').addEventListener('click', async () => {
@@ -1402,35 +1494,106 @@
     });
 
     const installButton = document.getElementById('install-app');
+    const installHelpDialog = document.getElementById('install-help-dialog');
+    const installHelpTitle = document.getElementById('install-help-title');
+    const installHelpCopy = document.getElementById('install-help-copy');
+    const installHelpClose = document.getElementById('install-help-close');
+    const installHelpDone = document.getElementById('install-help-done');
+    const offlineBanner = document.getElementById('offline-banner');
     const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-    const isInstalled = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+    const standaloneQuery = window.matchMedia('(display-mode: standalone)');
+    const isInstalled = () => standaloneQuery.matches || navigator.standalone === true;
     const isInstallableOrigin = location.protocol === 'https:' || (location.protocol === 'http:' && ['localhost', '127.0.0.1'].includes(location.hostname));
     let installPrompt = null;
-    if (isIOS && !isInstalled) installButton.hidden = false;
+    const isArabicLanguage = () => /^ar(?:-|$)/i.test(document.documentElement.lang || '');
+    const syncInstallLanguage = () => {
+      const isArabic = isArabicLanguage();
+      installButton.textContent = isArabic ? 'تثبيت التطبيق' : 'Install App';
+      offlineBanner.textContent = isArabic
+        ? 'أنت غير متصل. تظهر بيانات الأعمال المحفوظة مسبقًا فقط إذا فعّلت التخزين على هذا الجهاز؛ تسجيل الدخول والرفع والإشعارات وواتساب تحتاج إلى اتصال.'
+        : 'You’re offline. Previously synced portfolio data appears only if persistent storage was enabled on this device. Sign-in, uploads, notifications and WhatsApp need a connection.';
+      installHelpTitle.textContent = isArabic ? 'تثبيت YJ Studios' : 'Install YJ Studios';
+      installHelpCopy.textContent = isArabic
+        ? (isIOS
+          ? 'في Safari، اضغط «مشاركة» ثم «إضافة إلى الشاشة الرئيسية». في المتصفحات الأخرى على iPhone أو iPad، افتح قائمة المشاركة واختر إضافة الموقع إلى الشاشة الرئيسية.'
+          : 'على Android، افتح قائمة المتصفح واختر «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية». على الكمبيوتر، استخدم أيقونة التثبيت في شريط العنوان أو قائمة Chrome أو Edge. إذا لم يظهر خيار التثبيت، افتح الموقع في Chrome أو Edge حديث.')
+        : (isIOS
+          ? 'In Safari, tap Share, then choose “Add to Home Screen.” On other iPhone or iPad browsers, open the share menu and choose the option to add the site to your Home Screen.'
+          : /Macintosh/i.test(navigator.userAgent) && /Safari/i.test(navigator.userAgent) && !/Chrome|Chromium|Edg/i.test(navigator.userAgent)
+            ? 'In Safari on macOS Sonoma or later, choose File → Add to Dock. In Chrome or Edge, use the install icon in the address bar or choose Install YJ Studios from the browser menu.'
+            : /Android/i.test(navigator.userAgent)
+              ? 'Open your browser menu and choose “Install app” or “Add to Home screen.” Chrome and Samsung Internet can create an app-style installation on supported Android devices; other browsers may create a home-screen shortcut.'
+              : 'In Chrome or Edge, use the install icon in the address bar or choose “Install YJ Studios” from the browser menu. Firefox does not offer manifest-based app installation; open this site in Chrome or Edge to install it.');
+      installHelpDialog.lang = isArabic ? 'ar' : 'en';
+      installHelpDialog.dir = isArabic ? 'rtl' : 'ltr';
+      installHelpClose.setAttribute('aria-label', isArabic ? 'إغلاق تعليمات التثبيت' : 'Close installation instructions');
+      installHelpDone.textContent = isArabic ? 'تم' : 'Done';
+    };
+    const updateOfflineStatus = () => { offlineBanner.hidden = navigator.onLine; };
+    document.documentElement.dir = isArabicLanguage() ? 'rtl' : 'ltr';
+    syncInstallLanguage();
+    updateOfflineStatus();
+    new MutationObserver(() => {
+      document.documentElement.dir = isArabicLanguage() ? 'rtl' : 'ltr';
+      syncInstallLanguage();
+    }).observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
+    window.addEventListener('online', updateOfflineStatus);
+    window.addEventListener('offline', updateOfflineStatus);
+    if (isInstallableOrigin && !isInstalled()) installButton.hidden = false;
     window.addEventListener('beforeinstallprompt', (event) => {
       event.preventDefault();
       installPrompt = event;
-      installButton.hidden = false;
+      if (!isInstalled()) installButton.hidden = false;
     });
     installButton.addEventListener('click', async () => {
       navLinks.classList.remove('open');
       menu.setAttribute('aria-expanded', 'false');
-      if (installPrompt) {
-        await installPrompt.prompt();
-        installPrompt = null;
-        installButton.hidden = true;
-      } else if (!isInstallableOrigin) {
-        alert('Host YJ Studios on an HTTPS website first. Then use this button, or add the site to your phone’s Home Screen.');
-      } else if (isIOS) {
-        alert('In Safari, tap Share, then choose “Add to Home Screen” to keep YJ Studios on your phone.');
-      } else {
-        alert('Open your browser menu and choose “Install app” or “Add to Home screen.”');
+      if (!isInstallableOrigin) {
+        installHelpCopy.textContent = document.documentElement.lang.toLowerCase().startsWith('ar')
+          ? 'يتطلب التثبيت استضافة الموقع عبر HTTPS. افتح النسخة المنشورة الآمنة، ثم استخدم زر التثبيت أو قائمة المتصفح.'
+          : 'Installation requires a secure HTTPS website. Open the published secure site, then use this button or your browser menu.';
+        installHelpDialog.lang = document.documentElement.lang.toLowerCase().startsWith('ar') ? 'ar' : 'en';
+        installHelpDialog.dir = document.documentElement.lang.toLowerCase().startsWith('ar') ? 'rtl' : 'ltr';
+        if (installHelpDialog.showModal) installHelpDialog.showModal();
+        else alert(installHelpCopy.textContent);
+        return;
       }
+      if (installPrompt) {
+        const prompt = installPrompt;
+        installPrompt = null;
+        try {
+          await prompt.prompt();
+          const choice = await prompt.userChoice;
+          if (choice?.outcome === 'accepted') installButton.hidden = true;
+          else showInstallHelp();
+        } catch (error) {
+          console.warn('The browser install prompt could not be opened.', error);
+          showInstallHelp();
+        }
+        return;
+      }
+      showInstallHelp();
     });
-    window.addEventListener('appinstalled', () => { installButton.hidden = true; });
+    function showInstallHelp() {
+      syncInstallLanguage();
+      if (installHelpDialog.showModal) installHelpDialog.showModal();
+      else alert(installHelpCopy.textContent);
+    }
+    const closeInstallHelp = () => installHelpDialog.close();
+    installHelpClose.addEventListener('click', closeInstallHelp);
+    installHelpDone.addEventListener('click', closeInstallHelp);
+    window.addEventListener('appinstalled', () => { installButton.hidden = true; installPrompt = null; });
+    standaloneQuery.addEventListener?.('change', (event) => { if (event.matches) installButton.hidden = true; });
 
     if ('serviceWorker' in navigator && isInstallableOrigin) {
-      window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
+      window.addEventListener('load', async () => {
+        try {
+          const registration = await navigator.serviceWorker.register('./sw.js', { scope: './', updateViaCache: 'none' });
+          await registration.update();
+        } catch (error) {
+          console.warn('YJ Studios offline shell could not be registered.', error);
+        }
+      });
     }
 
     const dateField = document.getElementById('date');
@@ -1438,6 +1601,7 @@
     dateField.min = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
     document.getElementById('year').textContent = new Date().getFullYear();
   </script>
+  <script type="module" src="./offline-sync.mjs"></script>
   <script type="module" src="./site-cloud.js"></script>
   <script type="module" src="./studio-projects.js"></script>
   <script type="module" src="./notifications.js"></script>
